@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Grafico Vento Diga Sud Chioggia</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#071522;
+  color:#fff;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  background:radial-gradient(
+    circle at 50% 0%,
+    #123b56 0%,
+    #071522 45%,
+    #040d14 100%
+  );
+}
+
+.app{
+  width:100%;
+  max-width:800px;
+  min-height:100vh;
+  padding:22px 12px 18px;
+  display:flex;
+  flex-direction:column;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:16px;
+}
+
+.header .small{
+  font-size:12px;
+  letter-spacing:3px;
+  color:#75b9d8;
+  margin-bottom:6px;
+}
+
+.header h1{
+  margin:0;
+  font-size:25px;
+  letter-spacing:1.5px;
+}
+
+.header .location{
+  margin-top:6px;
+  font-size:13px;
+  color:#8ca5b5;
+}
+
+
+/* =========================================================
+   DIREZIONE ORA PER ORA
+   ========================================================= */
+
+.direction-card{
+  background:rgba(10,30,43,.82);
+  border:1px solid rgba(93,166,199,.22);
+  border-radius:20px;
+  padding:12px 8px 10px;
+  box-shadow:0 8px 30px rgba(0,0,0,.25);
+  margin-bottom:14px;
+}
+
+.direction-title{
+  text-align:center;
+  font-size:11px;
+  letter-spacing:2px;
+  color:#7fb9d5;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.direction-scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:thin;
+}
+
+/*
+   IMPORTANTE:
+   Questi padding sono IDENTICI a quelli utilizzati
+   dall'area del grafico.
+*/
+.direction-grid{
+  min-width:720px;
+  display:grid;
+  grid-template-columns:repeat(24,1fr);
+  align-items:center;
+  padding-left:42px;
+  padding-right:12px;
+}
+
+.direction-hour{
+  text-align:center;
+  font-size:10px;
+  color:#8faebd;
+  margin-bottom:7px;
+}
+
+.direction-arrow{
+  height:28px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.direction-arrow span{
+  display:block;
+  width:0;
+  height:0;
+
+  border-left:5px solid transparent;
+  border-right:5px solid transparent;
+  border-bottom:18px solid #55d6ff;
+
+  filter:drop-shadow(
+    0 0 4px rgba(85,214,255,.5)
+  );
+
+  transform-origin:50% 15px;
+}
+
+.direction-label{
+  text-align:center;
+  font-size:8px;
+  color:#9bb2be;
+  margin-top:5px;
+  white-space:nowrap;
+}
+
+
+/* =========================================================
+   GRAFICO
+   ========================================================= */
+
+.chart-card{
+  background:rgba(10,30,43,.82);
+  border:1px solid rgba(93,166,199,.22);
+  border-radius:22px;
+  padding:16px 10px 14px;
+  box-shadow:0 8px 30px rgba(0,0,0,.25);
+}
+
+.chart-title{
+  text-align:center;
+  font-size:11px;
+  letter-spacing:2px;
+  color:#7fb9d5;
+  font-weight:bold;
+  margin-bottom:12px;
+}
+
+.chart-wrap{
+  width:100%;
+  height:330px;
+  position:relative;
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.legend{
+  display:flex;
+  justify-content:center;
+  gap:22px;
+  margin-top:8px;
+  font-size:11px;
+  color:#a8bbc5;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.legend-line{
+  width:25px;
+  height:3px;
+  border-radius:2px;
+}
+
+.legend-wind{
+  background:#ffd84d;
+}
+
+.legend-gust{
+  background:#ff5b5b;
+}
+
+
+/* =========================================================
+   STATO
+   ========================================================= */
+
+.status{
+  margin-top:14px;
+  text-align:center;
+}
+
+.status span{
+  display:inline-block;
+  padding:8px 15px;
+  border-radius:20px;
+  background:rgba(40,170,110,.16);
+  border:1px solid rgba(70,220,150,.25);
+  color:#6ee0aa;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+}
+
+.status.error span{
+  background:rgba(220,60,60,.12);
+  border-color:rgba(220,80,80,.25);
+  color:#ff8585;
+}
+
+
+/* =========================================================
+   PULSANTE INDIETRO
+   ========================================================= */
+
+.back-container{
+  margin-top:14px;
+  text-align:center;
+}
+
+.back-button{
+  display:inline-block;
+  padding:10px 20px;
+  border-radius:20px;
+  border:1px solid rgba(93,166,199,.35);
+  background:rgba(17,42,57,.88);
+  color:#9fd8ed;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  text-decoration:none;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer{
+  margin-top:auto;
+  padding-top:18px;
+  text-align:center;
+  font-size:11px;
+  color:#647e8c;
+  line-height:1.5;
+}
+
+.footer strong{
+  color:#8299a6;
+}
+
+
+@media(max-width:500px){
+
+  .app{
+    padding-left:8px;
+    padding-right:8px;
+  }
+
+  .chart-wrap{
+    height:300px;
+  }
+
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+
+    <div class="small">
+      STAZIONE METEOROLOGICA
+    </div>
+
+    <h1>
+      GRAFICO 24 ORE
+    </h1>
+
+    <div class="location">
+      Chioggia · Sottomarina
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       DIREZIONE ORA PER ORA
+       ===================================================== -->
+
+  <div class="direction-card">
+
+    <div class="direction-title">
+      DIREZIONE DEL VENTO · ORA PER ORA
+    </div>
+
+    <div class="direction-scroll">
+
+      <div
+        class="direction-grid"
+        id="directionGrid"
+      >
+        <!-- generato da JavaScript -->
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       GRAFICO
+       ===================================================== -->
+
+  <div class="chart-card">
+
+    <div class="chart-title">
+      VENTO DELLE ULTIME 24 ORE · NODI
+    </div>
+
+    <div class="chart-wrap">
+
+      <canvas id="windChart"></canvas>
+
+    </div>
+
+    <div class="legend">
+
+      <div class="legend-item">
+
+        <div class="legend-line legend-wind"></div>
+
+        VENTO MEDIO
+
+      </div>
+
+
+      <div class="legend-item">
+
+        <div class="legend-line legend-gust"></div>
+
+        RAFFICHE
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="status"
+    id="status"
+  >
+
+    <span id="statusText">
+      CARICAMENTO DATI...
+    </span>
+
+  </div>
+
+
+  <div class="back-container">
+
+    <a
+      class="back-button"
+      href="index.html"
+    >
+      ← RILEVAZIONE VENTO
+    </a>
+
+  </div>
+
+
+  <div class="footer">
+
+    <div>
+      Ultimo dato disponibile:
+      <strong id="timestamp">--</strong>
+    </div>
+
+    <div>
+      Dati: Comune di Venezia · Diga Sud Chioggia
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const API_URL =
+  "https://vento-diga-sud-24h.riccardo172.workers.dev/";
+
+
+const canvas =
+  document.getElementById("windChart");
+
+const ctx =
+  canvas.getContext("2d");
+
+
+let historyData = [];
+
+
+/* =========================================================
+   STATO
+   ========================================================= */
+
+function setStatus(type,text){
+
+  const status =
+    document.getElementById("status");
+
+  const statusText =
+    document.getElementById("statusText");
+
+  status.className = "status";
+
+  if(type === "error"){
+    status.classList.add("error");
+  }
+
+  statusText.textContent = text;
+}
+
+
+/* =========================================================
+   ORA
+   ========================================================= */
+
+function formatHour(value){
+
+  if(!value){
+    return "--";
+  }
+
+  const match =
+    value.match(/\s(\d{2})$/);
+
+  return match
+    ? match[1]
+    : value;
+}
+
+
+/* =========================================================
+   DIREZIONE
+   ========================================================= */
+
+function directionName(deg){
+
+  if(deg >= 337.5 || deg < 22.5)
+    return "N";
+
+  if(deg < 67.5)
+    return "NE";
+
+  if(deg < 112.5)
+    return "E";
+
+  if(deg < 157.5)
+    return "SE";
+
+  if(deg < 202.5)
+    return "S";
+
+  if(deg < 247.5)
+    return "SO";
+
+  if(deg < 292.5)
+    return "O";
+
+  return "NO";
+}
+
+
+/* =========================================================
+   TIMESTAMP
+   ========================================================= */
+
+function formatTimestamp(timestamp){
+
+  if(!timestamp){
+    return "--";
+  }
+
+  const d =
+    new Date(
+      timestamp.replace(" ","T") +
+      "+01:00"
+    );
+
+  if(Number.isNaN(d.getTime())){
+    return timestamp;
+  }
+
+  return d.toLocaleString(
+    "it-IT",
+    {
+      timeZone:"Europe/Rome",
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
+    }
+  );
+}
+
+
+/* =========================================================
+   BARRA DIREZIONI
+   ========================================================= */
+
+function drawDirectionBar(){
+
+  const grid =
+    document.getElementById(
+      "directionGrid"
+    );
+
+  grid.innerHTML = "";
+
+
+  historyData.forEach(item => {
+
+    const cell =
+      document.createElement("div");
+
+
+    /*
+       ORA
+    */
+
+    const hour =
+      document.createElement("div");
+
+    hour.className =
+      "direction-hour";
+
+    hour.textContent =
+      formatHour(item.hour);
+
+
+    /*
+       FRECCIA
+    */
+
+    const arrowBox =
+      document.createElement("div");
+
+    arrowBox.className =
+      "direction-arrow";
+
+
+    const arrow =
+      document.createElement("span");
+
+
+    const deg =
+      Number(item.direction);
+
+
+    if(Number.isFinite(deg)){
+
+      arrow.style.transform =
+        "rotate(" +
+        deg +
+        "deg)";
+
+    }
+
+
+    arrowBox.appendChild(arrow);
+
+
+    /*
+       NOME DIREZIONE
+    */
+
+    const label =
+      document.createElement("div");
+
+    label.className =
+      "direction-label";
+
+
+    label.textContent =
+      Number.isFinite(deg)
+        ? directionName(deg)
+        : "--";
+
+
+    /*
+       CELLA
+    */
+
+    cell.appendChild(hour);
+
+    cell.appendChild(arrowBox);
+
+    cell.appendChild(label);
+
+    grid.appendChild(cell);
+
+  });
+
+}
+
+
+/* =========================================================
+   DIMENSIONAMENTO CANVAS
+   ========================================================= */
+
+function resizeCanvas(){
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  const ratio =
+    window.devicePixelRatio || 1;
+
+
+  canvas.width =
+    Math.round(
+      rect.width * ratio
+    );
+
+  canvas.height =
+    Math.round(
+      rect.height * ratio
+    );
+
+
+  ctx.setTransform(
+    ratio,
+    0,
+    0,
+    ratio,
+    0,
+    0
+  );
+
+}
+
+
+/* =========================================================
+   GRAFICO
+   ========================================================= */
+
+function drawChart(){
+
+  if(!historyData.length){
+    return;
+  }
+
+
+  resizeCanvas();
+
+
+  const width =
+    canvas.clientWidth;
+
+  const height =
+    canvas.clientHeight;
+
+
+  ctx.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  /*
+     QUESTI SONO I MARGINI DI RIFERIMENTO
+     DELLE ORE SULL'ASSE X.
+
+     DEVONO CORRISPONDERE ESATTAMENTE
+     A QUELLI DELLA BARRA SUPERIORE.
+  */
+
+  const paddingLeft = 42;
+  const paddingRight = 12;
+  const paddingTop = 16;
+  const paddingBottom = 38;
+
+
+  const chartWidth =
+    width -
+    paddingLeft -
+    paddingRight;
+
+
+  const chartHeight =
+    height -
+    paddingTop -
+    paddingBottom;
+
+
+  const values = [];
+
+
+  historyData.forEach(item => {
+
+    if(Number.isFinite(item.wind)){
+      values.push(item.wind);
+    }
+
+    if(Number.isFinite(item.gust)){
+      values.push(item.gust);
+    }
+
+  });
+
+
+  let maxValue =
+    values.length
+      ? Math.max(...values)
+      : 5;
+
+
+  maxValue =
+    Math.max(
+      5,
+      Math.ceil(maxValue / 5) * 5
+    );
+
+
+  /*
+     POSIZIONE X DELLE ORE
+
+     È QUESTA FUNZIONE CHE DETERMINA
+     LA POSIZIONE ESATTA DI OGNI ORA.
+  */
+
+  function xPosition(index){
+
+    if(historyData.length === 1){
+
+      return (
+        paddingLeft +
+        chartWidth / 2
+      );
+
+    }
+
+
+    return (
+      paddingLeft +
+      index *
+      (
+        chartWidth /
+        (historyData.length - 1)
+      )
+    );
+
+  }
+
+
+  function yPosition(value){
+
+    return (
+      paddingTop +
+      chartHeight -
+      (
+        value /
+        maxValue
+      ) *
+      chartHeight
+    );
+
+  }
+
+
+  /*
+     GRIGLIA ORIZZONTALE
+  */
+
+  ctx.lineWidth = 1;
+
+  ctx.strokeStyle =
+    "rgba(137,190,215,0.12)";
+
+  ctx.fillStyle =
+    "#8faebd";
+
+  ctx.font =
+    "10px Arial";
+
+  ctx.textAlign =
+    "right";
+
+  ctx.textBaseline =
+    "middle";
+
+
+  for(
+    let value = 0;
+    value <= maxValue;
+    value += 5
+  ){
+
+    const y =
+      yPosition(value);
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      paddingLeft,
+      y
+    );
+
+    ctx.lineTo(
+      width - paddingRight,
+      y
+    );
+
+    ctx.stroke();
+
+
+    ctx.fillText(
+      String(value),
+      paddingLeft - 7,
+      y
+    );
+
+  }
+
+
+  /*
+     ASSI
+  */
+
+  ctx.strokeStyle =
+    "rgba(137,190,215,0.3)";
+
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    paddingLeft,
+    paddingTop
+  );
+
+  ctx.lineTo(
+    paddingLeft,
+    height - paddingBottom
+  );
+
+  ctx.stroke();
+
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    paddingLeft,
+    height - paddingBottom
+  );
+
+  ctx.lineTo(
+    width - paddingRight,
+    height - paddingBottom
+  );
+
+  ctx.stroke();
+
+
+  /*
+     ORE ASSE X
+  */
+
+  ctx.fillStyle =
+    "#8faebd";
+
+  ctx.font =
+    "10px Arial";
+
+  ctx.textAlign =
+    "center";
+
+  ctx.textBaseline =
+    "top";
+
+
+  historyData.forEach(
+    (item,index) => {
+
+      ctx.fillText(
+        formatHour(item.hour),
+        xPosition(index),
+        height -
+        paddingBottom +
+        9
+      );
+
+    }
+  );
+
+
+  /*
+     LINEE
+  */
+
+  function drawLine(
+    key,
+    lineColor,
+    lineWidth
+  ){
+
+    ctx.beginPath();
+
+    let started = false;
+
+
+    historyData.forEach(
+      (item,index) => {
+
+        const value =
+          Number(item[key]);
+
+
+        if(!Number.isFinite(value)){
+          return;
+        }
+
+
+        const x =
+          xPosition(index);
+
+        const y =
+          yPosition(value);
+
+
+        if(!started){
+
+          ctx.moveTo(x,y);
+
+          started = true;
+
+        }else{
+
+          ctx.lineTo(x,y);
+
+        }
+
+      }
+    );
+
+
+    ctx.strokeStyle =
+      lineColor;
+
+    ctx.lineWidth =
+      lineWidth;
+
+    ctx.lineJoin =
+      "round";
+
+    ctx.lineCap =
+      "round";
+
+    ctx.stroke();
+
+  }
+
+
+  /*
+     VENTO MEDIO
+  */
+
+  drawLine(
+    "wind",
+    "#ffd84d",
+    3
+  );
+
+
+  /*
+     RAFFICHE
+  */
+
+  drawLine(
+    "gust",
+    "#ff5b5b",
+    3
+  );
+
+
+  /*
+     PUNTI
+  */
+
+  function drawPoints(
+    key,
+    pointColor
+  ){
+
+    historyData.forEach(
+      (item,index) => {
+
+        const value =
+          Number(item[key]);
+
+
+        if(!Number.isFinite(value)){
+          return;
+        }
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+          xPosition(index),
+          yPosition(value),
+          2.5,
+          0,
+          Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+          pointColor;
+
+        ctx.fill();
+
+      }
+    );
+
+  }
+
+
+  drawPoints(
+    "wind",
+    "#ffd84d"
+  );
+
+
+  drawPoints(
+    "gust",
+    "#ff5b5b"
+  );
+
+}
+
+
+/* =========================================================
+   CARICAMENTO DATI
+   ========================================================= */
+
+async function loadGraph(){
+
+  try{
+
+    setStatus(
+      "ok",
+      "CARICAMENTO DATI..."
+    );
+
+
+    const response =
+      await fetch(
+        API_URL +
+        "?t=" +
+        Date.now(),
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    if(
+      !result ||
+      result.ok !== true ||
+      !result.current ||
+      !Array.isArray(result.history)
+    ){
+
+      throw new Error(
+        "Dati non validi"
+      );
+
+    }
+
+
+    /*
+       PREPARA LE 24 ORE
+    */
+
+    historyData =
+      result.history.map(
+        item => ({
+
+          hour:item.hour,
+
+          wind:Number(
+            item.wind
+          ),
+
+          gust:Number(
+            item.gust
+          ),
+
+          direction:Number(
+            item.direction
+          )
+
+        })
+      );
+
+
+    if(!historyData.length){
+
+      throw new Error(
+        "Nessun dato storico disponibile"
+      );
+
+    }
+
+
+    /*
+       DISEGNA PRIMA LA BARRA
+       E POI IL GRAFICO.
+
+       ENTRAMBI UTILIZZANO
+       LO STESSO INDEX PER OGNI ORA.
+    */
+
+    drawDirectionBar();
+
+    drawChart();
+
+
+    /*
+       TIMESTAMP
+    */
+
+    document.getElementById(
+      "timestamp"
+    ).textContent =
+      formatTimestamp(
+        result.current.timestamp
+      );
+
+
+    setStatus(
+      "ok",
+      "DATI AGGIORNATI"
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    setStatus(
+      "error",
+      "ERRORE DATI"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   RIDIMENSIONAMENTO
+   ========================================================= */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    drawDirectionBar();
+
+    drawChart();
+
+  }
+);
+
+
+/* =========================================================
+   AVVIO
+   ========================================================= */
+
+loadGraph();
+
+</script>
+
+</body>
+</html>
