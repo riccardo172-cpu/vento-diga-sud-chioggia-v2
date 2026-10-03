@@ -335,16 +335,16 @@ body {
   color: #ff8585;
 }
 
-/* PULSANTE AGGIORNA */
+/* PULSANTE GRAFICO 24 ORE */
 
-.refresh-container {
+.graph-button-container {
   margin-top: 12px;
   text-align: center;
 }
 
-.refresh-button {
+.graph-button {
   display: inline-block;
-  padding: 9px 18px;
+  padding: 10px 20px;
   border-radius: 20px;
   border: 1px solid rgba(93, 166, 199, 0.35);
   background: rgba(17, 42, 57, 0.88);
@@ -353,17 +353,13 @@ body {
   font-weight: bold;
   letter-spacing: 1.5px;
   cursor: pointer;
+  text-decoration: none;
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
-.refresh-button:active {
+.graph-button:active {
   transform: scale(0.97);
-}
-
-.refresh-button:disabled {
-  opacity: 0.55;
-  cursor: default;
 }
 
 /* FOOTER */
@@ -545,16 +541,13 @@ body {
   </div>
 
 
-  <div class="refresh-container">
-
-    <button
-      class="refresh-button"
-      id="refreshButton"
-      onclick="refreshData()"
+  <div class="graph-button-container">
+    <a
+      class="graph-button"
+      href="grafico.html"
     >
-      ↻ AGGIORNA
-    </button>
-
+      GRAFICO 24 ORE
+    </a>
   </div>
 
 
@@ -831,35 +824,12 @@ async function loadData() {
 }
 
 
-/* AGGIORNAMENTO MANUALE */
-
-async function refreshData() {
-
-  const button =
-    document.getElementById("refreshButton");
-
-  button.disabled = true;
-  button.textContent = "AGGIORNAMENTO...";
-
-  setStatus(
-    "ok",
-    "AGGIORNAMENTO..."
-  );
-
-  await loadData();
-
-  button.disabled = false;
-  button.textContent = "↻ AGGIORNA";
-
-}
-
-
 /* CARICAMENTO INIZIALE */
 
 loadData();
 
 
-/* AGGIORNAMENTO AUTOMATICO OGNI 5 MINUTI */
+/* AGGIORNAMENTO OGNI 5 MINUTI */
 
 setInterval(
   loadData,
