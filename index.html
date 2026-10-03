@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+<meta charset="UTF-8">
+
+<!-- PREVIEW WHATSAPP -->
+<meta property="og:title" content="Vento Diga Sud Chioggia">
+<meta property="og:description" content="Vento medio, vento max e direzione del vento in tempo reale.">
+<meta property="og:image" content="https://riccardo172-cpu.github.io/vento-diga-sud-chioggia/preview.jpg">
+<meta property="og:url" content="https://riccardo172-cpu.github.io/vento-diga-sud-chioggia/">
+<meta property="og:type" content="website">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Vento Diga Sud Chioggia</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #071522;
+  color: white;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #123b56 0%,
+      #071522 45%,
+      #040d14 100%
+    );
+}
+
+.app {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  padding: 22px 18px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TITOLO */
+
+.header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.header .small {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #75b9d8;
+  margin-bottom: 6px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 25px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.header .location {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #8ca5b5;
+}
+
+/* RIQUADRI VENTO */
+
+.wind-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.wind-box {
+  background: rgba(17, 42, 57, 0.88);
+  border: 1px solid rgba(93, 166, 199, 0.25);
+  border-radius: 18px;
+  padding: 17px 12px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.wind-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7fb9d5;
+  font-weight: bold;
+}
+
+.wind-value {
+  margin-top: 7px;
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.wind-unit {
+  font-size: 13px;
+  color: #9eb4c1;
+  margin-top: 5px;
+}
+
+.wind-ms {
+  font-size: 12px;
+  color: #6f8b9b;
+  margin-top: 7px;
+}
+
+/* BUSSOLA */
+
+.compass-section {
+  margin-top: 22px;
+  background: rgba(10, 30, 43, 0.82);
+  border: 1px solid rgba(93, 166, 199, 0.22);
+  border-radius: 22px;
+  padding: 20px 15px 18px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+}
+
+.direction-title {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7fb9d5;
+  font-weight: bold;
+  margin-bottom: 14px;
+}
+
+.compass {
+  width: min(65vw, 270px);
+  height: min(65vw, 270px);
+  max-width: 270px;
+  max-height: 270px;
+  min-width: 210px;
+  min-height: 210px;
+  margin: auto;
+  position: relative;
+  border-radius: 50%;
+  border: 2px solid rgba(137, 190, 215, 0.45);
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(30, 74, 97, 0.65) 0%,
+      rgba(8, 28, 42, 0.9) 68%,
+      rgb(4, 15, 23) 100%
+    );
+
+  box-shadow:
+    inset 0 0 35px rgba(0,0,0,0.45),
+    0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ANELLI */
+
+.compass::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 1px solid rgba(137, 190, 215, 0.2);
+}
+
+.compass::after {
+  content: "";
+  position: absolute;
+  inset: 23%;
+  border-radius: 50%;
+  border: 1px solid rgba(137, 190, 215, 0.12);
+}
+
+/* PUNTI CARDINALI */
+
+.cardinal {
+  position: absolute;
+  font-size: 14px;
+  font-weight: bold;
+  color: #b9d5e3;
+  z-index: 3;
+}
+
+.north {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.south {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.east {
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.west {
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* TACCHETTE */
+
+.tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 9px;
+  background: rgba(180, 215, 230, 0.45);
+  transform-origin: 50% 135px;
+}
+
+.t1 { transform: translate(-50%, -135px) rotate(0deg); }
+.t2 { transform: translate(-50%, -135px) rotate(30deg); }
+.t3 { transform: translate(-50%, -135px) rotate(60deg); }
+.t4 { transform: translate(-50%, -135px) rotate(90deg); }
+.t5 { transform: translate(-50%, -135px) rotate(120deg); }
+.t6 { transform: translate(-50%, -135px) rotate(150deg); }
+.t7 { transform: translate(-50%, -135px) rotate(180deg); }
+.t8 { transform: translate(-50%, -135px) rotate(210deg); }
+.t9 { transform: translate(-50%, -135px) rotate(240deg); }
+.t10 { transform: translate(-50%, -135px) rotate(270deg); }
+.t11 { transform: translate(-50%, -135px) rotate(300deg); }
+.t12 { transform: translate(-50%, -135px) rotate(330deg); }
+
+/* FRECCIA */
+
+.arrow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-bottom: 82px solid #55d6ff;
+  transform-origin: 50% 82px;
+  transform: translate(-50%, -82px) rotate(0deg);
+  filter: drop-shadow(0 0 8px rgba(85,214,255,0.5));
+  z-index: 5;
+}
+
+.arrow::after {
+  content: "";
+  position: absolute;
+  left: -13px;
+  top: 82px;
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 25px solid rgba(255,255,255,0.2);
+}
+
+.center-dot {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #dff8ff;
+  border: 4px solid #1d526c;
+  z-index: 6;
+  box-shadow: 0 0 10px rgba(85,214,255,0.45);
+}
+
+/* DIREZIONE */
+
+.direction-name {
+  margin-top: 15px;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.direction-degrees {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #8faebd;
+}
+
+/* STATO */
+
+.status {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.status span {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background: rgba(40, 170, 110, 0.16);
+  border: 1px solid rgba(70, 220, 150, 0.25);
+  color: #6ee0aa;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+}
+
+.status.warning span {
+  background: rgba(220, 170, 40, 0.12);
+  border-color: rgba(220, 190, 70, 0.25);
+  color: #e7c96a;
+}
+
+.status.error span {
+  background: rgba(220, 60, 60, 0.12);
+  border-color: rgba(220, 80, 80, 0.25);
+  color: #ff8585;
+}
+
+/* PULSANTE AGGIORNA */
+
+.refresh-container {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.refresh-button {
+  display: inline-block;
+  padding: 9px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(93, 166, 199, 0.35);
+  background: rgba(17, 42, 57, 0.88);
+  color: #9fd8ed;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.refresh-button:active {
+  transform: scale(0.97);
+}
+
+.refresh-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* FOOTER */
+
+.footer {
+  margin-top: auto;
+  padding-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  color: #647e8c;
+  line-height: 1.5;
+}
+
+.footer strong {
+  color: #8299a6;
+}
+
+/* SCHERMI PICCOLI */
+
+@media (max-width: 360px) {
+
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .wind-value {
+    font-size: 32px;
+  }
+
+  .compass {
+    width: 220px;
+    height: 220px;
+    min-width: 220px;
+    min-height: 220px;
+  }
+
+  .tick {
+    transform-origin: 50% 110px;
+  }
+
+  .t1 { transform: translate(-50%, -110px) rotate(0deg); }
+  .t2 { transform: translate(-50%, -110px) rotate(30deg); }
+  .t3 { transform: translate(-50%, -110px) rotate(60deg); }
+  .t4 { transform: translate(-50%, -110px) rotate(90deg); }
+  .t5 { transform: translate(-50%, -110px) rotate(120deg); }
+  .t6 { transform: translate(-50%, -110px) rotate(150deg); }
+  .t7 { transform: translate(-50%, -110px) rotate(180deg); }
+  .t8 { transform: translate(-50%, -110px) rotate(210deg); }
+  .t9 { transform: translate(-50%, -110px) rotate(240deg); }
+  .t10 { transform: translate(-50%, -110px) rotate(270deg); }
+  .t11 { transform: translate(-50%, -110px) rotate(300deg); }
+  .t12 { transform: translate(-50%, -110px) rotate(330deg); }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+
+    <div class="small">
+      STAZIONE METEOROLOGICA
+    </div>
+
+    <h1>
+      VENTO DIGA SUD
+    </h1>
+
+    <div class="location">
+      Chioggia · Sottomarina
+    </div>
+
+  </div>
+
+
+  <div class="wind-boxes">
+
+    <div class="wind-box">
+
+      <div class="wind-label">
+        VENTO MEDIO
+      </div>
+
+      <div class="wind-value" id="windKnots">
+        --
+      </div>
+
+      <div class="wind-unit">
+        nodi
+      </div>
+
+      <div class="wind-ms" id="windMs">
+        -- m/s
+      </div>
+
+    </div>
+
+
+    <div class="wind-box">
+
+      <div class="wind-label">
+        VENTO MAX
+      </div>
+
+      <div class="wind-value" id="maxKnots">
+        --
+      </div>
+
+      <div class="wind-unit">
+        nodi
+      </div>
+
+      <div class="wind-ms" id="maxMs">
+        -- m/s
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="compass-section">
+
+    <div class="direction-title">
+      DIREZIONE DEL VENTO
+    </div>
+
+
+    <div class="compass">
+
+      <div class="cardinal north">N</div>
+      <div class="cardinal east">E</div>
+      <div class="cardinal south">S</div>
+      <div class="cardinal west">O</div>
+
+      <div class="tick t1"></div>
+      <div class="tick t2"></div>
+      <div class="tick t3"></div>
+      <div class="tick t4"></div>
+      <div class="tick t5"></div>
+      <div class="tick t6"></div>
+      <div class="tick t7"></div>
+      <div class="tick t8"></div>
+      <div class="tick t9"></div>
+      <div class="tick t10"></div>
+      <div class="tick t11"></div>
+      <div class="tick t12"></div>
+
+      <div class="arrow" id="arrow"></div>
+
+      <div class="center-dot"></div>
+
+    </div>
+
+
+    <div class="direction-name" id="directionName">
+      --
+    </div>
+
+    <div class="direction-degrees" id="directionDegrees">
+      --°
+    </div>
+
+  </div>
+
+
+  <div class="status" id="status">
+
+    <span id="statusText">
+      CARICAMENTO DATI...
+    </span>
+
+  </div>
+
+
+  <div class="refresh-container">
+
+    <button
+      class="refresh-button"
+      id="refreshButton"
+      onclick="refreshData()"
+    >
+      ↻ AGGIORNA
+    </button>
+
+  </div>
+
+
+  <div class="footer">
+
+    <div>
+      Ultimo dato:
+      <strong id="timestamp">
+        --
+      </strong>
+    </div>
+
+    <div>
+      Dati: Comune di Venezia · Diga Sud Chioggia
+    </div>
+
+    <div>
+      Aggiornamento automatico ogni 5 minuti
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const API_URL =
+  "https://vento-diga-sud.riccardo172.workers.dev/";
+
+
+function formatTimestamp(timestamp) {
+
+  if (!timestamp) {
+    return "--";
+  }
+
+  /*
+   * Il dato della stazione è espresso come UTC+1 fisso.
+   * Lo convertiamo nell'orario locale italiano.
+   */
+
+  const stationDate =
+    new Date(timestamp.replace(" ", "T") + "+01:00");
+
+  if (Number.isNaN(stationDate.getTime())) {
+    return timestamp;
+  }
+
+  return stationDate.toLocaleString(
+    "it-IT",
+    {
+      timeZone: "Europe/Rome",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    }
+  );
+
+}
+
+
+function getTimestampDate(timestamp) {
+
+  if (!timestamp) {
+    return null;
+  }
+
+  const date =
+    new Date(timestamp.replace(" ", "T") + "+01:00");
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+
+}
+
+
+function clearWindValues() {
+
+  document.getElementById("windKnots").textContent = "--";
+  document.getElementById("windMs").textContent = "-- m/s";
+
+  document.getElementById("maxKnots").textContent = "--";
+  document.getElementById("maxMs").textContent = "-- m/s";
+
+  document.getElementById("directionName").textContent = "--";
+  document.getElementById("directionDegrees").textContent = "--°";
+
+  document.getElementById("arrow").style.transform =
+    "translate(-50%, -82px) rotate(0deg)";
+
+}
+
+
+function setStatus(type, text) {
+
+  const status =
+    document.getElementById("status");
+
+  const statusText =
+    document.getElementById("statusText");
+
+  status.className = "status";
+
+  if (type === "warning") {
+    status.classList.add("warning");
+  }
+
+  if (type === "error") {
+    status.classList.add("error");
+  }
+
+  statusText.textContent = text;
+
+}
+
+
+async function loadData() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL + "?t=" + Date.now(),
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      !result ||
+      result.ok !== true ||
+      !result.data
+    ) {
+      throw new Error(
+        "Dati non validi"
+      );
+    }
+
+
+    const data =
+      result.data;
+
+
+    const direction =
+      Number(data.direction);
+
+    const windMs =
+      Number(data.windMs);
+
+    const windKnots =
+      Number(data.windKnots);
+
+    const maxMs =
+      Number(data.maxMs);
+
+    const maxKnots =
+      Number(data.maxKnots);
+
+
+    if (
+      !Number.isFinite(direction) ||
+      !Number.isFinite(windMs) ||
+      !Number.isFinite(windKnots) ||
+      !Number.isFinite(maxMs) ||
+      !Number.isFinite(maxKnots)
+    ) {
+
+      throw new Error(
+        "Valori vento non validi"
+      );
+
+    }
+
+
+    const timestampDate =
+      getTimestampDate(data.timestamp);
+
+
+    document.getElementById("timestamp").textContent =
+      formatTimestamp(data.timestamp);
+
+
+    if (timestampDate) {
+
+      const ageMinutes =
+        (Date.now() - timestampDate.getTime()) / 60000;
+
+
+      if (
+        ageMinutes < 0 ||
+        ageMinutes > 15
+      ) {
+
+        clearWindValues();
+
+        setStatus(
+          "warning",
+          "DATI NON AGGIORNATI"
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    document.getElementById("windKnots").textContent =
+      windKnots.toFixed(1);
+
+    document.getElementById("windMs").textContent =
+      windMs.toFixed(1) + " m/s";
+
+
+    document.getElementById("maxKnots").textContent =
+      maxKnots.toFixed(1);
+
+    document.getElementById("maxMs").textContent =
+      maxMs.toFixed(1) + " m/s";
+
+
+    document.getElementById("directionName").textContent =
+      data.directionName || "--";
+
+
+    document.getElementById("directionDegrees").textContent =
+      Math.round(direction) + "°";
+
+
+    document.getElementById("arrow").style.transform =
+      "translate(-50%, -82px) rotate(" +
+      direction +
+      "deg)";
+
+
+    setStatus(
+      "ok",
+      "DATI AGGIORNATI"
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    clearWindValues();
+
+    setStatus(
+      "error",
+      "ERRORE DATI"
+    );
+
+  }
+
+}
+
+
+/* AGGIORNAMENTO MANUALE */
+
+async function refreshData() {
+
+  const button =
+    document.getElementById("refreshButton");
+
+  button.disabled = true;
+  button.textContent = "AGGIORNAMENTO...";
+
+  setStatus(
+    "ok",
+    "AGGIORNAMENTO..."
+  );
+
+  await loadData();
+
+  button.disabled = false;
+  button.textContent = "↻ AGGIORNA";
+
+}
+
+
+/* CARICAMENTO INIZIALE */
+
+loadData();
+
+
+/* AGGIORNAMENTO AUTOMATICO OGNI 5 MINUTI */
+
+setInterval(
+  loadData,
+  5 * 60 * 1000
+);
+
+</script>
+
+</body>
+</html>
