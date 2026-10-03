@@ -1,50 +1,58 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Grafico Vento Diga Sud Chioggia</title>
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Grafico 24 Ore · Vento Diga Sud</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
   margin:0;
   padding:0;
   width:100%;
   min-height:100%;
   font-family:Arial,Helvetica,sans-serif;
   background:#071522;
-  color:#fff;
+  color:white;
 }
 
 body{
   min-height:100vh;
   display:flex;
   justify-content:center;
-  background:radial-gradient(
-    circle at 50% 0%,
-    #123b56 0%,
-    #071522 45%,
-    #040d14 100%
-  );
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #123b56 0%,
+      #071522 45%,
+      #040d14 100%
+    );
 }
 
 .app{
   width:100%;
-  max-width:800px;
+  max-width:760px;
   min-height:100vh;
-  padding:22px 12px 18px;
+  padding:22px 14px 18px;
+
   display:flex;
   flex-direction:column;
 }
 
-
-/* =========================================================
-   INTESTAZIONE
-   ========================================================= */
+/* =========================
+   HEADER
+   ========================= */
 
 .header{
   text-align:center;
@@ -60,7 +68,7 @@ body{
 
 .header h1{
   margin:0;
-  font-size:25px;
+  font-size:24px;
   letter-spacing:1.5px;
 }
 
@@ -70,245 +78,378 @@ body{
   color:#8ca5b5;
 }
 
+/* =========================
+   CARDS
+   ========================= */
 
-/* =========================================================
-   DIREZIONE ORA PER ORA
-   ========================================================= */
+.direction-card,
+.chart-card{
+
+  background:rgba(10,30,43,.82);
+
+  border:1px solid rgba(93,166,199,.22);
+
+  border-radius:22px;
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.25);
+}
+
+/* =========================
+   DIREZIONE
+   ========================= */
 
 .direction-card{
-  background:rgba(10,30,43,.82);
-  border:1px solid rgba(93,166,199,.22);
-  border-radius:20px;
   padding:12px 8px 10px;
-  box-shadow:0 8px 30px rgba(0,0,0,.25);
   margin-bottom:14px;
 }
 
-.direction-title{
-  text-align:center;
+.direction-label,
+.chart-title{
+
   font-size:11px;
   letter-spacing:2px;
   color:#7fb9d5;
   font-weight:bold;
+  text-align:center;
+}
+
+.direction-label{
   margin-bottom:10px;
 }
+
+/*
+   La fascia delle direzioni è scorrevole
+   su schermi piccoli.
+*/
 
 .direction-scroll{
   width:100%;
   overflow-x:auto;
   overflow-y:hidden;
+
   scrollbar-width:thin;
+
+  -webkit-overflow-scrolling:touch;
 }
 
 /*
-   IMPORTANTE:
-   Questi margini sono gli stessi utilizzati
-   dall'area del grafico.
+   24 colonne sempre leggibili.
 */
+
 .direction-grid{
-  min-width:720px;
+
+  min-width:1100px;
+
   display:grid;
-  grid-template-columns:repeat(24,1fr);
-  align-items:center;
+
+  grid-template-columns:
+    repeat(24, 1fr);
+
+  align-items:start;
+
   padding-left:42px;
   padding-right:12px;
 }
 
-.direction-hour{
+.direction-cell{
   text-align:center;
-  font-size:10px;
-  color:#8faebd;
-  margin-bottom:7px;
+  min-width:42px;
 }
 
-.direction-arrow{
-  height:28px;
+.direction-hour{
+  font-size:12px;
+  color:#9db8c6;
+  margin-bottom:6px;
+  font-weight:bold;
+}
+
+.hourly-arrow{
+  height:32px;
+
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
 }
 
-.direction-arrow span{
+.hourly-arrow span{
+
   display:block;
+
   width:0;
   height:0;
 
-  border-left:5px solid transparent;
-  border-right:5px solid transparent;
-  border-bottom:18px solid #55d6ff;
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-bottom:20px solid #55d6ff;
 
-  filter:drop-shadow(
-    0 0 4px rgba(85,214,255,.5)
-  );
+  filter:
+    drop-shadow(
+      0 0 4px rgba(85,214,255,.5)
+    );
 
   transform-origin:50% 15px;
 }
 
-.direction-label{
-  text-align:center;
-  font-size:8px;
-  color:#9bb2be;
-  margin-top:5px;
+.hourly-name{
+
+  font-size:9px;
+  color:#c1d4dd;
+
+  font-weight:bold;
+
   white-space:nowrap;
+
+  margin-top:4px;
 }
 
+.hourly-degrees{
 
-/* =========================================================
+  font-size:9px;
+  color:#718b99;
+
+  margin-top:2px;
+}
+
+/* =========================
    GRAFICO
-   ========================================================= */
+   ========================= */
 
 .chart-card{
-  background:rgba(10,30,43,.82);
-  border:1px solid rgba(93,166,199,.22);
-  border-radius:22px;
-  padding:16px 10px 14px;
-  box-shadow:0 8px 30px rgba(0,0,0,.25);
+  padding:15px 10px 12px;
 }
 
 .chart-title{
   text-align:center;
-  font-size:11px;
-  letter-spacing:2px;
-  color:#7fb9d5;
-  font-weight:bold;
-  margin-bottom:12px;
+  margin-bottom:8px;
+}
+
+/*
+   Contenitore scorrevole.
+
+   Sul cellulare il grafico non viene
+   schiacciato: si può scorrere
+   orizzontalmente.
+*/
+
+.chart-scroll{
+
+  width:100%;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+
+  scrollbar-width:thin;
+
+  -webkit-overflow-scrolling:touch;
+}
+
+/*
+   Il grafico ha una larghezza interna
+   sufficiente per separare bene
+   tutte le 24 ore.
+*/
+
+.chart-inner{
+
+  width:1100px;
+  height:350px;
+
+  position:relative;
 }
 
 .chart-wrap{
-  width:100%;
-  height:330px;
+
   position:relative;
+
+  width:1100px;
+  height:350px;
 }
 
 canvas{
   display:block;
-  width:100%;
-  height:100%;
+
+  width:1100px;
+  height:350px;
 }
 
+/* =========================
+   LEGENDA
+   ========================= */
+
 .legend{
+
   display:flex;
+
   justify-content:center;
+
   gap:22px;
-  margin-top:8px;
+
+  flex-wrap:wrap;
+
+  margin-top:10px;
+
   font-size:11px;
-  color:#a8bbc5;
+
+  color:#a8bac5;
 }
 
 .legend-item{
-  display:flex;
+
+  display:inline-flex;
+
   align-items:center;
-  gap:6px;
+
+  gap:7px;
 }
 
 .legend-line{
-  width:25px;
+
+  width:24px;
   height:3px;
-  border-radius:2px;
+
+  border-radius:3px;
 }
 
 .legend-wind{
-  background:#ffd84d;
+  background:#ffd83d;
 }
 
 .legend-gust{
-  background:#ff5b5b;
+  background:#ff5555;
 }
 
+/* =========================
+   AGGIORNAMENTO
+   ========================= */
 
-/* =========================================================
-   STATO
-   ========================================================= */
+.updated{
 
-.status{
-  margin-top:14px;
   text-align:center;
+
+  margin-top:9px;
+
+  font-size:10px;
+
+  color:#647e8c;
 }
 
-.status span{
-  display:inline-block;
-  padding:8px 15px;
-  border-radius:20px;
-  background:rgba(40,170,110,.16);
-  border:1px solid rgba(70,220,150,.25);
-  color:#6ee0aa;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1.5px;
-}
-
-.status.error span{
-  background:rgba(220,60,60,.12);
-  border-color:rgba(220,80,80,.25);
+.error{
   color:#ff8585;
 }
 
+/* =========================
+   PULSANTE
+   ========================= */
 
-/* =========================================================
-   PULSANTE INDIETRO
-   ========================================================= */
+.buttons{
 
-.back-container{
+  display:flex;
+
+  justify-content:center;
+
   margin-top:14px;
-  text-align:center;
 }
 
 .back-button{
+
   display:inline-block;
+
   padding:10px 20px;
+
   border-radius:20px;
+
   border:1px solid rgba(93,166,199,.35);
+
   background:rgba(17,42,57,.88);
+
   color:#9fd8ed;
+
   font-size:11px;
+
   font-weight:bold;
+
   letter-spacing:1.5px;
+
   text-decoration:none;
+
+  box-shadow:
+    0 5px 15px rgba(0,0,0,.2);
 }
 
+.back-button:active{
+  transform:scale(.97);
+}
 
-/* =========================================================
+/* =========================
    FOOTER
-   ========================================================= */
+   ========================= */
 
 .footer{
+
   margin-top:auto;
+
   padding-top:18px;
+
   text-align:center;
-  font-size:11px;
+
+  font-size:10px;
+
   color:#647e8c;
+
   line-height:1.5;
 }
 
-.footer strong{
-  color:#8299a6;
-}
+/* =========================
+   MOBILE
+   ========================= */
 
-
-@media(max-width:500px){
+@media(max-width:520px){
 
   .app{
     padding-left:8px;
     padding-right:8px;
   }
 
-  .chart-wrap{
-    height:300px;
+  .header h1{
+    font-size:23px;
+  }
+
+  .direction-card,
+  .chart-card{
+    border-radius:20px;
   }
 
 }
-</style>
-</head>
 
+/* =========================
+   TELEFONI MOLTO STRETTI
+   ========================= */
+
+@media(max-width:360px){
+
+  .header h1{
+    font-size:21px;
+  }
+
+  .direction-label,
+  .chart-title{
+    font-size:10px;
+  }
+
+}
+
+</style>
+
+</head>
 
 <body>
 
 <div class="app">
 
-
-  <!-- =====================================================
-       INTESTAZIONE
-       ===================================================== -->
+  <!-- =========================
+       HEADER
+       ========================= -->
 
   <div class="header">
 
@@ -327,13 +468,13 @@ canvas{
   </div>
 
 
-  <!-- =====================================================
-       DIREZIONE DEL VENTO ORA PER ORA
-       ===================================================== -->
+  <!-- =========================
+       DIREZIONE DEL VENTO
+       ========================= -->
 
   <div class="direction-card">
 
-    <div class="direction-title">
+    <div class="direction-label">
       DIREZIONE DEL VENTO · ORA PER ORA
     </div>
 
@@ -341,9 +482,7 @@ canvas{
 
       <div
         class="direction-grid"
-        id="directionGrid"
-      >
-        <!-- generato da JavaScript -->
+        id="directionGrid">
       </div>
 
     </div>
@@ -351,9 +490,9 @@ canvas{
   </div>
 
 
-  <!-- =====================================================
-       GRAFICO VENTO
-       ===================================================== -->
+  <!-- =========================
+       GRAFICO 24 ORE
+       ========================= -->
 
   <div class="chart-card">
 
@@ -361,83 +500,86 @@ canvas{
       VENTO DELLE ULTIME 24 ORE · NODI
     </div>
 
-    <div class="chart-wrap">
+    <div class="chart-scroll">
 
-      <canvas id="windChart"></canvas>
+      <div class="chart-inner">
+
+        <div class="chart-wrap">
+
+          <canvas id="windChart"></canvas>
+
+        </div>
+
+      </div>
 
     </div>
 
+
+    <!-- LEGENDA -->
 
     <div class="legend">
 
       <div class="legend-item">
 
-        <div class="legend-line legend-wind"></div>
+        <span class="legend-line legend-wind"></span>
 
-        VENTO MEDIO
+        <span>
+          VENTO MEDIO
+        </span>
 
       </div>
 
 
       <div class="legend-item">
 
-        <div class="legend-line legend-gust"></div>
+        <span class="legend-line legend-gust"></span>
 
-        RAFFICHE
+        <span>
+          RAFFICHE
+        </span>
 
       </div>
 
     </div>
 
-  </div>
 
+    <!-- AGGIORNAMENTO -->
 
-  <!-- =====================================================
-       STATO
-       ===================================================== -->
+    <div
+      class="updated"
+      id="updated">
 
-  <div
-    class="status"
-    id="status"
-  >
+      Caricamento dati...
 
-    <span id="statusText">
-      CARICAMENTO DATI...
-    </span>
+    </div>
 
   </div>
 
 
-  <!-- =====================================================
-       RITORNO
-       ===================================================== -->
+  <!-- =========================
+       PULSANTE INDIETRO
+       ========================= -->
 
-  <div class="back-container">
+  <div class="buttons">
 
     <a
       class="back-button"
-      href="index.html"
-    >
+      href="index.html">
+
       ← RILEVAZIONE VENTO
+
     </a>
 
   </div>
 
 
-  <!-- =====================================================
+  <!-- =========================
        FOOTER
-       ===================================================== -->
+       ========================= -->
 
   <div class="footer">
 
-    <div>
-      Ultimo dato disponibile:
-      <strong id="timestamp">--</strong>
-    </div>
-
-    <div>
-      Dati: Comune di Venezia · Diga Sud Chioggia
-    </div>
+    Dati: Comune di Venezia · Diga Sud Chioggia
 
   </div>
 
@@ -446,14 +588,17 @@ canvas{
 
 <script>
 
-
-/* =========================================================
+/* =====================================================
    API
-   ========================================================= */
+   ===================================================== */
 
 const API_URL =
   "https://vento-diga-sud-24h.riccardo172.workers.dev/";
 
+
+/* =====================================================
+   CANVAS
+   ===================================================== */
 
 const canvas =
   document.getElementById("windChart");
@@ -461,263 +606,23 @@ const canvas =
 const ctx =
   canvas.getContext("2d");
 
-
 let historyData = [];
 
 
-/* =========================================================
-   STATO
-   ========================================================= */
-
-function setStatus(type,text){
-
-  const status =
-    document.getElementById("status");
-
-  const statusText =
-    document.getElementById("statusText");
-
-  status.className = "status";
-
-  if(type === "error"){
-    status.classList.add("error");
-  }
-
-  statusText.textContent = text;
-}
-
-
-/* =========================================================
-   ORA
-   ========================================================= */
-
-function formatHour(value){
-
-  if(!value){
-    return "--";
-  }
-
-  const match =
-    value.match(/\s(\d{2})$/);
-
-  return match
-    ? match[1]
-    : value;
-}
-
-
-/* =========================================================
-   DIREZIONE COMPATTA
-   ========================================================= */
-
-function directionName(deg){
-
-  if(deg >= 337.5 || deg < 22.5)
-    return "N";
-
-  if(deg < 67.5)
-    return "NE";
-
-  if(deg < 112.5)
-    return "E";
-
-  if(deg < 157.5)
-    return "SE";
-
-  if(deg < 202.5)
-    return "S";
-
-  if(deg < 247.5)
-    return "SO";
-
-  if(deg < 292.5)
-    return "O";
-
-  return "NO";
-}
-
-
-/* =========================================================
-   TIMESTAMP
-   ========================================================= */
-
-function formatTimestamp(timestamp){
-
-  if(!timestamp){
-    return "--";
-  }
-
-  const d =
-    new Date(
-      timestamp.replace(" ","T") +
-      "+01:00"
-    );
-
-  if(Number.isNaN(d.getTime())){
-    return timestamp;
-  }
-
-  return d.toLocaleString(
-    "it-IT",
-    {
-      timeZone:"Europe/Rome",
-      day:"2-digit",
-      month:"2-digit",
-      year:"numeric",
-      hour:"2-digit",
-      minute:"2-digit",
-      second:"2-digit"
-    }
-  );
-}
-
-
-/* =========================================================
-   BARRA DELLE DIREZIONI
-   ========================================================= */
-
-function drawDirectionBar(){
-
-  const grid =
-    document.getElementById(
-      "directionGrid"
-    );
-
-  grid.innerHTML = "";
-
-
-  historyData.forEach(item => {
-
-
-    /*
-       CELLA
-    */
-
-    const cell =
-      document.createElement("div");
-
-
-    /*
-       ORA
-    */
-
-    const hour =
-      document.createElement("div");
-
-    hour.className =
-      "direction-hour";
-
-    hour.textContent =
-      formatHour(item.hour);
-
-
-    /*
-       CONTENITORE FRECCIA
-    */
-
-    const arrowBox =
-      document.createElement("div");
-
-    arrowBox.className =
-      "direction-arrow";
-
-
-    /*
-       FRECCIA
-    */
-
-    const arrow =
-      document.createElement("span");
-
-
-    const deg =
-      Number(item.direction);
-
-
-    /*
-       IMPORTANTE:
-       LA STAZIONE INDICA LA DIREZIONE
-       DA CUI PROVIENE IL VENTO.
-
-       LA FRECCIA DEVE QUINDI ESSERE
-       GIRATA DI 180° PER INDICARE
-       LA DIREZIONE VERSO CUI SOFFIA.
-    */
-
-    if(Number.isFinite(deg)){
-
-      const arrowDeg =
-        (deg + 180) % 360;
-
-
-      arrow.style.transform =
-        "rotate(" +
-        arrowDeg +
-        "deg)";
-
-    }
-
-
-    arrowBox.appendChild(arrow);
-
-
-    /*
-       NOME DIREZIONE
-    */
-
-    const label =
-      document.createElement("div");
-
-    label.className =
-      "direction-label";
-
-
-    label.textContent =
-      Number.isFinite(deg)
-        ? directionName(deg)
-        : "--";
-
-
-    /*
-       COSTRUZIONE CELLA
-    */
-
-    cell.appendChild(hour);
-
-    cell.appendChild(arrowBox);
-
-    cell.appendChild(label);
-
-    grid.appendChild(cell);
-
-  });
-
-}
-
-
-/* =========================================================
+/* =====================================================
    DIMENSIONAMENTO CANVAS
-   ========================================================= */
+   ===================================================== */
 
 function resizeCanvas(){
-
-  const rect =
-    canvas.getBoundingClientRect();
 
   const ratio =
     window.devicePixelRatio || 1;
 
-
   canvas.width =
-    Math.round(
-      rect.width * ratio
-    );
+    Math.round(1100 * ratio);
 
   canvas.height =
-    Math.round(
-      rect.height * ratio
-    );
-
+    Math.round(350 * ratio);
 
   ctx.setTransform(
     ratio,
@@ -727,166 +632,117 @@ function resizeCanvas(){
     0,
     0
   );
-
 }
 
 
-/* =========================================================
+/* =====================================================
    DISEGNO GRAFICO
-   ========================================================= */
+   ===================================================== */
 
-function drawChart(){
+function drawChart(history){
 
-  if(!historyData.length){
-    return;
+  if(
+    !history ||
+    !history.length
+  ){
+
+    throw new Error(
+      "Nessun dato storico disponibile"
+    );
+
   }
 
+  historyData = history;
 
   resizeCanvas();
 
 
-  const width =
-    canvas.clientWidth;
+  const w = 1100;
+  const h = 350;
 
-  const height =
-    canvas.clientHeight;
 
+  /*
+     Spazio del grafico.
+  */
+
+  const L = 48;
+  const R = 18;
+  const T = 14;
+  const B = 58;
+
+
+  const pw =
+    w - L - R;
+
+  const ph =
+    h - T - B;
+
+
+  /*
+     Massimo valore.
+  */
+
+  const max =
+    Math.max(
+      ...history.map(
+        d =>
+          Math.max(
+            Number(d.wind),
+            Number(d.gust)
+          )
+      ),
+      1
+    );
+
+
+  const yMax =
+    Math.max(
+      5,
+      Math.ceil(max / 5) * 5
+    );
+
+
+  /*
+     Posizione X delle ore.
+  */
+
+  const x = i =>
+    history.length === 1
+      ? L + pw / 2
+      : L +
+        i /
+        (history.length - 1) *
+        pw;
+
+
+  /*
+     Posizione Y.
+  */
+
+  const y = v =>
+    T +
+    ph -
+    v / yMax * ph;
+
+
+  /*
+     Pulisce il canvas.
+  */
 
   ctx.clearRect(
     0,
     0,
-    width,
-    height
+    w,
+    h
   );
 
 
-  /*
-     MARGINI DEL GRAFICO
-
-     QUESTI VALORI SONO IDENTICI
-     A QUELLI DELLA BARRA SUPERIORE.
-  */
-
-  const paddingLeft = 42;
-  const paddingRight = 12;
-  const paddingTop = 16;
-  const paddingBottom = 38;
-
-
-  const chartWidth =
-    width -
-    paddingLeft -
-    paddingRight;
-
-
-  const chartHeight =
-    height -
-    paddingTop -
-    paddingBottom;
-
-
-  /*
-     VALORI MASSIMI
-  */
-
-  const values = [];
-
-
-  historyData.forEach(item => {
-
-    if(Number.isFinite(item.wind)){
-      values.push(item.wind);
-    }
-
-    if(Number.isFinite(item.gust)){
-      values.push(item.gust);
-    }
-
-  });
-
-
-  let maxValue =
-    values.length
-      ? Math.max(...values)
-      : 5;
-
-
-  maxValue =
-    Math.max(
-      5,
-      Math.ceil(maxValue / 5) * 5
-    );
-
-
-  /*
-     POSIZIONE X
-
-     QUESTA È LA POSIZIONE USATA
-     DALLE ORE DEL GRAFICO.
-
-     L'INDICE 0 = PRIMA ORA
-     L'INDICE 1 = SECONDA ORA
-     ...
-     L'INDICE 23 = ULTIMA ORA
-  */
-
-  function xPosition(index){
-
-    if(historyData.length === 1){
-
-      return (
-        paddingLeft +
-        chartWidth / 2
-      );
-
-    }
-
-
-    return (
-      paddingLeft +
-      index *
-      (
-        chartWidth /
-        (historyData.length - 1)
-      )
-    );
-
-  }
-
-
-  /*
-     POSIZIONE Y
-  */
-
-  function yPosition(value){
-
-    return (
-      paddingTop +
-      chartHeight -
-      (
-        value /
-        maxValue
-      ) *
-      chartHeight
-    );
-
-  }
-
-
-  /* =======================================================
+  /* =================================================
      GRIGLIA ORIZZONTALE
-     ======================================================= */
-
-  ctx.lineWidth = 1;
-
-  ctx.strokeStyle =
-    "rgba(137,190,215,0.12)";
-
-  ctx.fillStyle =
-    "#8faebd";
+     ================================================= */
 
   ctx.font =
-    "10px Arial";
+    "11px Arial";
 
   ctx.textAlign =
     "right";
@@ -896,86 +752,52 @@ function drawChart(){
 
 
   for(
-    let value = 0;
-    value <= maxValue;
-    value += 5
+    let v = 0;
+    v <= yMax;
+    v += 5
   ){
 
-    const y =
-      yPosition(value);
+    const yy =
+      y(v);
+
+
+    ctx.strokeStyle =
+      "rgba(137,190,215,.14)";
+
+    ctx.lineWidth = 1;
 
 
     ctx.beginPath();
 
     ctx.moveTo(
-      paddingLeft,
-      y
+      L,
+      yy
     );
 
     ctx.lineTo(
-      width - paddingRight,
-      y
+      w - R,
+      yy
     );
 
     ctx.stroke();
 
 
+    ctx.fillStyle =
+      "#8da5b2";
+
+
     ctx.fillText(
-      String(value),
-      paddingLeft - 7,
-      y
+      String(v),
+      L - 8,
+      yy
     );
 
   }
 
 
-  /* =======================================================
-     ASSI
-     ======================================================= */
-
-  ctx.strokeStyle =
-    "rgba(137,190,215,0.3)";
-
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    paddingLeft,
-    paddingTop
-  );
-
-  ctx.lineTo(
-    paddingLeft,
-    height - paddingBottom
-  );
-
-  ctx.stroke();
-
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    paddingLeft,
-    height - paddingBottom
-  );
-
-  ctx.lineTo(
-    width - paddingRight,
-    height - paddingBottom
-  );
-
-  ctx.stroke();
-
-
-  /* =======================================================
-     ORE ASSE X
-     ======================================================= */
-
-  ctx.fillStyle =
-    "#8faebd";
-
-  ctx.font =
-    "10px Arial";
+  /* =================================================
+     ORE
+     ================================================= */
 
   ctx.textAlign =
     "center";
@@ -984,76 +806,75 @@ function drawChart(){
     "top";
 
 
-  historyData.forEach(
-    (item,index) => {
+  history.forEach(
+    (d,i)=>{
+
+      const xx =
+        x(i);
+
+
+      /*
+         Linea verticale
+         dell'ora.
+      */
+
+      ctx.strokeStyle =
+        "rgba(137,190,215,.07)";
+
+      ctx.lineWidth = 1;
+
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        xx,
+        T
+      );
+
+      ctx.lineTo(
+        xx,
+        T + ph
+      );
+
+      ctx.stroke();
+
+
+      /*
+         Ora.
+      */
+
+      ctx.fillStyle =
+        "#a2b7c2";
+
+      ctx.font =
+        "12px Arial";
+
 
       ctx.fillText(
-        formatHour(item.hour),
-        xPosition(index),
-        height -
-        paddingBottom +
-        9
+        String(d.hour).slice(-2),
+        xx,
+        T + ph + 9
       );
 
     }
   );
 
 
-  /* =======================================================
-     LINEA GRAFICO
-     ======================================================= */
+  /* =================================================
+     LINEE
+     ================================================= */
 
-  function drawLine(
+  function line(
     key,
-    lineColor,
-    lineWidth
+    color,
+    width
   ){
 
-    ctx.beginPath();
-
-    let started = false;
-
-
-    historyData.forEach(
-      (item,index) => {
-
-        const value =
-          Number(item[key]);
-
-
-        if(!Number.isFinite(value)){
-          return;
-        }
-
-
-        const x =
-          xPosition(index);
-
-        const y =
-          yPosition(value);
-
-
-        if(!started){
-
-          ctx.moveTo(x,y);
-
-          started = true;
-
-        }else{
-
-          ctx.lineTo(x,y);
-
-        }
-
-      }
-    );
-
-
     ctx.strokeStyle =
-      lineColor;
+      color;
 
     ctx.lineWidth =
-      lineWidth;
+      width;
 
     ctx.lineJoin =
       "round";
@@ -1061,68 +882,64 @@ function drawChart(){
     ctx.lineCap =
       "round";
 
-    ctx.stroke();
 
-  }
-
-
-  /*
-     VENTO MEDIO
-  */
-
-  drawLine(
-    "wind",
-    "#ffd84d",
-    3
-  );
+    ctx.beginPath();
 
 
-  /*
-     RAFFICHE
-  */
+    history.forEach(
+      (d,i)=>{
 
-  drawLine(
-    "gust",
-    "#ff5b5b",
-    3
-  );
+        const xx =
+          x(i);
 
-
-  /* =======================================================
-     PUNTI
-     ======================================================= */
-
-  function drawPoints(
-    key,
-    pointColor
-  ){
-
-    historyData.forEach(
-      (item,index) => {
-
-        const value =
-          Number(item[key]);
+        const yy =
+          y(
+            Number(d[key])
+          );
 
 
-        if(!Number.isFinite(value)){
-          return;
+        if(i === 0){
+
+          ctx.moveTo(
+            xx,
+            yy
+          );
+
+        }else{
+
+          ctx.lineTo(
+            xx,
+            yy
+          );
+
         }
 
+      }
+    );
+
+
+    ctx.stroke();
+
+
+    /*
+       Pallini.
+    */
+
+    history.forEach(
+      (d,i)=>{
+
+        ctx.fillStyle =
+          color;
 
         ctx.beginPath();
 
-
         ctx.arc(
-          xPosition(index),
-          yPosition(value),
-          2.5,
+          x(i),
+          y(Number(d[key])),
+          3,
           0,
           Math.PI * 2
         );
-
-
-        ctx.fillStyle =
-          pointColor;
 
         ctx.fill();
 
@@ -1132,32 +949,300 @@ function drawChart(){
   }
 
 
-  drawPoints(
-    "wind",
-    "#ffd84d"
+  /*
+     Prima raffiche.
+  */
+
+  line(
+    "gust",
+    "#ff5555",
+    2.5
   );
 
 
-  drawPoints(
-    "gust",
-    "#ff5b5b"
+  /*
+     Poi vento medio.
+  */
+
+  line(
+    "wind",
+    "#ffd83d",
+    3
   );
 
 }
 
 
-/* =========================================================
+/* =====================================================
+   NOMI DIREZIONI
+   ===================================================== */
+
+function directionName(deg){
+
+  if(
+    deg >= 337.5 ||
+    deg < 22.5
+  )
+    return "TRAMONTANA";
+
+
+  if(deg < 67.5)
+    return "GRECALE";
+
+
+  if(deg < 112.5)
+    return "LEVANTE";
+
+
+  if(deg < 157.5)
+    return "SCIROCCO";
+
+
+  if(deg < 202.5)
+    return "OSTRO";
+
+
+  if(deg < 247.5)
+    return "LIBECCIO";
+
+
+  if(deg < 292.5)
+    return "PONENTE";
+
+
+  return "MAESTRALE";
+
+}
+
+
+/* =====================================================
+   DIREZIONI COMPATTE
+   ===================================================== */
+
+function compactDirection(deg){
+
+  if(
+    deg >= 337.5 ||
+    deg < 22.5
+  )
+    return "N";
+
+
+  if(deg < 67.5)
+    return "NE";
+
+
+  if(deg < 112.5)
+    return "E";
+
+
+  if(deg < 157.5)
+    return "SE";
+
+
+  if(deg < 202.5)
+    return "S";
+
+
+  if(deg < 247.5)
+    return "SO";
+
+
+  if(deg < 292.5)
+    return "O";
+
+
+  return "NO";
+
+}
+
+
+/* =====================================================
+   BARRA DIREZIONE
+   ===================================================== */
+
+function drawDirectionBar(history){
+
+  const grid =
+    document.getElementById(
+      "directionGrid"
+    );
+
+
+  grid.innerHTML = "";
+
+
+  history.forEach(
+    d => {
+
+      const deg =
+        Number(d.direction);
+
+
+      const cell =
+        document.createElement(
+          "div"
+        );
+
+      cell.className =
+        "direction-cell";
+
+
+      /*
+         Ora.
+      */
+
+      const hour =
+        document.createElement(
+          "div"
+        );
+
+      hour.className =
+        "direction-hour";
+
+      hour.textContent =
+        String(d.hour).slice(-2);
+
+
+      /*
+         Freccia.
+      */
+
+      const arrowBox =
+        document.createElement(
+          "div"
+        );
+
+      arrowBox.className =
+        "hourly-arrow";
+
+
+      const arrow =
+        document.createElement(
+          "span"
+        );
+
+
+      /*
+         IMPORTANTE:
+         il dato della stazione indica
+         da dove proviene il vento.
+
+         La freccia deve indicare
+         verso dove va il vento.
+
+         Quindi +180°.
+      */
+
+      if(
+        Number.isFinite(deg)
+      ){
+
+        const arrowDeg =
+          (deg + 180) % 360;
+
+
+        arrow.style.transform =
+          "rotate(" +
+          arrowDeg +
+          "deg)";
+
+      }
+
+
+      arrowBox.appendChild(
+        arrow
+      );
+
+
+      /*
+         Direzione compatta.
+      */
+
+      const name =
+        document.createElement(
+          "div"
+        );
+
+      name.className =
+        "hourly-name";
+
+      name.textContent =
+        Number.isFinite(deg)
+          ? compactDirection(deg)
+          : "--";
+
+
+      /*
+         Gradi.
+      */
+
+      const degrees =
+        document.createElement(
+          "div"
+        );
+
+      degrees.className =
+        "hourly-degrees";
+
+      degrees.textContent =
+        Number.isFinite(deg)
+          ? Math.round(deg) + "°"
+          : "--";
+
+
+      /*
+         Inserimento.
+      */
+
+      cell.appendChild(
+        hour
+      );
+
+      cell.appendChild(
+        arrowBox
+      );
+
+      cell.appendChild(
+        name
+      );
+
+      cell.appendChild(
+        degrees
+      );
+
+
+      grid.appendChild(
+        cell
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
    CARICAMENTO DATI
-   ========================================================= */
+   ===================================================== */
 
 async function loadGraph(){
 
+  const updated =
+    document.getElementById(
+      "updated"
+    );
+
+
   try{
 
-    setStatus(
-      "ok",
-      "CARICAMENTO DATI..."
+    updated.classList.remove(
+      "error"
     );
+
+
+    updated.textContent =
+      "Aggiornamento dati...";
 
 
     const response =
@@ -1171,7 +1256,9 @@ async function loadGraph(){
       );
 
 
-    if(!response.ok){
+    if(
+      !response.ok
+    ){
 
       throw new Error(
         "HTTP " +
@@ -1188,8 +1275,8 @@ async function loadGraph(){
     if(
       !result ||
       result.ok !== true ||
-      !result.current ||
-      !Array.isArray(result.history)
+      !result.history ||
+      !result.current
     ){
 
       throw new Error(
@@ -1200,78 +1287,45 @@ async function loadGraph(){
 
 
     /*
-       DATI DELLE 24 ORE
+       Disegna direzioni.
     */
 
-    historyData =
-      result.history.map(
-        item => ({
-
-          hour:item.hour,
-
-          wind:Number(
-            item.wind
-          ),
-
-          gust:Number(
-            item.gust
-          ),
-
-          direction:Number(
-            item.direction
-          )
-
-        })
-      );
-
-
-    if(!historyData.length){
-
-      throw new Error(
-        "Nessun dato storico disponibile"
-      );
-
-    }
-
-
-    /*
-       PRIMA LE DIREZIONI,
-       POI IL GRAFICO.
-
-       ENTRAMBI UTILIZZANO
-       LO STESSO INDICE ORARIO.
-    */
-
-    drawDirectionBar();
-
-    drawChart();
-
-
-    /*
-       ULTIMO AGGIORNAMENTO
-    */
-
-    document.getElementById(
-      "timestamp"
-    ).textContent =
-      formatTimestamp(
-        result.current.timestamp
-      );
-
-
-    setStatus(
-      "ok",
-      "DATI AGGIORNATI"
+    drawDirectionBar(
+      result.history
     );
+
+
+    /*
+       Disegna grafico.
+    */
+
+    drawChart(
+      result.history
+    );
+
+
+    /*
+       Ultimo aggiornamento.
+    */
+
+    updated.textContent =
+      "Ultimo dato disponibile: " +
+      result.current.timestamp;
 
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
 
-    setStatus(
-      "error",
-      "ERRORE DATI"
+
+    updated.textContent =
+      "ERRORE NEL CARICAMENTO DEI DATI";
+
+
+    updated.classList.add(
+      "error"
     );
 
   }
@@ -1279,25 +1333,9 @@ async function loadGraph(){
 }
 
 
-/* =========================================================
-   RIDIMENSIONAMENTO FINESTRA
-   ========================================================= */
-
-window.addEventListener(
-  "resize",
-  () => {
-
-    drawDirectionBar();
-
-    drawChart();
-
-  }
-);
-
-
-/* =========================================================
+/* =====================================================
    AVVIO
-   ========================================================= */
+   ===================================================== */
 
 loadGraph();
 
