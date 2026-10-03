@@ -21,13 +21,16 @@ body{
   padding:0;
   width:100%;
   min-height:100%;
+
   font-family:Arial,Helvetica,sans-serif;
+
   background:#071522;
   color:white;
 }
 
 body{
   min-height:100vh;
+
   display:flex;
   justify-content:center;
 
@@ -44,15 +47,17 @@ body{
   width:100%;
   max-width:760px;
   min-height:100vh;
-  padding:22px 14px 18px;
+
+  padding:22px 10px 18px;
 
   display:flex;
   flex-direction:column;
 }
 
-/* =========================
+
+/* =====================================================
    HEADER
-   ========================= */
+   ===================================================== */
 
 .header{
   text-align:center;
@@ -68,22 +73,71 @@ body{
 
 .header h1{
   margin:0;
+
   font-size:24px;
   letter-spacing:1.5px;
 }
 
 .header .location{
   margin-top:6px;
+
   font-size:13px;
   color:#8ca5b5;
 }
 
-/* =========================
-   CARDS
-   ========================= */
 
-.direction-card,
-.chart-card{
+/* =====================================================
+   CONTENITORE SCORRIMENTO UNICO
+   ===================================================== */
+
+/*
+   IMPORTANTE:
+
+   FRECCE + GRAFICO sono dentro
+   QUESTO UNICO contenitore.
+
+   Quindi quando si scorre orizzontalmente
+   con il dito, tutto rimane perfettamente
+   sincronizzato.
+*/
+
+.timeline-scroll{
+
+  width:100%;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+
+  -webkit-overflow-scrolling:touch;
+
+  scrollbar-width:thin;
+}
+
+
+/*
+   L'intera timeline ha una larghezza
+   interna sufficiente per visualizzare
+   comodamente 24 ore.
+
+   Direzioni e grafico usano
+   esattamente la stessa larghezza.
+*/
+
+.timeline-inner{
+
+  width:1100px;
+
+  padding:0 2px;
+}
+
+
+/* =====================================================
+   DIREZIONE
+   ===================================================== */
+
+.direction-card{
+
+  width:1100px;
 
   background:rgba(10,30,43,.82);
 
@@ -93,82 +147,76 @@ body{
 
   box-shadow:
     0 8px 30px rgba(0,0,0,.25);
-}
 
-/* =========================
-   DIREZIONE
-   ========================= */
-
-.direction-card{
   padding:12px 8px 10px;
+
   margin-bottom:14px;
 }
 
-.direction-label,
-.chart-title{
+.direction-label{
 
   font-size:11px;
-  letter-spacing:2px;
-  color:#7fb9d5;
-  font-weight:bold;
-  text-align:center;
-}
 
-.direction-label{
+  letter-spacing:2px;
+
+  color:#7fb9d5;
+
+  font-weight:bold;
+
+  text-align:center;
+
   margin-bottom:10px;
 }
 
-/*
-   La fascia delle direzioni è scorrevole
-   su schermi piccoli.
-*/
-
-.direction-scroll{
-  width:100%;
-  overflow-x:auto;
-  overflow-y:hidden;
-
-  scrollbar-width:thin;
-
-  -webkit-overflow-scrolling:touch;
-}
 
 /*
-   24 colonne sempre leggibili.
+   24 colonne.
+
+   Questa griglia ha la stessa identica
+   larghezza utilizzata dal grafico.
 */
 
 .direction-grid{
 
-  min-width:1100px;
+  width:100%;
 
   display:grid;
 
   grid-template-columns:
-    repeat(24, 1fr);
+    repeat(24,1fr);
 
   align-items:start;
 
   padding-left:42px;
-  padding-right:12px;
+  padding-right:18px;
 }
 
 .direction-cell{
+
   text-align:center;
-  min-width:42px;
+
+  min-width:40px;
 }
 
 .direction-hour{
+
   font-size:12px;
+
   color:#9db8c6;
+
   margin-bottom:6px;
+
   font-weight:bold;
 }
 
 .hourly-arrow{
+
   height:32px;
 
   display:flex;
+
   align-items:center;
+
   justify-content:center;
 }
 
@@ -181,6 +229,7 @@ body{
 
   border-left:6px solid transparent;
   border-right:6px solid transparent;
+
   border-bottom:20px solid #55d6ff;
 
   filter:
@@ -194,6 +243,7 @@ body{
 .hourly-name{
 
   font-size:9px;
+
   color:#c1d4dd;
 
   font-weight:bold;
@@ -206,76 +256,77 @@ body{
 .hourly-degrees{
 
   font-size:9px;
+
   color:#718b99;
 
   margin-top:2px;
 }
 
-/* =========================
+
+/* =====================================================
    GRAFICO
-   ========================= */
+   ===================================================== */
 
 .chart-card{
+
+  width:1100px;
+
+  background:rgba(10,30,43,.82);
+
+  border:1px solid rgba(93,166,199,.22);
+
+  border-radius:22px;
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.25);
+
   padding:15px 10px 12px;
 }
 
 .chart-title{
+
+  font-size:11px;
+
+  letter-spacing:2px;
+
+  color:#7fb9d5;
+
+  font-weight:bold;
+
   text-align:center;
+
   margin-bottom:8px;
 }
 
-/*
-   Contenitore scorrevole.
-
-   Sul cellulare il grafico non viene
-   schiacciato: si può scorrere
-   orizzontalmente.
-*/
-
-.chart-scroll{
-
-  width:100%;
-
-  overflow-x:auto;
-  overflow-y:hidden;
-
-  scrollbar-width:thin;
-
-  -webkit-overflow-scrolling:touch;
-}
 
 /*
-   Il grafico ha una larghezza interna
-   sufficiente per separare bene
-   tutte le 24 ore.
+   NESSUN ALTRO SCROLL QUI.
+
+   Il movimento orizzontale è gestito
+   esclusivamente da .timeline-scroll.
 */
-
-.chart-inner{
-
-  width:1100px;
-  height:350px;
-
-  position:relative;
-}
 
 .chart-wrap{
 
   position:relative;
 
-  width:1100px;
+  width:100%;
+
   height:350px;
 }
 
 canvas{
+
   display:block;
 
-  width:1100px;
+  width:100%;
   height:350px;
 }
 
-/* =========================
+
+/* =====================================================
    LEGENDA
-   ========================= */
+   ===================================================== */
 
 .legend{
 
@@ -319,9 +370,10 @@ canvas{
   background:#ff5555;
 }
 
-/* =========================
+
+/* =====================================================
    AGGIORNAMENTO
-   ========================= */
+   ===================================================== */
 
 .updated{
 
@@ -338,9 +390,28 @@ canvas{
   color:#ff8585;
 }
 
-/* =========================
+
+/* =====================================================
+   INDICAZIONE SCORRIMENTO
+   ===================================================== */
+
+.scroll-hint{
+
+  text-align:center;
+
+  margin-top:7px;
+
+  font-size:9px;
+
+  letter-spacing:1.4px;
+
+  color:#607b89;
+}
+
+
+/* =====================================================
    PULSANTE
-   ========================= */
+   ===================================================== */
 
 .buttons{
 
@@ -381,9 +452,10 @@ canvas{
   transform:scale(.97);
 }
 
-/* =========================
+
+/* =====================================================
    FOOTER
-   ========================= */
+   ===================================================== */
 
 .footer{
 
@@ -400,41 +472,50 @@ canvas{
   line-height:1.5;
 }
 
-/* =========================
-   MOBILE
-   ========================= */
 
-@media(max-width:520px){
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media(max-width:700px){
 
   .app{
-    padding-left:8px;
-    padding-right:8px;
+    padding-left:6px;
+    padding-right:6px;
+  }
+
+  /*
+     Sul cellulare la timeline è volutamente
+     più larga dello schermo.
+
+     Si scorre con un unico movimento.
+  */
+
+  .timeline-scroll{
+    margin-left:0;
+    margin-right:0;
   }
 
   .header h1{
     font-size:23px;
   }
 
-  .direction-card,
-  .chart-card{
-    border-radius:20px;
-  }
-
 }
 
-/* =========================
-   TELEFONI MOLTO STRETTI
-   ========================= */
 
-@media(max-width:360px){
+/* =====================================================
+   DESKTOP
+   ===================================================== */
 
-  .header h1{
-    font-size:21px;
-  }
+@media(min-width:701px){
 
-  .direction-label,
-  .chart-title{
-    font-size:10px;
+  /*
+     Su desktop manteniamo la timeline
+     orizzontalmente scorrevole.
+  */
+
+  .timeline-scroll{
+    max-width:100%;
   }
 
 }
@@ -447,9 +528,10 @@ canvas{
 
 <div class="app">
 
-  <!-- =========================
+
+  <!-- =================================================
        HEADER
-       ========================= -->
+       ================================================= -->
 
   <div class="header">
 
@@ -468,41 +550,42 @@ canvas{
   </div>
 
 
-  <!-- =========================
-       DIREZIONE DEL VENTO
-       ========================= -->
+  <!-- =================================================
+       UNICO SCORRIMENTO ORIZZONTALE
+       ================================================= -->
 
-  <div class="direction-card">
+  <div class="timeline-scroll">
 
-    <div class="direction-label">
-      DIREZIONE DEL VENTO · ORA PER ORA
-    </div>
+    <div class="timeline-inner">
 
-    <div class="direction-scroll">
 
-      <div
-        class="direction-grid"
-        id="directionGrid">
+      <!-- ===============================================
+           DIREZIONE DEL VENTO
+           =============================================== -->
+
+      <div class="direction-card">
+
+        <div class="direction-label">
+          DIREZIONE DEL VENTO · ORA PER ORA
+        </div>
+
+        <div
+          class="direction-grid"
+          id="directionGrid">
+        </div>
+
       </div>
 
-    </div>
 
-  </div>
+      <!-- ===============================================
+           GRAFICO
+           =============================================== -->
 
+      <div class="chart-card">
 
-  <!-- =========================
-       GRAFICO 24 ORE
-       ========================= -->
-
-  <div class="chart-card">
-
-    <div class="chart-title">
-      VENTO DELLE ULTIME 24 ORE · NODI
-    </div>
-
-    <div class="chart-scroll">
-
-      <div class="chart-inner">
+        <div class="chart-title">
+          VENTO DELLE ULTIME 24 ORE · NODI
+        </div>
 
         <div class="chart-wrap">
 
@@ -510,55 +593,67 @@ canvas{
 
         </div>
 
+
+        <!-- LEGENDA -->
+
+        <div class="legend">
+
+          <div class="legend-item">
+
+            <span class="legend-line legend-wind"></span>
+
+            <span>
+              VENTO MEDIO
+            </span>
+
+          </div>
+
+
+          <div class="legend-item">
+
+            <span class="legend-line legend-gust"></span>
+
+            <span>
+              RAFFICHE
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- AGGIORNAMENTO -->
+
+        <div
+          class="updated"
+          id="updated">
+
+          Caricamento dati...
+
+        </div>
+
       </div>
 
-    </div>
-
-
-    <!-- LEGENDA -->
-
-    <div class="legend">
-
-      <div class="legend-item">
-
-        <span class="legend-line legend-wind"></span>
-
-        <span>
-          VENTO MEDIO
-        </span>
-
-      </div>
-
-
-      <div class="legend-item">
-
-        <span class="legend-line legend-gust"></span>
-
-        <span>
-          RAFFICHE
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <!-- AGGIORNAMENTO -->
-
-    <div
-      class="updated"
-      id="updated">
-
-      Caricamento dati...
 
     </div>
 
   </div>
 
 
-  <!-- =========================
-       PULSANTE INDIETRO
-       ========================= -->
+  <!-- =================================================
+       INDICAZIONE
+       ================================================= -->
+
+  <div class="scroll-hint">
+
+    ← SCORRI ORIZZONTALMENTE PER VEDERE LE 24 ORE →
+
+  </div>
+
+
+  <!-- =================================================
+       PULSANTE
+       ================================================= -->
 
   <div class="buttons">
 
@@ -573,9 +668,9 @@ canvas{
   </div>
 
 
-  <!-- =========================
+  <!-- =================================================
        FOOTER
-       ========================= -->
+       ================================================= -->
 
   <div class="footer">
 
@@ -587,6 +682,7 @@ canvas{
 
 
 <script>
+
 
 /* =====================================================
    API
@@ -606,6 +702,7 @@ const canvas =
 const ctx =
   canvas.getContext("2d");
 
+
 let historyData = [];
 
 
@@ -618,11 +715,19 @@ function resizeCanvas(){
   const ratio =
     window.devicePixelRatio || 1;
 
+  const width =
+    canvas.clientWidth;
+
+  const height =
+    canvas.clientHeight;
+
+
   canvas.width =
-    Math.round(1100 * ratio);
+    Math.round(width * ratio);
 
   canvas.height =
-    Math.round(350 * ratio);
+    Math.round(height * ratio);
+
 
   ctx.setTransform(
     ratio,
@@ -632,6 +737,7 @@ function resizeCanvas(){
     0,
     0
   );
+
 }
 
 
@@ -652,18 +758,20 @@ function drawChart(history){
 
   }
 
-  historyData = history;
+
+  historyData =
+    history;
+
 
   resizeCanvas();
 
 
-  const w = 1100;
-  const h = 350;
+  const w =
+    canvas.clientWidth;
 
+  const h =
+    canvas.clientHeight;
 
-  /*
-     Spazio del grafico.
-  */
 
   const L = 48;
   const R = 18;
@@ -703,16 +811,27 @@ function drawChart(history){
 
 
   /*
-     Posizione X delle ore.
+     Posizione X.
   */
 
-  const x = i =>
-    history.length === 1
-      ? L + pw / 2
-      : L +
-        i /
-        (history.length - 1) *
-        pw;
+  const x = i => {
+
+    if(
+      history.length === 1
+    ){
+
+      return L + pw / 2;
+
+    }
+
+    return (
+      L +
+      i /
+      (history.length - 1) *
+      pw
+    );
+
+  };
 
 
   /*
@@ -726,7 +845,7 @@ function drawChart(history){
 
 
   /*
-     Pulisce il canvas.
+     Pulisce.
   */
 
   ctx.clearRect(
@@ -738,7 +857,7 @@ function drawChart(history){
 
 
   /* =================================================
-     GRIGLIA ORIZZONTALE
+     GRIGLIA
      ================================================= */
 
   ctx.font =
@@ -764,7 +883,8 @@ function drawChart(history){
     ctx.strokeStyle =
       "rgba(137,190,215,.14)";
 
-    ctx.lineWidth = 1;
+    ctx.lineWidth =
+      1;
 
 
     ctx.beginPath();
@@ -814,14 +934,14 @@ function drawChart(history){
 
 
       /*
-         Linea verticale
-         dell'ora.
+         Linea verticale.
       */
 
       ctx.strokeStyle =
         "rgba(137,190,215,.07)";
 
-      ctx.lineWidth = 1;
+      ctx.lineWidth =
+        1;
 
 
       ctx.beginPath();
@@ -864,7 +984,7 @@ function drawChart(history){
      LINEE
      ================================================= */
 
-  function line(
+  function drawLine(
     key,
     color,
     width
@@ -931,6 +1051,7 @@ function drawChart(history){
         ctx.fillStyle =
           color;
 
+
         ctx.beginPath();
 
         ctx.arc(
@@ -950,10 +1071,10 @@ function drawChart(history){
 
 
   /*
-     Prima raffiche.
+     Raffiche.
   */
 
-  line(
+  drawLine(
     "gust",
     "#ff5555",
     2.5
@@ -961,10 +1082,10 @@ function drawChart(history){
 
 
   /*
-     Poi vento medio.
+     Vento medio.
   */
 
-  line(
+  drawLine(
     "wind",
     "#ffd83d",
     3
@@ -974,49 +1095,7 @@ function drawChart(history){
 
 
 /* =====================================================
-   NOMI DIREZIONI
-   ===================================================== */
-
-function directionName(deg){
-
-  if(
-    deg >= 337.5 ||
-    deg < 22.5
-  )
-    return "TRAMONTANA";
-
-
-  if(deg < 67.5)
-    return "GRECALE";
-
-
-  if(deg < 112.5)
-    return "LEVANTE";
-
-
-  if(deg < 157.5)
-    return "SCIROCCO";
-
-
-  if(deg < 202.5)
-    return "OSTRO";
-
-
-  if(deg < 247.5)
-    return "LIBECCIO";
-
-
-  if(deg < 292.5)
-    return "PONENTE";
-
-
-  return "MAESTRALE";
-
-}
-
-
-/* =====================================================
-   DIREZIONI COMPATTE
+   DIREZIONE COMPATTA
    ===================================================== */
 
 function compactDirection(deg){
@@ -1069,7 +1148,8 @@ function drawDirectionBar(history){
     );
 
 
-  grid.innerHTML = "";
+  grid.innerHTML =
+    "";
 
 
   history.forEach(
@@ -1124,14 +1204,13 @@ function drawDirectionBar(history){
 
 
       /*
-         IMPORTANTE:
-         il dato della stazione indica
-         da dove proviene il vento.
+         Il dato del Comune indica
+         DA DOVE arriva il vento.
 
          La freccia deve indicare
-         verso dove va il vento.
+         DOVE va il vento.
 
-         Quindi +180°.
+         Per questo invertiamo di 180°.
       */
 
       if(
@@ -1156,7 +1235,7 @@ function drawDirectionBar(history){
 
 
       /*
-         Direzione compatta.
+         Direzione.
       */
 
       const name =
@@ -1190,10 +1269,6 @@ function drawDirectionBar(history){
           ? Math.round(deg) + "°"
           : "--";
 
-
-      /*
-         Inserimento.
-      */
 
       cell.appendChild(
         hour
@@ -1287,7 +1362,7 @@ async function loadGraph(){
 
 
     /*
-       Disegna direzioni.
+       Prima le frecce.
     */
 
     drawDirectionBar(
@@ -1296,7 +1371,7 @@ async function loadGraph(){
 
 
     /*
-       Disegna grafico.
+       Poi il grafico.
     */
 
     drawChart(
@@ -1305,7 +1380,7 @@ async function loadGraph(){
 
 
     /*
-       Ultimo aggiornamento.
+       Aggiornamento.
     */
 
     updated.textContent =
@@ -1331,6 +1406,28 @@ async function loadGraph(){
   }
 
 }
+
+
+/* =====================================================
+   RIDISEGNO AL CAMBIO DIMENSIONE
+   ===================================================== */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    if(
+      historyData.length
+    ){
+
+      drawChart(
+        historyData
+      );
+
+    }
+
+  }
+);
 
 
 /* =====================================================
