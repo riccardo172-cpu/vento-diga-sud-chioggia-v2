@@ -41,6 +41,11 @@ body{
   flex-direction:column;
 }
 
+
+/* =========================================================
+   INTESTAZIONE
+   ========================================================= */
+
 .header{
   text-align:center;
   margin-bottom:16px;
@@ -97,7 +102,7 @@ body{
 
 /*
    IMPORTANTE:
-   Questi padding sono IDENTICI a quelli utilizzati
+   Questi margini sono gli stessi utilizzati
    dall'area del grafico.
 */
 .direction-grid{
@@ -300,6 +305,11 @@ canvas{
 
 <div class="app">
 
+
+  <!-- =====================================================
+       INTESTAZIONE
+       ===================================================== -->
+
   <div class="header">
 
     <div class="small">
@@ -318,7 +328,7 @@ canvas{
 
 
   <!-- =====================================================
-       DIREZIONE ORA PER ORA
+       DIREZIONE DEL VENTO ORA PER ORA
        ===================================================== -->
 
   <div class="direction-card">
@@ -342,7 +352,7 @@ canvas{
 
 
   <!-- =====================================================
-       GRAFICO
+       GRAFICO VENTO
        ===================================================== -->
 
   <div class="chart-card">
@@ -356,6 +366,7 @@ canvas{
       <canvas id="windChart"></canvas>
 
     </div>
+
 
     <div class="legend">
 
@@ -381,6 +392,10 @@ canvas{
   </div>
 
 
+  <!-- =====================================================
+       STATO
+       ===================================================== -->
+
   <div
     class="status"
     id="status"
@@ -393,6 +408,10 @@ canvas{
   </div>
 
 
+  <!-- =====================================================
+       RITORNO
+       ===================================================== -->
+
   <div class="back-container">
 
     <a
@@ -404,6 +423,10 @@ canvas{
 
   </div>
 
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
 
   <div class="footer">
 
@@ -422,6 +445,11 @@ canvas{
 
 
 <script>
+
+
+/* =========================================================
+   API
+   ========================================================= */
 
 const API_URL =
   "https://vento-diga-sud-24h.riccardo172.workers.dev/";
@@ -479,7 +507,7 @@ function formatHour(value){
 
 
 /* =========================================================
-   DIREZIONE
+   DIREZIONE COMPATTA
    ========================================================= */
 
 function directionName(deg){
@@ -545,7 +573,7 @@ function formatTimestamp(timestamp){
 
 
 /* =========================================================
-   BARRA DIREZIONI
+   BARRA DELLE DIREZIONI
    ========================================================= */
 
 function drawDirectionBar(){
@@ -559,6 +587,11 @@ function drawDirectionBar(){
 
 
   historyData.forEach(item => {
+
+
+    /*
+       CELLA
+    */
 
     const cell =
       document.createElement("div");
@@ -579,7 +612,7 @@ function drawDirectionBar(){
 
 
     /*
-       FRECCIA
+       CONTENITORE FRECCIA
     */
 
     const arrowBox =
@@ -589,6 +622,10 @@ function drawDirectionBar(){
       "direction-arrow";
 
 
+    /*
+       FRECCIA
+    */
+
     const arrow =
       document.createElement("span");
 
@@ -597,11 +634,25 @@ function drawDirectionBar(){
       Number(item.direction);
 
 
+    /*
+       IMPORTANTE:
+       LA STAZIONE INDICA LA DIREZIONE
+       DA CUI PROVIENE IL VENTO.
+
+       LA FRECCIA DEVE QUINDI ESSERE
+       GIRATA DI 180° PER INDICARE
+       LA DIREZIONE VERSO CUI SOFFIA.
+    */
+
     if(Number.isFinite(deg)){
+
+      const arrowDeg =
+        (deg + 180) % 360;
+
 
       arrow.style.transform =
         "rotate(" +
-        deg +
+        arrowDeg +
         "deg)";
 
     }
@@ -628,7 +679,7 @@ function drawDirectionBar(){
 
 
     /*
-       CELLA
+       COSTRUZIONE CELLA
     */
 
     cell.appendChild(hour);
@@ -681,7 +732,7 @@ function resizeCanvas(){
 
 
 /* =========================================================
-   GRAFICO
+   DISEGNO GRAFICO
    ========================================================= */
 
 function drawChart(){
@@ -710,10 +761,9 @@ function drawChart(){
 
 
   /*
-     QUESTI SONO I MARGINI DI RIFERIMENTO
-     DELLE ORE SULL'ASSE X.
+     MARGINI DEL GRAFICO
 
-     DEVONO CORRISPONDERE ESATTAMENTE
+     QUESTI VALORI SONO IDENTICI
      A QUELLI DELLA BARRA SUPERIORE.
   */
 
@@ -734,6 +784,10 @@ function drawChart(){
     paddingTop -
     paddingBottom;
 
+
+  /*
+     VALORI MASSIMI
+  */
 
   const values = [];
 
@@ -765,10 +819,15 @@ function drawChart(){
 
 
   /*
-     POSIZIONE X DELLE ORE
+     POSIZIONE X
 
-     È QUESTA FUNZIONE CHE DETERMINA
-     LA POSIZIONE ESATTA DI OGNI ORA.
+     QUESTA È LA POSIZIONE USATA
+     DALLE ORE DEL GRAFICO.
+
+     L'INDICE 0 = PRIMA ORA
+     L'INDICE 1 = SECONDA ORA
+     ...
+     L'INDICE 23 = ULTIMA ORA
   */
 
   function xPosition(index){
@@ -795,6 +854,10 @@ function drawChart(){
   }
 
 
+  /*
+     POSIZIONE Y
+  */
+
   function yPosition(value){
 
     return (
@@ -810,9 +873,9 @@ function drawChart(){
   }
 
 
-  /*
+  /* =======================================================
      GRIGLIA ORIZZONTALE
-  */
+     ======================================================= */
 
   ctx.lineWidth = 1;
 
@@ -866,9 +929,9 @@ function drawChart(){
   }
 
 
-  /*
+  /* =======================================================
      ASSI
-  */
+     ======================================================= */
 
   ctx.strokeStyle =
     "rgba(137,190,215,0.3)";
@@ -904,9 +967,9 @@ function drawChart(){
   ctx.stroke();
 
 
-  /*
+  /* =======================================================
      ORE ASSE X
-  */
+     ======================================================= */
 
   ctx.fillStyle =
     "#8faebd";
@@ -936,9 +999,9 @@ function drawChart(){
   );
 
 
-  /*
-     LINEE
-  */
+  /* =======================================================
+     LINEA GRAFICO
+     ======================================================= */
 
   function drawLine(
     key,
@@ -1025,9 +1088,9 @@ function drawChart(){
   );
 
 
-  /*
+  /* =======================================================
      PUNTI
-  */
+     ======================================================= */
 
   function drawPoints(
     key,
@@ -1137,7 +1200,7 @@ async function loadGraph(){
 
 
     /*
-       PREPARA LE 24 ORE
+       DATI DELLE 24 ORE
     */
 
     historyData =
@@ -1172,11 +1235,11 @@ async function loadGraph(){
 
 
     /*
-       DISEGNA PRIMA LA BARRA
-       E POI IL GRAFICO.
+       PRIMA LE DIREZIONI,
+       POI IL GRAFICO.
 
        ENTRAMBI UTILIZZANO
-       LO STESSO INDEX PER OGNI ORA.
+       LO STESSO INDICE ORARIO.
     */
 
     drawDirectionBar();
@@ -1185,7 +1248,7 @@ async function loadGraph(){
 
 
     /*
-       TIMESTAMP
+       ULTIMO AGGIORNAMENTO
     */
 
     document.getElementById(
@@ -1217,7 +1280,7 @@ async function loadGraph(){
 
 
 /* =========================================================
-   RIDIMENSIONAMENTO
+   RIDIMENSIONAMENTO FINESTRA
    ========================================================= */
 
 window.addEventListener(
