@@ -36,12 +36,12 @@ body {
 
 
 /* =====================================================
-   CONTENITORE PRINCIPALE
+   CONTENITORE PRINCIPALE (Alinea tutto alla stessa larghezza)
    ===================================================== */
 
 .container {
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     margin: 0 auto;
     padding: 8px;
 }
@@ -57,7 +57,7 @@ body {
 }
 
 .title {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: bold;
     color: #ffffff;
     margin-bottom: 2px;
@@ -71,50 +71,31 @@ body {
 
 /* =====================================================
    CORNICE BLU RADAR
+   Della stessa identica larghezza degli altri elementi
    ===================================================== */
 
 .radar-card {
     width: 100%;
-    height: 480px;
+    height: 520px;
     margin: 0 auto;
     background: #0b1d2b;
     border: 1px solid #1c607d;
     border-radius: 12px;
-    padding: 3px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    padding: 4px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.3);
 }
 
 
 /* =====================================================
-   FINESTRA RADAR
-   ===================================================== */
-
-.radar-wrapper {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    border-radius: 8px;
-    position: relative;
-}
-
-
-/* =====================================================
-   IFRAME RADAR
-   Dimensione nativa per non comprimere i testi/pulsanti in basso
+   IFRAME RADAR (Si adatta perfettamente al contenitore)
    ===================================================== */
 
 .radar-frame {
-    position: absolute;
-    top: -90px;
-    left: 50%;
-    width: 620px;
-    height: 670px;
+    width: 100%;
+    height: 100%;
     border: 0;
+    border-radius: 8px;
     background: #071522;
-    /* Scala proporzionale per adattarsi al display mantenendo il centro */
-    transform: translateX(-50%) scale(0.65);
-    transform-origin: top center;
 }
 
 
@@ -160,17 +141,16 @@ body {
 
 
 /* =====================================================
-   ADATTAMENTO SMARTPHONE PICCOLI
+   RESPONSIVE SMARTPHONE
    ===================================================== */
 
-@media (max-width: 380px) {
-    .radar-card {
-        height: 440px;
+@media (max-width: 440px) {
+    .container {
+        padding: 4px;
     }
 
-    .radar-frame {
-        top: -85px;
-        transform: translateX(-50%) scale(0.58);
+    .radar-card {
+        height: 480px;
     }
 }
 
@@ -193,15 +173,13 @@ body {
 
     <!-- RADAR -->
     <div class="radar-card">
-        <div class="radar-wrapper">
-            <iframe
-                id="radar"
-                class="radar-frame"
-                src="https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.28&zoom=8.5&loop=true"
-                title="Radar Meteo Sottomarina"
-                allowfullscreen>
-            </iframe>
-        </div>
+        <iframe
+            id="radar"
+            class="radar-frame"
+            src="https://www.meteoeradar.it/radar-meteo?center=45.22,12.28&zoom=8.5&loop=true"
+            title="Radar Meteo Sottomarina"
+            allowfullscreen>
+        </iframe>
     </div>
 
 
@@ -225,7 +203,7 @@ body {
 
 function reloadRadar() {
     const radar = document.getElementById("radar");
-    radar.src = "https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.28&zoom=8.5&loop=true&t=" + Date.now();
+    radar.src = "https://www.meteoeradar.it/radar-meteo?center=45.22,12.28&zoom=8.5&loop=true&t=" + Date.now();
 }
 
 </script>
