@@ -41,9 +41,9 @@ body {
 
 .container {
     width: 100%;
-    max-width: 420px; /* Larghezza ideale per smartphone */
+    max-width: 420px;
     margin: 0 auto;
-    padding: 8px;
+    padding: 6px;
 }
 
 
@@ -53,7 +53,7 @@ body {
 
 .header {
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .title {
@@ -70,24 +70,24 @@ body {
 
 
 /* =====================================================
-   CORNICE BLU RADAR
+   CORNICE BLU ESTERNA
    ===================================================== */
 
 .radar-card {
     width: 100%;
-    height: 520px;
+    height: 540px;
     margin: 0 auto;
     background: #0b1d2b;
     border: 1px solid #1c607d;
     border-radius: 12px;
-    padding: 4px;
+    padding: 3px;
     overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
 }
 
 
 /* =====================================================
-   FINESTRA RADAR & IFRAME
+   FINESTRA DI RITAGLIO
    ===================================================== */
 
 .radar-wrapper {
@@ -98,12 +98,23 @@ body {
     position: relative;
 }
 
+
+/* =====================================================
+   IFRAME RADAR
+   Ancorato al centro in basso per garantire la visibilità
+   completa della barra temporale e dei pulsanti
+   ===================================================== */
+
 .radar-frame {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    width: 650px;
+    height: 660px;
     border: 0;
     background: #071522;
-    border-radius: 8px;
+    transform: translateX(-50%) scale(0.62);
+    transform-origin: bottom center;
 }
 
 
@@ -113,7 +124,7 @@ body {
 
 .info {
     width: 100%;
-    margin: 8px 0 0 0;
+    margin: 6px 0 0 0;
     background: #0b1d2b;
     border: 1px solid #17435b;
     border-radius: 9px;
@@ -131,8 +142,8 @@ body {
 .button {
     display: block;
     width: 100%;
-    margin: 8px 0 0 0;
-    padding: 12px;
+    margin: 6px 0 0 0;
+    padding: 11px;
     border-radius: 9px;
     border: 1px solid #2182a6;
     background: #0d3a50;
@@ -147,6 +158,22 @@ body {
     background: #14516b;
 }
 
+
+/* =====================================================
+   ADATTAMENTO PER SCHERMI MOLTO STRETTI (< 360px)
+   ===================================================== */
+
+@media (max-width: 360px) {
+    .radar-card {
+        height: 480px;
+    }
+
+    .radar-frame {
+        bottom: -10px;
+        transform: translateX(-50%) scale(0.55);
+    }
+}
+
 </style>
 
 </head>
@@ -159,9 +186,14 @@ body {
 
     <!-- TESTATA -->
     <div class="header">
-        <div class="title">Sottomarina</div>
-        <div class="subtitle">Radar meteorologico</div>
+        <div class="title">
+            Sottomarina
+        </div>
+        <div class="subtitle">
+            Radar meteorologico
+        </div>
     </div>
+
 
     <!-- RADAR -->
     <div class="radar-card">
@@ -169,20 +201,24 @@ body {
             <iframe
                 id="radar"
                 class="radar-frame"
-                src="https://www.meteoeradar.it/radar-meteo?center=45.22,12.28&zoom=8.5&loop=true"
-                title="Radar Meteo Sottomarina"
+                src="https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.28&zoom=8.5&loop=true"
+                title="Radar Meteo & Radar"
                 allowfullscreen>
             </iframe>
         </div>
     </div>
+
 
     <!-- INFORMAZIONI -->
     <div class="info">
         Radar Meteo & Radar · animazione radar
     </div>
 
+
     <!-- AGGIORNA -->
-    <button class="button" onclick="reloadRadar()">
+    <button
+        class="button"
+        onclick="reloadRadar()">
         AGGIORNA RADAR
     </button>
 
@@ -193,7 +229,7 @@ body {
 
 function reloadRadar() {
     const radar = document.getElementById("radar");
-    radar.src = "https://www.meteoeradar.it/radar-meteo?center=45.22,12.28&zoom=8.5&loop=true&t=" + Date.now();
+    radar.src = "https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.28&zoom=8.5&loop=true&t=" + Date.now();
 }
 
 </script>
