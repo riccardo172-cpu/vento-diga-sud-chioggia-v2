@@ -304,7 +304,7 @@ body {
   color: #8faebd;
 }
 
-/* STATO */
+/* STATO / PULSANTE AGGIORNAMENTO */
 
 .status {
   margin-top: 18px;
@@ -321,6 +321,24 @@ body {
   font-size: 11px;
   font-weight: bold;
   letter-spacing: 1.5px;
+}
+
+.status button {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background: rgba(40, 170, 110, 0.16);
+  border: 1px solid rgba(70, 220, 150, 0.25);
+  color: #6ee0aa;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+}
+
+.status button:active {
+  transform: scale(0.97);
 }
 
 .status.warning span {
@@ -532,22 +550,32 @@ body {
   </div>
 
 
+  <!-- PULSANTE AGGIORNA DATI -->
+
   <div class="status" id="status">
 
-    <span id="statusText">
-      CARICAMENTO DATI...
-    </span>
+    <button
+      type="button"
+      id="refreshButton"
+      onclick="loadData()">
+
+      AGGIORNA DATI
+
+    </button>
 
   </div>
 
 
   <div class="graph-button-container">
+
     <a
       class="graph-button"
-      href="grafico.html"
-    >
+      href="grafico.html">
+
       GRAFICO 24 ORE
+
     </a>
+
   </div>
 
 
@@ -653,9 +681,6 @@ function setStatus(type, text) {
   const status =
     document.getElementById("status");
 
-  const statusText =
-    document.getElementById("statusText");
-
   status.className = "status";
 
   if (type === "warning") {
@@ -666,14 +691,34 @@ function setStatus(type, text) {
     status.classList.add("error");
   }
 
-  statusText.textContent = text;
+  /*
+   * Il pulsante rimane sempre "AGGIORNA DATI".
+   */
+
+  const refreshButton =
+    document.getElementById("refreshButton");
+
+  refreshButton.textContent =
+    "AGGIORNA DATI";
 
 }
 
 
 async function loadData() {
 
+  const refreshButton =
+    document.getElementById("refreshButton");
+
+
   try {
+
+    /*
+     * Piccolo feedback durante l'aggiornamento,
+     * senza modificare la grafica del pulsante.
+     */
+
+    refreshButton.disabled = true;
+
 
     const response =
       await fetch(
@@ -700,9 +745,11 @@ async function loadData() {
       result.ok !== true ||
       !result.data
     ) {
+
       throw new Error(
         "Dati non validi"
       );
+
     }
 
 
@@ -804,7 +851,7 @@ async function loadData() {
 
     setStatus(
       "ok",
-      "DATI AGGIORNATI"
+      "AGGIORNA DATI"
     );
 
 
@@ -816,8 +863,12 @@ async function loadData() {
 
     setStatus(
       "error",
-      "ERRORE DATI"
+      "AGGIORNA DATI"
     );
+
+  } finally {
+
+    refreshButton.disabled = false;
 
   }
 
