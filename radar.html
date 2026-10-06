@@ -34,7 +34,7 @@ body {
     overflow-x: hidden;
 }
 
-/* CONTENITORE MOBILE */
+/* CONTENITORE PRINCIPALE */
 
 .container {
     width: 100%;
@@ -62,7 +62,7 @@ body {
     color: #82d9f7;
 }
 
-/* RADAR */
+/* RIQUADRO RADAR */
 
 .radar-card {
     width: 100%;
@@ -71,50 +71,48 @@ body {
     border-radius: 14px;
     padding: 5px;
     box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+    overflow: hidden;
 }
 
 /*
-   Il radar viene mantenuto leggermente più largo
-   della schermata per evitare che gli elementi
-   laterali vengano tagliati.
+   Il radar occupa tutta la larghezza disponibile.
+   Nessuno scroll orizzontale.
 */
 
 .radar-wrapper {
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+    height: 650px;
+    overflow: hidden;
     border-radius: 10px;
-    -webkit-overflow-scrolling: touch;
+    position: relative;
 }
 
 /*
-   Larghezza minima interna del radar.
-   Su smartphone permette alla pagina radar
-   di mantenere tutti i suoi strumenti.
+   Pagina mobile Meteo & Radar.
+   La visualizzazione viene lasciata
+   completamente responsiva.
 */
-
-.radar-inner {
-    width: 620px;
-    min-width: 620px;
-}
 
 .radar-frame {
     display: block;
-    width: 620px;
-    min-width: 620px;
-    height: 620px;
+    width: 100%;
+    height: 100%;
     border: 0;
     border-radius: 10px;
     background: #071522;
 }
 
-/* INDICAZIONE */
+/* INFORMAZIONI */
 
-.swipe-info {
+.info {
+    margin-top: 9px;
+    background: #0b1d2b;
+    border: 1px solid #17435b;
+    border-radius: 10px;
+    padding: 9px;
     text-align: center;
     color: #82a7b8;
     font-size: 10px;
-    margin-top: 7px;
 }
 
 /* PULSANTE */
@@ -136,22 +134,9 @@ body {
     background: #14516b;
 }
 
-/* INFORMAZIONI */
+/* SMARTPHONE */
 
-.info {
-    margin-top: 9px;
-    background: #0b1d2b;
-    border: 1px solid #17435b;
-    border-radius: 10px;
-    padding: 9px;
-    text-align: center;
-    color: #82a7b8;
-    font-size: 10px;
-}
-
-/* SMARTPHONE PICCOLO */
-
-@media (max-width: 380px) {
+@media (max-width: 600px) {
 
     .container {
         padding: 6px;
@@ -161,19 +146,34 @@ body {
         font-size: 20px;
     }
 
+    .subtitle {
+        font-size: 11px;
+    }
+
     .radar-card {
         padding: 4px;
     }
 
-    .radar-inner {
-        width: 620px;
-        min-width: 620px;
+    .radar-wrapper {
+        height: 620px;
     }
 
-    .radar-frame {
-        width: 620px;
-        min-width: 620px;
-        height: 590px;
+}
+
+/* SMARTPHONE PICCOLO */
+
+@media (max-width: 380px) {
+
+    .container {
+        padding: 5px;
+    }
+
+    .title {
+        font-size: 19px;
+    }
+
+    .radar-wrapper {
+        height: 580px;
     }
 
 }
@@ -189,6 +189,8 @@ body {
 <div class="container">
 
 
+    <!-- TESTATA -->
+
     <div class="header">
 
         <div class="title">
@@ -202,53 +204,42 @@ body {
     </div>
 
 
-    <div class="radar-card">
+    <!-- RADAR -->
 
+    <div class="radar-card">
 
         <div class="radar-wrapper">
 
+            <iframe
 
-            <div class="radar-inner">
+                id="radar"
 
+                class="radar-frame"
 
-                <iframe
+                src="https://www.meteoeradar.it/radar-meteo/mobile/?center=45.66%2C12.28&zoom=7&loop=true"
 
-                    id="radar"
+                title="Radar Meteo & Radar"
 
-                    class="radar-frame"
+                allowfullscreen>
 
-                    src="https://www.meteoeradar.it/radar-meteo?center=45.66%2C13.36&zoom=5.69&loop=true"
-
-                    title="Radar Meteo & Radar"
-
-                    allowfullscreen>
-
-                </iframe>
-
-
-            </div>
-
+            </iframe>
 
         </div>
-
-
-        <div class="swipe-info">
-
-            Scorri lateralmente se necessario
-
-        </div>
-
 
     </div>
 
+
+    <!-- INFORMAZIONI -->
 
     <div class="info">
 
         Radar Meteo & Radar ·
-        visualizzazione interattiva
+        animazione radar in tempo reale
 
     </div>
 
+
+    <!-- AGGIORNA -->
 
     <button
         class="button"
@@ -270,7 +261,7 @@ function reloadRadar() {
         document.getElementById("radar");
 
     radar.src =
-        "https://www.meteoeradar.it/radar-meteo?center=45.66%2C13.36&zoom=5.69&loop=true&t=" +
+        "https://www.meteoeradar.it/radar-meteo/mobile/?center=45.66%2C12.28&zoom=7&loop=true&t=" +
         Date.now();
 
 }
