@@ -42,13 +42,13 @@ body {
 }
 
 
-/* CONTENITORE */
+/* CONTENITORE PRINCIPALE */
 
 .container {
 
     width: 100%;
 
-    max-width: 600px;
+    max-width: 670px;
 
     margin: 0 auto;
 
@@ -106,13 +106,13 @@ body {
 }
 
 
-/* AREA DEL RADAR */
+/* FINESTRA DEL RADAR */
 
 .radar-wrapper {
 
     width: 100%;
 
-    height: 600px;
+    height: 590px;
 
     overflow: hidden;
 
@@ -123,15 +123,9 @@ body {
 
 
 /*
-    PAGINA METEO & RADAR
+   PAGINA INTERNA DI METEO & RADAR
 
-    La pagina interna viene ridotta
-    e spostata verso sinistra.
-
-    Questo serve soprattutto a
-    centrare la barra temporale
-    e rendere visibili i comandi
-    sulla destra.
+   Ridotta e centrata nella finestra.
 */
 
 .radar-frame {
@@ -154,7 +148,6 @@ body {
 
     transform:
         translateX(-50%)
-        translateX(-100px)
         scale(0.84);
 
     transform-origin:
@@ -215,11 +208,13 @@ body {
 }
 
 
-/* MOBILE */
+/* SMARTPHONE */
 
-@media (max-width: 600px) {
+@media (max-width: 670px) {
 
     .container {
+
+        max-width: 100%;
 
         padding: 6px;
     }
@@ -241,7 +236,7 @@ body {
 
     .radar-wrapper {
 
-        height: 600px;
+        height: 590px;
     }
 
 }
