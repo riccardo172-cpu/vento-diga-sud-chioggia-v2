@@ -21,10 +21,13 @@
 
 html,
 body {
+
     margin: 0;
     padding: 0;
+
     width: 100%;
     min-height: 100%;
+
 }
 
 body {
@@ -39,30 +42,37 @@ body {
         sans-serif;
 
     overflow-x: hidden;
+
 }
 
 
-/* CONTENITORE PRINCIPALE */
+/* =====================================================
+   CONTENITORE
+   ===================================================== */
 
 .container {
 
     width: 100%;
 
-    max-width: 670px;
+    max-width: 600px;
 
     margin: 0 auto;
 
-    padding: 8px;
+    padding: 6px;
+
 }
 
 
-/* TESTATA */
+/* =====================================================
+   TESTATA
+   ===================================================== */
 
 .header {
 
     text-align: center;
 
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+
 }
 
 .title {
@@ -73,7 +83,8 @@ body {
 
     color: #ffffff;
 
-    margin-bottom: 3px;
+    margin-bottom: 2px;
+
 }
 
 .subtitle {
@@ -81,10 +92,13 @@ body {
     font-size: 12px;
 
     color: #82d9f7;
+
 }
 
 
-/* RIQUADRO RADAR */
+/* =====================================================
+   RIQUADRO RADAR
+   ===================================================== */
 
 .radar-card {
 
@@ -103,10 +117,20 @@ body {
         rgba(0,0,0,0.25);
 
     overflow: hidden;
+
 }
 
 
-/* FINESTRA DEL RADAR */
+/* =====================================================
+   FINESTRA VISIBILE
+   =====================================================
+
+   Mostriamo solamente la parte utile della pagina
+   Meteo & Radar.
+
+   La fascia superiore blu viene tagliata.
+   La pubblicità inferiore viene tagliata.
+   ===================================================== */
 
 .radar-wrapper {
 
@@ -119,20 +143,30 @@ body {
     border-radius: 10px;
 
     position: relative;
+
 }
 
 
-/*
-   PAGINA INTERNA DI METEO & RADAR
-
-   Ridotta e centrata nella finestra.
-*/
+/* =====================================================
+   PAGINA METEO & RADAR
+   ===================================================== */
 
 .radar-frame {
 
     position: absolute;
 
-    top: 0;
+    /*
+       La parte superiore della pagina viene
+       spostata fuori dalla finestra.
+    */
+
+    top: -105px;
+
+    /*
+       La larghezza interna viene mantenuta
+       abbastanza grande per conservare
+       l'interfaccia originale.
+    */
 
     left: 50%;
 
@@ -142,24 +176,34 @@ body {
 
     border: 0;
 
+    background: #071522;
+
     border-radius: 10px;
 
-    background: #071522;
+    /*
+       Spostiamo la pagina interna verso sinistra
+       in modo che il pannello radar utile
+       venga centrato nello smartphone.
+    */
 
     transform:
         translateX(-50%)
+        translateX(-155px)
         scale(0.84);
 
     transform-origin:
         top center;
+
 }
 
 
-/* INFORMAZIONI */
+/* =====================================================
+   INFORMAZIONI
+   ===================================================== */
 
 .info {
 
-    margin-top: 9px;
+    margin-top: 8px;
 
     background: #0b1d2b;
 
@@ -167,23 +211,26 @@ body {
 
     border-radius: 10px;
 
-    padding: 9px;
+    padding: 8px;
 
     text-align: center;
 
     color: #82a7b8;
 
     font-size: 10px;
+
 }
 
 
-/* PULSANTE */
+/* =====================================================
+   PULSANTE
+   ===================================================== */
 
 .button {
 
     width: 100%;
 
-    margin-top: 10px;
+    margin-top: 9px;
 
     padding: 12px;
 
@@ -200,65 +247,94 @@ body {
     font-weight: bold;
 
     cursor: pointer;
+
 }
 
 .button:active {
 
     background: #14516b;
+
 }
 
 
-/* SMARTPHONE */
+/* =====================================================
+   SMARTPHONE
+   ===================================================== */
 
-@media (max-width: 670px) {
+@media (max-width: 600px) {
 
     .container {
 
         max-width: 100%;
 
-        padding: 6px;
+        padding: 5px;
+
     }
 
     .title {
 
         font-size: 20px;
+
     }
 
     .subtitle {
 
         font-size: 11px;
+
     }
 
     .radar-card {
 
-        padding: 4px;
-    }
+        padding: 3px;
 
-    .radar-wrapper {
-
-        height: 590px;
-    }
-
-}
-
-
-/* SMARTPHONE PICCOLO */
-
-@media (max-width: 380px) {
-
-    .container {
-
-        padding: 5px;
-    }
-
-    .title {
-
-        font-size: 19px;
     }
 
     .radar-wrapper {
 
         height: 570px;
+
+    }
+
+}
+
+
+/* =====================================================
+   SMARTPHONE PICCOLO
+   ===================================================== */
+
+@media (max-width: 380px) {
+
+    .container {
+
+        padding: 4px;
+
+    }
+
+    .title {
+
+        font-size: 19px;
+
+    }
+
+    .radar-wrapper {
+
+        height: 550px;
+
+    }
+
+}
+
+
+/* =====================================================
+   SMARTPHONE MOLTO STRETTO
+   ===================================================== */
+
+@media (max-width: 350px) {
+
+    .radar-wrapper {
+
+        height: 530px;
+
     }
 
 }
@@ -274,7 +350,9 @@ body {
 <div class="container">
 
 
-    <!-- TESTATA -->
+    <!-- =================================================
+         TESTATA
+         ================================================= -->
 
     <div class="header">
 
@@ -289,13 +367,13 @@ body {
     </div>
 
 
-    <!-- RADAR -->
+    <!-- =================================================
+         RADAR
+         ================================================= -->
 
     <div class="radar-card">
 
-
         <div class="radar-wrapper">
-
 
             <iframe
 
@@ -311,14 +389,14 @@ body {
 
             </iframe>
 
-
         </div>
-
 
     </div>
 
 
-    <!-- INFORMAZIONI -->
+    <!-- =================================================
+         INFORMAZIONI
+         ================================================= -->
 
     <div class="info">
 
@@ -328,7 +406,9 @@ body {
     </div>
 
 
-    <!-- AGGIORNA -->
+    <!-- =================================================
+         AGGIORNA
+         ================================================= -->
 
     <button
         class="button"
