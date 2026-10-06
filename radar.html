@@ -28,74 +28,121 @@ body {
 }
 
 body {
+
     background: #071522;
+
     color: #ffffff;
-    font-family: Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
     overflow-x: hidden;
 }
 
+
+/* CONTENITORE */
+
 .container {
+
     width: 100%;
+
     max-width: 600px;
+
     margin: 0 auto;
+
     padding: 8px;
 }
 
+
+/* TESTATA */
+
 .header {
+
     text-align: center;
+
     margin-bottom: 10px;
 }
 
 .title {
+
     font-size: 21px;
+
     font-weight: bold;
+
     color: #ffffff;
+
     margin-bottom: 3px;
 }
 
 .subtitle {
+
     font-size: 12px;
+
     color: #82d9f7;
 }
 
+
+/* RIQUADRO RADAR */
+
 .radar-card {
+
     width: 100%;
+
     background: #0b1d2b;
+
     border: 1px solid #1c607d;
+
     border-radius: 14px;
-    padding: 5px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+
+    padding: 4px;
+
+    box-shadow:
+        0 4px 18px
+        rgba(0,0,0,0.25);
+
     overflow: hidden;
 }
 
-/*
-   Il radar interno è leggermente più largo
-   dello schermo.
 
-   In questo modo la mappa mantiene la propria
-   interfaccia completa, comprese le icone
-   sulla destra.
-*/
+/* AREA DEL RADAR */
 
 .radar-wrapper {
+
     width: 100%;
-    height: 620px;
+
+    height: 600px;
+
     overflow: hidden;
+
     border-radius: 10px;
+
     position: relative;
 }
 
-.radar-frame {
-    display: block;
 
-    /*
-       Larghezza interna del radar.
-       La pagina viene spostata verso sinistra
-       per lasciare spazio alle icone destre.
-    */
+/*
+    PAGINA METEO & RADAR
+
+    La pagina interna viene ridotta
+    e spostata verso sinistra.
+
+    Questo serve soprattutto a
+    centrare la barra temporale
+    e rendere visibili i comandi
+    sulla destra.
+*/
+
+.radar-frame {
+
+    position: absolute;
+
+    top: 0;
+
+    left: 50%;
 
     width: 700px;
-    min-width: 700px;
 
     height: 700px;
 
@@ -105,80 +152,117 @@ body {
 
     background: #071522;
 
-    position: absolute;
+    transform:
+        translateX(-50%)
+        translateX(-100px)
+        scale(0.84);
 
-    top: 0;
-
-    left: -105px;
+    transform-origin:
+        top center;
 }
 
-/*
-   Informazioni sotto il radar
-*/
+
+/* INFORMAZIONI */
 
 .info {
+
     margin-top: 9px;
+
     background: #0b1d2b;
+
     border: 1px solid #17435b;
+
     border-radius: 10px;
+
     padding: 9px;
+
     text-align: center;
+
     color: #82a7b8;
+
     font-size: 10px;
 }
 
+
+/* PULSANTE */
+
 .button {
+
     width: 100%;
+
     margin-top: 10px;
+
     padding: 12px;
+
     border-radius: 10px;
+
     border: 1px solid #2182a6;
+
     background: #0d3a50;
+
     color: #ffffff;
+
     font-size: 13px;
+
     font-weight: bold;
+
     cursor: pointer;
 }
 
 .button:active {
+
     background: #14516b;
 }
 
-/*
-   Smartphone
-*/
+
+/* MOBILE */
 
 @media (max-width: 600px) {
 
     .container {
+
         padding: 6px;
     }
 
     .title {
+
         font-size: 20px;
     }
 
+    .subtitle {
+
+        font-size: 11px;
+    }
+
+    .radar-card {
+
+        padding: 4px;
+    }
+
     .radar-wrapper {
+
         height: 600px;
     }
 
 }
 
-/*
-   Smartphone piccoli
-*/
+
+/* SMARTPHONE PICCOLO */
 
 @media (max-width: 380px) {
 
     .container {
+
         padding: 5px;
     }
 
     .title {
+
         font-size: 19px;
     }
 
     .radar-wrapper {
+
         height: 570px;
     }
 
@@ -195,6 +279,8 @@ body {
 <div class="container">
 
 
+    <!-- TESTATA -->
+
     <div class="header">
 
         <div class="title">
@@ -208,6 +294,8 @@ body {
     </div>
 
 
+    <!-- RADAR -->
+
     <div class="radar-card">
 
 
@@ -220,7 +308,7 @@ body {
 
                 class="radar-frame"
 
-                src="https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.30&zoom=7.2&loop=true"
+                src="https://www.meteoeradar.it/radar-meteo?center=45.54%2C12.16&zoom=7.53&loop=true"
 
                 title="Radar Meteo & Radar"
 
@@ -235,6 +323,8 @@ body {
     </div>
 
 
+    <!-- INFORMAZIONI -->
+
     <div class="info">
 
         Radar Meteo & Radar ·
@@ -242,6 +332,8 @@ body {
 
     </div>
 
+
+    <!-- AGGIORNA -->
 
     <button
         class="button"
@@ -263,7 +355,7 @@ function reloadRadar() {
         document.getElementById("radar");
 
     radar.src =
-        "https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.30&zoom=7.2&loop=true&t=" +
+        "https://www.meteoeradar.it/radar-meteo?center=45.54%2C12.16&zoom=7.53&loop=true&t=" +
         Date.now();
 
 }
