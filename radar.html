@@ -35,25 +35,21 @@ body {
 }
 
 
-/* =====================================================
-   CONTENITORE
-   ===================================================== */
+/* CONTENITORE */
 
 .container {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    padding: 6px;
+    padding: 5px;
 }
 
 
-/* =====================================================
-   TESTATA
-   ===================================================== */
+/* TESTATA */
 
 .header {
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
 }
 
 .title {
@@ -70,54 +66,54 @@ body {
 
 
 /* =====================================================
-   FINESTRA BLU DEL RADAR
+   CORNICE ESTERNA BLU
+   =====================================================
 
-   RIDOTTA E ADATTATA ALLO SMARTPHONE
+   Deve essere appena attorno al radar.
+   Niente grande fascia vuota.
    ===================================================== */
 
 .radar-card {
-    width: 100%;
-    max-width: 590px;
+    width: fit-content;
+    max-width: 100%;
     margin: 0 auto;
 
     background: #0b1d2b;
 
     border: 1px solid #1c607d;
 
-    border-radius: 12px;
+    border-radius: 10px;
 
-    padding: 3px;
-
-    box-shadow:
-        0 4px 18px
-        rgba(0,0,0,0.25);
+    padding: 2px;
 
     overflow: hidden;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,0.25);
 }
 
 
 /* =====================================================
-   FINESTRA VISIBILE DEL RADAR
+   FINESTRA RADAR
    ===================================================== */
 
 .radar-wrapper {
+
     width: 100%;
-    height: 560px;
+
+    height: 550px;
 
     overflow: hidden;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     position: relative;
 }
 
 
 /* =====================================================
-   METEO & RADAR
-
-   La pagina viene ingrandita internamente ma
-   la finestra esterna mostra solamente la parte
-   utile.
+   PAGINA METEO & RADAR
    ===================================================== */
 
 .radar-frame {
@@ -136,7 +132,7 @@ body {
 
     background: #071522;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     transform:
         translateX(-50%)
@@ -153,9 +149,8 @@ body {
    ===================================================== */
 
 .info {
-    width: 100%;
 
-    margin-top: 8px;
+    margin-top: 7px;
 
     background: #0b1d2b;
 
@@ -181,7 +176,7 @@ body {
 
     width: 100%;
 
-    margin-top: 9px;
+    margin-top: 8px;
 
     padding: 12px;
 
@@ -212,8 +207,7 @@ body {
 @media (max-width: 600px) {
 
     .container {
-        max-width: 100%;
-        padding: 5px;
+        padding: 4px;
     }
 
     .title {
@@ -225,13 +219,13 @@ body {
     }
 
     .radar-card {
-        width: calc(100% - 8px);
-        max-width: 590px;
-        padding: 3px;
+        width: fit-content;
+        max-width: calc(100vw - 8px);
+        padding: 2px;
     }
 
     .radar-wrapper {
-        height: 550px;
+        height: 540px;
     }
 
 }
@@ -244,7 +238,7 @@ body {
 @media (max-width: 380px) {
 
     .container {
-        padding: 4px;
+        padding: 3px;
     }
 
     .title {
@@ -252,11 +246,11 @@ body {
     }
 
     .radar-card {
-        width: calc(100% - 6px);
+        max-width: calc(100vw - 6px);
     }
 
     .radar-wrapper {
-        height: 530px;
+        height: 520px;
     }
 
 }
@@ -272,8 +266,6 @@ body {
 <div class="container">
 
 
-    <!-- TESTATA -->
-
     <div class="header">
 
         <div class="title">
@@ -287,11 +279,11 @@ body {
     </div>
 
 
-    <!-- RADAR -->
-
     <div class="radar-card">
 
+
         <div class="radar-wrapper">
+
 
             <iframe
 
@@ -307,12 +299,12 @@ body {
 
             </iframe>
 
+
         </div>
+
 
     </div>
 
-
-    <!-- INFORMAZIONI -->
 
     <div class="info">
 
@@ -321,8 +313,6 @@ body {
 
     </div>
 
-
-    <!-- AGGIORNA -->
 
     <button
         class="button"
