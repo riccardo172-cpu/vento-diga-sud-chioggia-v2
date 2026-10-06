@@ -1,1 +1,367 @@
+<!DOCTYPE html>
+<html lang="it">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>Radar Meteo · Sottomarina</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: #071522;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   CONTENITORE
+   ===================================================== */
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+
+/* =====================================================
+   TESTATA
+   ===================================================== */
+
+.header {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.title {
+    font-size: 21px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #82d9f7;
+}
+
+
+/* =====================================================
+   CORNICE ESTERNA BLU
+
+   La cornice deve seguire la larghezza
+   effettiva della schermata radar.
+   ===================================================== */
+
+.radar-card {
+
+    width: 500px;
+
+    max-width: calc(100vw - 10px);
+
+    margin: 0 auto;
+
+    background: #0b1d2b;
+
+    border: 1px solid #1c607d;
+
+    border-radius: 10px;
+
+    padding: 3px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,0.25);
+}
+
+
+/* =====================================================
+   FINESTRA RADAR
+   ===================================================== */
+
+.radar-wrapper {
+
+    width: 100%;
+
+    height: 560px;
+
+    overflow: hidden;
+
+    border-radius: 7px;
+
+    position: relative;
+}
+
+
+/* =====================================================
+   PAGINA METEO & RADAR
+   ===================================================== */
+
+.radar-frame {
+
+    position: absolute;
+
+    top: -105px;
+
+    left: 50%;
+
+    width: 700px;
+
+    height: 700px;
+
+    border: 0;
+
+    background: #071522;
+
+    border-radius: 7px;
+
+    transform:
+        translateX(-50%)
+        translateX(-5px)
+        scale(0.84);
+
+    transform-origin:
+        top center;
+}
+
+
+/* =====================================================
+   INFORMAZIONI
+   ===================================================== */
+
+.info {
+
+    width: 100%;
+
+    margin-top: 7px;
+
+    background: #0b1d2b;
+
+    border: 1px solid #17435b;
+
+    border-radius: 9px;
+
+    padding: 8px;
+
+    text-align: center;
+
+    color: #82a7b8;
+
+    font-size: 10px;
+}
+
+
+/* =====================================================
+   PULSANTE
+   ===================================================== */
+
+.button {
+
+    width: 100%;
+
+    margin-top: 8px;
+
+    padding: 12px;
+
+    border-radius: 9px;
+
+    border: 1px solid #2182a6;
+
+    background: #0d3a50;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.button:active {
+    background: #14516b;
+}
+
+
+/* =====================================================
+   SMARTPHONE
+   ===================================================== */
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 4px;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .subtitle {
+        font-size: 11px;
+    }
+
+    /*
+       Su smartphone la cornice occupa
+       tutta la larghezza disponibile,
+       senza eccedere lo schermo.
+    */
+
+    .radar-card {
+
+        width: calc(100vw - 10px);
+
+        max-width: 500px;
+
+        padding: 3px;
+    }
+
+    .radar-wrapper {
+        height: 550px;
+    }
+
+}
+
+
+/* =====================================================
+   SMARTPHONE PICCOLO
+   ===================================================== */
+
+@media (max-width: 380px) {
+
+    .container {
+        padding: 3px;
+    }
+
+    .title {
+        font-size: 19px;
+    }
+
+    .radar-card {
+        width: calc(100vw - 8px);
+    }
+
+    .radar-wrapper {
+        height: 530px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- TESTATA -->
+
+    <div class="header">
+
+        <div class="title">
+            Sottomarina
+        </div>
+
+        <div class="subtitle">
+            Radar meteorologico
+        </div>
+
+    </div>
+
+
+    <!-- RADAR -->
+
+    <div class="radar-card">
+
+        <div class="radar-wrapper">
+
+            <iframe
+
+                id="radar"
+
+                class="radar-frame"
+
+                src="https://www.meteoeradar.it/radar-meteo?center=45.54%2C12.16&zoom=7.53&loop=true"
+
+                title="Radar Meteo & Radar"
+
+                allowfullscreen>
+
+            </iframe>
+
+        </div>
+
+    </div>
+
+
+    <!-- INFORMAZIONI -->
+
+    <div class="info">
+
+        Radar Meteo & Radar · animazione radar
+
+    </div>
+
+
+    <!-- AGGIORNA -->
+
+    <button
+        class="button"
+        onclick="reloadRadar()">
+
+        AGGIORNA RADAR
+
+    </button>
+
+
+</div>
+
+
+<script>
+
+function reloadRadar() {
+
+    const radar =
+        document.getElementById("radar");
+
+    radar.src =
+        "https://www.meteoeradar.it/radar-meteo?center=45.54%2C12.16&zoom=7.53&loop=true&t=" +
+        Date.now();
+
+}
+
+</script>
+
+
+</body>
+
+</html>
