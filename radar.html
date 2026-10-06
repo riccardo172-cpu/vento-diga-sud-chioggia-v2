@@ -28,188 +28,94 @@ body {
 }
 
 body {
-
     background: #071522;
-
     color: #ffffff;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
     overflow-x: hidden;
 }
 
 .container {
-
     width: 100%;
-
-    max-width: 900px;
-
+    max-width: 1000px;
     margin: 0 auto;
-
-    padding: 14px;
+    padding: 12px;
 }
 
 .header {
-
     text-align: center;
-
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 .title {
-
-    font-size: 24px;
-
+    font-size: 23px;
     font-weight: bold;
-
     color: #ffffff;
-
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .subtitle {
-
     font-size: 13px;
-
     color: #82d9f7;
-}
-
-.status {
-
-    background: #0b1d2b;
-
-    border: 1px solid #17435b;
-
-    border-radius: 12px;
-
-    padding: 10px 13px;
-
-    margin-bottom: 12px;
-
-    text-align: center;
-
-    color: #82d9f7;
-
-    font-size: 12px;
 }
 
 .radar-card {
-
-    background:
-        linear-gradient(
-            180deg,
-            #0d2a3d 0%,
-            #091d2b 100%
-        );
-
+    background: #0b1d2b;
     border: 1px solid #1c607d;
-
-    border-radius: 16px;
-
-    padding: 10px;
-
-    box-shadow:
-        0 4px 18px
-        rgba(0,0,0,0.25);
-
+    border-radius: 15px;
+    padding: 8px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
     overflow: hidden;
 }
 
-.radar-title {
-
-    text-align: center;
-
-    color: #82d9f7;
-
-    font-size: 14px;
-
-    font-weight: bold;
-
-    margin-bottom: 9px;
-}
-
 .radar-frame {
-
-    width: 100%;
-
-    height: 600px;
-
-    border: 0;
-
-    border-radius: 10px;
-
-    background: #ffffff;
-
     display: block;
-}
-
-.note {
-
-    margin-top: 12px;
-
-    background: #0b1d2b;
-
-    border: 1px solid #17435b;
-
-    border-radius: 11px;
-
-    padding: 11px;
-
-    color: #82a7b8;
-
-    font-size: 11px;
-
-    line-height: 1.45;
-
-    text-align: center;
-}
-
-.refresh {
-
     width: 100%;
-
-    background: #0d3a50;
-
-    border: 1px solid #2182a6;
-
-    color: #ffffff;
-
+    height: 720px;
+    border: 0;
     border-radius: 10px;
-
-    padding: 12px;
-
-    font-size: 13px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    margin-top: 12px;
+    background: #071522;
 }
 
-.refresh:active {
+.info {
+    margin-top: 10px;
+    background: #0b1d2b;
+    border: 1px solid #17435b;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    color: #82a7b8;
+    font-size: 11px;
+}
 
+.button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #2182a6;
+    background: #0d3a50;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button:active {
     background: #14516b;
 }
 
 @media (max-width: 600px) {
 
     .container {
-
-        padding: 10px;
+        padding: 8px;
     }
 
     .title {
-
         font-size: 21px;
     }
 
     .radar-frame {
-
-        height: 520px;
+        height: 650px;
     }
 
 }
@@ -217,8 +123,7 @@ body {
 @media (max-width: 400px) {
 
     .radar-frame {
-
-        height: 470px;
+        height: 590px;
     }
 
 }
@@ -241,63 +146,36 @@ body {
         </div>
 
         <div class="subtitle">
-            Radar meteorologico Veneto
+            Radar meteorologico
         </div>
-
-    </div>
-
-
-    <div class="status">
-
-        Radar ARPAV · aggiornamento ogni 10 minuti
 
     </div>
 
 
     <div class="radar-card">
 
-
-        <div class="radar-title">
-
-            MOSAICO RADAR METEO VENETO
-
-        </div>
-
-
         <iframe
-
-            id="radarFrame"
-
+            id="radar"
             class="radar-frame"
-
-            src="https://meteo.arpa.veneto.it/?page=mosaicoradar"
-
-            title="Mosaico Radar Meteo Veneto"
-
-            loading="eager"
-
+            src="https://www.meteoeradar.it/radar-meteo?center=45.66%2C13.36&zoom=5.69&loop=true"
+            title="Radar Meteo & Radar"
             allowfullscreen>
-
         </iframe>
-
 
     </div>
 
 
-    <div class="note">
+    <div class="info">
 
-        Fonte dati: ARPAV · Radar di Teolo e
-        Concordia Sagittaria.<br>
-
-        Le immagini radar sono pubblicate in tempo reale
-        e hanno carattere divulgativo.
+        Radar Meteo & Radar ·
+        visualizzazione interattiva
 
     </div>
 
 
     <button
-        class="refresh"
-        onclick="refreshRadar()">
+        class="button"
+        onclick="reloadRadar()">
 
         AGGIORNA RADAR
 
@@ -309,15 +187,13 @@ body {
 
 <script>
 
-function refreshRadar() {
+function reloadRadar() {
 
-    const frame =
-        document.getElementById(
-            "radarFrame"
-        );
+    const radar =
+        document.getElementById("radar");
 
-    frame.src =
-        "https://meteo.arpa.veneto.it/?page=mosaicoradar&t=" +
+    radar.src =
+        "https://www.meteoeradar.it/radar-meteo?center=45.66%2C13.36&zoom=5.69&loop=true&t=" +
         Date.now();
 
 }
