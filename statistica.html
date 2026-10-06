@@ -2,189 +2,358 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
 
-<title>Statistiche vento – Diga Sud Chioggia</title>
+<title>Statistiche vento - Diga Sud Chioggia</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
 
-    body {
-        margin: 0;
-        background: #071522;
-        color: #ffffff;
-        font-family: Arial, Helvetica, sans-serif;
-    }
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: #071522;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 14px;
+}
+
+/* =========================
+   TESTATA
+========================= */
+
+.header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.logo-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.logo-subtitle {
+    font-size: 13px;
+    color: #82d9f7;
+}
+
+/* =========================
+   STATO
+========================= */
+
+.status {
+    background: #0b1d2b;
+    border: 1px solid #17435b;
+    border-radius: 12px;
+    padding: 11px 13px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.status-text {
+    color: #82d9f7;
+    font-size: 12px;
+}
+
+/* =========================
+   CARD PRINCIPALE
+========================= */
+
+.main-card {
+    background: linear-gradient(
+        180deg,
+        #0d2a3d 0%,
+        #091d2b 100%
+    );
+
+    border: 1px solid #1c607d;
+    border-radius: 16px;
+
+    padding: 22px 15px;
+
+    text-align: center;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.25);
+
+    margin-bottom: 14px;
+}
+
+.main-label {
+    color: #82d9f7;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.4px;
+}
+
+.main-number {
+    font-size: 64px;
+    line-height: 1;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 8px 0;
+}
+
+.main-text {
+    font-size: 16px;
+    color: #d4e8f1;
+}
+
+.main-rule {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #82a7b8;
+}
+
+/* =========================
+   INFO
+========================= */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-bottom: 14px;
+}
+
+.info-card {
+    background: #0b1d2b;
+    border: 1px solid #17435b;
+    border-radius: 11px;
+    padding: 12px;
+    min-width: 0;
+}
+
+.info-label {
+    font-size: 10px;
+    color: #82d9f7;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    word-break: break-word;
+}
+
+/* =========================
+   TITOLO SEZIONE
+========================= */
+
+.section {
+    background: #0b1d2b;
+    border: 1px solid #17435b;
+    border-radius: 14px;
+    padding: 13px;
+    margin-bottom: 14px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+/* =========================
+   GIORNATA
+========================= */
+
+.day-card {
+    background: #081925;
+    border: 1px solid #16465e;
+    border-radius: 11px;
+
+    padding: 12px;
+
+    margin-bottom: 9px;
+}
+
+.day-card:last-child {
+    margin-bottom: 0;
+}
+
+.day-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+.day-date {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.day-duration {
+    background: #103a4e;
+    border: 1px solid #1b6987;
+    color: #8ee2ff;
+
+    border-radius: 7px;
+
+    padding: 5px 8px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+.day-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+}
+
+.day-info {
+    background: #0b2231;
+    border-radius: 7px;
+    padding: 8px;
+}
+
+.day-info-label {
+    font-size: 9px;
+    color: #6faec5;
+    margin-bottom: 3px;
+}
+
+.day-info-value {
+    font-size: 12px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* =========================
+   NESSUN DATO
+========================= */
+
+.no-data {
+    text-align: center;
+    color: #82a7b8;
+    padding: 20px 5px;
+    font-size: 13px;
+}
+
+/* =========================
+   PULSANTE
+========================= */
+
+.refresh {
+    width: 100%;
+
+    background: #0d3a50;
+    border: 1px solid #2182a6;
+
+    color: #ffffff;
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 3px;
+}
+
+.refresh:active {
+    background: #14516b;
+}
+
+/* =========================
+   ERRORE
+========================= */
+
+.error {
+    background: #351719;
+    border: 1px solid #713238;
+    color: #ffb8b8;
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    font-size: 13px;
+
+    margin-top: 12px;
+}
+
+/* =========================
+   DESKTOP
+========================= */
+
+@media (min-width: 701px) {
 
     .container {
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 20px;
+        padding-top: 25px;
     }
 
-    h1 {
-        margin: 0 0 6px 0;
-        font-size: 28px;
-        color: #ffffff;
+    .main-number {
+        font-size: 72px;
     }
 
-    .subtitle {
-        color: #8fdfff;
-        margin-bottom: 22px;
-        font-size: 15px;
+}
+
+/* =========================
+   SMARTPHONE MOLTO PICCOLO
+========================= */
+
+@media (max-width: 360px) {
+
+    .container {
+        padding: 10px;
     }
 
-    .status {
-        background: #0d2233;
-        border: 1px solid #1c4058;
-        border-radius: 12px;
-        padding: 15px;
-        margin-bottom: 20px;
+    .logo-title {
+        font-size: 21px;
     }
 
-    .status-title {
-        font-size: 13px;
-        color: #8fdfff;
-        margin-bottom: 5px;
+    .main-number {
+        font-size: 54px;
     }
 
-    .status-text {
-        font-size: 15px;
+    .main-card {
+        padding: 18px 12px;
     }
 
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-bottom: 22px;
-    }
-
-    .card {
-        background: #0d2233;
-        border: 1px solid #1c4058;
-        border-radius: 12px;
-        padding: 18px;
-        min-height: 105px;
-    }
-
-    .card-label {
-        font-size: 13px;
-        color: #8fdfff;
-        margin-bottom: 10px;
-    }
-
-    .card-value {
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .card-small {
-        font-size: 13px;
-        color: #a9bac5;
-        margin-top: 5px;
-    }
-
-    .section {
-        background: #0d2233;
-        border: 1px solid #1c4058;
-        border-radius: 12px;
-        padding: 18px;
-        margin-bottom: 20px;
-    }
-
-    .section h2 {
-        margin: 0 0 15px 0;
-        font-size: 19px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-    }
-
-    .info {
-        background: #091b29;
-        border-radius: 9px;
-        padding: 12px;
-    }
-
-    .info-label {
-        font-size: 12px;
-        color: #8fdfff;
-        margin-bottom: 5px;
-    }
-
-    .info-value {
-        font-size: 15px;
-    }
-
-    .loading {
-        text-align: center;
-        padding: 35px 10px;
-        color: #8fdfff;
-    }
-
-    .error {
-        background: #351719;
-        border: 1px solid #7d3438;
-        color: #ffb4b4;
-        border-radius: 10px;
-        padding: 15px;
-        margin-top: 15px;
-    }
-
-    .refresh {
-        margin-top: 18px;
-        padding: 11px 18px;
-        border: none;
-        border-radius: 8px;
-        background: #19a7d8;
-        color: white;
+    .day-date {
         font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
     }
 
-    .refresh:hover {
-        background: #168db7;
+    .day-duration {
+        font-size: 11px;
     }
 
-    @media (max-width: 800px) {
-        .cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
+}
 
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 500px) {
-        .container {
-            padding: 12px;
-        }
-
-        h1 {
-            font-size: 23px;
-        }
-
-        .cards {
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .card {
-            padding: 13px;
-        }
-
-        .card-value {
-            font-size: 23px;
-        }
-    }
 </style>
 </head>
 
@@ -192,138 +361,254 @@
 
 <div class="container">
 
-    <h1>Statistiche vento</h1>
+    <!-- =========================
+         TESTATA
+    ========================== -->
 
-    <div class="subtitle">
-        Diga Sud Chioggia · vento medio superiore a 14 nodi
+    <div class="header">
+
+        <div class="logo-title">
+            Diga Sud Chioggia
+        </div>
+
+        <div class="logo-subtitle">
+            Statistiche vento · ultimi 3 mesi
+        </div>
+
     </div>
+
+
+    <!-- =========================
+         STATO
+    ========================== -->
 
     <div class="status">
-        <div class="status-title">STATO DATI</div>
-        <div id="statusText" class="status-text">
+
+        <div id="statusText"
+             class="status-text">
+
             Caricamento dati...
-        </div>
-    </div>
-
-    <div id="loading" class="loading">
-        Sto leggendo i dati della stazione...
-    </div>
-
-    <div id="content" style="display:none;">
-
-        <div class="cards">
-
-            <div class="card">
-                <div class="card-label">RILEVAZIONI &gt; 14 KT</div>
-                <div id="qualifying" class="card-value">-</div>
-                <div class="card-small">ultimi 3 mesi</div>
-            </div>
-
-            <div class="card">
-                <div class="card-label">MISURE TOTALI</div>
-                <div id="total" class="card-value">-</div>
-                <div class="card-small">dati disponibili</div>
-            </div>
-
-            <div class="card">
-                <div class="card-label">VENTO MEDIO MASSIMO</div>
-                <div id="maxWind" class="card-value">-</div>
-                <div class="card-small">tra le rilevazioni &gt; 14 kt</div>
-            </div>
-
-            <div class="card">
-                <div class="card-label">RAFFICA MASSIMA</div>
-                <div id="maxGust" class="card-value">-</div>
-                <div class="card-small">tra le rilevazioni disponibili</div>
-            </div>
 
         </div>
+
+    </div>
+
+
+    <!-- =========================
+         CONTENUTO
+    ========================== -->
+
+    <div id="content"
+         style="display:none;">
+
+
+        <!-- =========================
+             NUMERO GIORNATE
+        ========================== -->
+
+        <div class="main-card">
+
+            <div class="main-label">
+                GIORNATE DI VENTO
+            </div>
+
+            <div id="dayCount"
+                 class="main-number">
+                -
+            </div>
+
+            <div class="main-text">
+                giornate con almeno 2 ore consecutive
+                oltre 14 nodi
+            </div>
+
+            <div class="main-rule">
+                Solo nel periodo tra alba e tramonto
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             PERIODO / DATI
+        ========================== -->
+
+        <div class="info-grid">
+
+            <div class="info-card">
+
+                <div class="info-label">
+                    PERIODO
+                </div>
+
+                <div id="period"
+                     class="info-value">
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-label">
+                    SOGLIA VENTO
+                </div>
+
+                <div class="info-value">
+                    &gt; 14 kt
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-label">
+                    MISURE VALIDE
+                </div>
+
+                <div id="measurements"
+                     class="info-value">
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-label">
+                    DURATA MINIMA
+                </div>
+
+                <div class="info-value">
+                    2 ore
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             ELENCO GIORNATE
+        ========================== -->
 
         <div class="section">
 
-            <h2>Periodo analizzato</h2>
+            <div class="section-title">
+                Giornate di vento
+            </div>
 
-            <div class="info-grid">
-
-                <div class="info">
-                    <div class="info-label">DAL</div>
-                    <div id="periodFrom" class="info-value">-</div>
-                </div>
-
-                <div class="info">
-                    <div class="info-label">AL</div>
-                    <div id="periodTo" class="info-value">-</div>
-                </div>
-
-                <div class="info">
-                    <div class="info-label">SOGLIA</div>
-                    <div class="info-value">Oltre 14 nodi</div>
-                </div>
-
+            <div id="daysList">
             </div>
 
         </div>
 
-        <div class="section">
 
-            <h2>Prima e ultima rilevazione utile</h2>
+        <!-- =========================
+             AGGIORNA
+        ========================== -->
 
-            <div class="info-grid">
+        <button class="refresh"
+                onclick="loadData()">
 
-                <div class="info">
-                    <div class="info-label">PRIMA</div>
-                    <div id="firstData" class="info-value">-</div>
-                </div>
-
-                <div class="info">
-                    <div class="info-label">ULTIMA</div>
-                    <div id="lastData" class="info-value">-</div>
-                </div>
-
-                <div class="info">
-                    <div class="info-label">AGGIORNAMENTO</div>
-                    <div id="updated" class="info-value">-</div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <button class="refresh" onclick="loadData()">
             AGGIORNA DATI
+
         </button>
 
+
     </div>
 
-    <div id="error"></div>
+
+    <!-- =========================
+         CARICAMENTO
+    ========================== -->
+
+    <div id="loading"
+         class="status">
+
+        <div class="status-text">
+            Sto leggendo i dati della stazione...
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         ERRORE
+    ========================== -->
+
+    <div id="error">
+    </div>
 
 </div>
 
+
 <script>
+
+/* =====================================================
+   WORKER
+===================================================== */
 
 const WORKER_URL =
     "https://statistica-diga-sud.riccardo172.workers.dev/";
 
+
+/* =====================================================
+   PARAMETRI
+===================================================== */
+
+const THRESHOLD =
+    14;
+
+const MINUTES_REQUIRED =
+    120;
+
+const MEASUREMENT_INTERVAL =
+    5;
+
+
+/* =====================================================
+   CARICAMENTO DATI
+===================================================== */
+
 async function loadData() {
 
     const loading =
-        document.getElementById("loading");
+        document.getElementById(
+            "loading"
+        );
 
     const content =
-        document.getElementById("content");
+        document.getElementById(
+            "content"
+        );
 
     const error =
-        document.getElementById("error");
+        document.getElementById(
+            "error"
+        );
 
-    const statusText =
-        document.getElementById("statusText");
+    const status =
+        document.getElementById(
+            "statusText"
+        );
 
-    loading.style.display = "block";
-    content.style.display = "none";
-    error.innerHTML = "";
 
-    statusText.textContent =
+    loading.style.display =
+        "block";
+
+    content.style.display =
+        "none";
+
+    error.innerHTML =
+        "";
+
+    status.textContent =
         "Caricamento dati...";
+
 
     try {
 
@@ -337,6 +622,7 @@ async function loadData() {
                 }
             );
 
+
         if (!response.ok) {
 
             throw new Error(
@@ -346,130 +632,127 @@ async function loadData() {
 
         }
 
+
         const result =
             await response.json();
+
 
         if (!result.ok) {
 
             throw new Error(
                 result.error ||
-                "Il Worker ha restituito un errore"
+                "Errore restituito dal Worker"
             );
 
         }
+
 
         const data =
-            Array.isArray(result.data)
-                ? result.data
-                : [];
+            Array.isArray(
+                result.data
+            )
+            ? result.data
+            : [];
 
-        if (data.length === 0) {
+
+        if (
+            data.length === 0
+        ) {
 
             throw new Error(
-                "Nessuna rilevazione superiore a 14 nodi."
+                "Nessun dato superiore a 14 nodi."
             );
 
         }
 
-        document.getElementById(
-            "qualifying"
-        ).textContent =
-            result.qualifyingMeasurements
-            .toLocaleString("it-IT");
 
-        document.getElementById(
-            "total"
-        ).textContent =
-            result.totalMeasurements
-            .toLocaleString("it-IT");
+        /*
+         * Ordiniamo le rilevazioni
+         * cronologicamente.
+         */
 
-        let maxWind = 0;
-        let maxGust = 0;
+        data.sort(
+            function(a, b) {
 
-        for (const item of data) {
+                return (
+                    parseStationDate(
+                        a.timestamp
+                    ) -
+                    parseStationDate(
+                        b.timestamp
+                    )
+                );
 
-            if (
-                typeof item.windKnots ===
-                "number" &&
-                item.windKnots > maxWind
-            ) {
-                maxWind =
-                    item.windKnots;
             }
+        );
 
-            if (
-                typeof item.maxKnots ===
-                "number" &&
-                item.maxKnots > maxGust
-            ) {
-                maxGust =
-                    item.maxKnots;
-            }
 
-        }
+        /*
+         * Individua le giornate
+         * con almeno 2 ore consecutive.
+         */
 
-        document.getElementById(
-            "maxWind"
-        ).textContent =
-            maxWind.toFixed(1) +
-            " kt";
-
-        document.getElementById(
-            "maxGust"
-        ).textContent =
-            maxGust.toFixed(1) +
-            " kt";
-
-        document.getElementById(
-            "periodFrom"
-        ).textContent =
-            formatDate(
-                result.period.from
+        const windDays =
+            calculateWindDays(
+                data
             );
 
+
+        /*
+         * Numero finale.
+         */
+
         document.getElementById(
-            "periodTo"
+            "dayCount"
         ).textContent =
-            formatDate(
-                result.period.to
+            windDays.length;
+
+
+        /*
+         * Informazioni periodo.
+         */
+
+        document.getElementById(
+            "period"
+        ).textContent =
+            formatPeriod(
+                result.period
             );
 
-        const first =
-            data[0];
-
-        const last =
-            data[data.length - 1];
 
         document.getElementById(
-            "firstData"
+            "measurements"
         ).textContent =
-            formatMeasurement(first);
-
-        document.getElementById(
-            "lastData"
-        ).textContent =
-            formatMeasurement(last);
-
-        const now =
-            new Date();
-
-        document.getElementById(
-            "updated"
-        ).textContent =
-            now.toLocaleString(
+            data.length.toLocaleString(
                 "it-IT"
             );
 
-        statusText.textContent =
-            "Dati caricati correttamente · " +
-            data.length.toLocaleString("it-IT") +
-            " rilevazioni oltre 14 nodi.";
+
+        /*
+         * Disegna le giornate.
+         */
+
+        renderDays(
+            windDays
+        );
+
+
+        /*
+         * Stato.
+         */
+
+        status.textContent =
+            "Dati aggiornati · " +
+            windDays.length +
+            " giornate di vento significative";
+
 
         loading.style.display =
             "none";
 
         content.style.display =
             "block";
+
 
     } catch (err) {
 
@@ -479,8 +762,10 @@ async function loadData() {
         content.style.display =
             "none";
 
-        statusText.textContent =
+
+        status.textContent =
             "Errore nel caricamento";
+
 
         error.innerHTML =
             '<div class="error">' +
@@ -493,70 +778,847 @@ async function loadData() {
 
 }
 
-function formatDate(value) {
 
-    if (!value) {
-        return "-";
+/* =====================================================
+   CALCOLO GIORNATE
+===================================================== */
+
+function calculateWindDays(
+    data
+) {
+
+    const days = {};
+
+
+    /*
+     * Raggruppiamo tutte le misure
+     * per data.
+     */
+
+    for (
+        const item of data
+    ) {
+
+        if (
+            typeof item.windKnots !==
+            "number"
+        ) {
+            continue;
+        }
+
+
+        if (
+            item.windKnots <=
+            THRESHOLD
+        ) {
+            continue;
+        }
+
+
+        const date =
+            item.timestamp.substring(
+                0,
+                10
+            );
+
+
+        if (!days[date]) {
+
+            days[date] = [];
+
+        }
+
+
+        days[date].push(
+            item
+        );
+
     }
 
-    const parts =
-        value.split("-");
 
-    if (parts.length !== 3) {
-        return value;
+    const result = [];
+
+
+    /*
+     * Analizziamo ogni giornata.
+     */
+
+    for (
+        const date of Object.keys(
+            days
+        )
+    ) {
+
+        const measurements =
+            days[date];
+
+
+        measurements.sort(
+            function(a, b) {
+
+                return (
+                    parseStationDate(
+                        a.timestamp
+                    ) -
+                    parseStationDate(
+                        b.timestamp
+                    )
+                );
+
+            }
+        );
+
+
+        let sequence = [];
+
+
+        for (
+            let i = 0;
+            i < measurements.length;
+            i++
+        ) {
+
+            const current =
+                measurements[i];
+
+
+            if (
+                sequence.length === 0
+            ) {
+
+                sequence = [
+                    current
+                ];
+
+                continue;
+
+            }
+
+
+            const previous =
+                sequence[
+                    sequence.length - 1
+                ];
+
+
+            const previousTime =
+                parseStationDate(
+                    previous.timestamp
+                );
+
+            const currentTime =
+                parseStationDate(
+                    current.timestamp
+                );
+
+
+            const difference =
+                (
+                    currentTime -
+                    previousTime
+                ) /
+                60000;
+
+
+            /*
+             * Le misure devono essere
+             * consecutive a 5 minuti.
+             */
+
+            if (
+                difference ===
+                MEASUREMENT_INTERVAL
+            ) {
+
+                sequence.push(
+                    current
+                );
+
+            } else {
+
+                /*
+                 * La sequenza si è interrotta.
+                 * Controlliamo quella precedente.
+                 */
+
+                const valid =
+                    evaluateSequence(
+                        sequence
+                    );
+
+
+                if (
+                    valid
+                ) {
+
+                    result.push(
+                        valid
+                    );
+
+                }
+
+
+                sequence = [
+                    current
+                ];
+
+            }
+
+        }
+
+
+        /*
+         * Controlliamo l'ultima sequenza
+         * della giornata.
+         */
+
+        if (
+            sequence.length > 0
+        ) {
+
+            const valid =
+                evaluateSequence(
+                    sequence
+                );
+
+
+            if (
+                valid
+            ) {
+
+                result.push(
+                    valid
+                );
+
+            }
+
+        }
+
     }
 
-    return (
-        parts[2] +
-        "/" +
-        parts[1] +
-        "/" +
-        parts[0]
+
+    /*
+     * Una sola giornata.
+     *
+     * Se nella stessa giornata
+     * ci sono più periodi validi,
+     * scegliamo quello più lungo.
+     */
+
+    const uniqueDays = {};
+
+
+    for (
+        const period of result
+    ) {
+
+        if (
+            !uniqueDays[
+                period.date
+            ]
+        ) {
+
+            uniqueDays[
+                period.date
+            ] = period;
+
+        } else if (
+            period.durationMinutes >
+            uniqueDays[
+                period.date
+            ].durationMinutes
+        ) {
+
+            uniqueDays[
+                period.date
+            ] = period;
+
+        }
+
+    }
+
+
+    const finalResult =
+        Object.values(
+            uniqueDays
+        );
+
+
+    /*
+     * Ordine cronologico.
+     */
+
+    finalResult.sort(
+        function(a, b) {
+
+            return (
+                parseStationDate(
+                    a.start
+                ) -
+                parseStationDate(
+                    b.start
+                )
+            );
+
+        }
+    );
+
+
+    return finalResult;
+
+}
+
+
+/* =====================================================
+   VALUTA SEQUENZA
+===================================================== */
+
+function evaluateSequence(
+    sequence
+) {
+
+    if (
+        sequence.length <
+        (
+            MINUTES_REQUIRED /
+            MEASUREMENT_INTERVAL
+        ) + 1
+    ) {
+
+        return null;
+
+    }
+
+
+    const first =
+        sequence[0];
+
+    const last =
+        sequence[
+            sequence.length - 1
+        ];
+
+
+    const start =
+        parseStationDate(
+            first.timestamp
+        );
+
+    const end =
+        parseStationDate(
+            last.timestamp
+        );
+
+
+    /*
+     * Durata reale.
+     *
+     * Esempio:
+     * 05:00, 05:05 ... 07:00
+     * = 2 ore.
+     */
+
+    const durationMinutes =
+        (
+            end -
+            start
+        ) /
+        60000;
+
+
+    if (
+        durationMinutes <
+        MINUTES_REQUIRED
+    ) {
+
+        return null;
+
+    }
+
+
+    /*
+     * Calcoliamo il vento massimo
+     * della sequenza.
+     */
+
+    let maxWind =
+        0;
+
+    let maxGust =
+        0;
+
+
+    for (
+        const item of sequence
+    ) {
+
+        if (
+            typeof item.windKnots ===
+            "number"
+        ) {
+
+            if (
+                item.windKnots >
+                maxWind
+            ) {
+
+                maxWind =
+                    item.windKnots;
+
+            }
+
+        }
+
+
+        if (
+            typeof item.maxKnots ===
+            "number"
+        ) {
+
+            if (
+                item.maxKnots >
+                maxGust
+            ) {
+
+                maxGust =
+                    item.maxKnots;
+
+            }
+
+        }
+
+    }
+
+
+    return {
+
+        date:
+            first.timestamp.substring(
+                0,
+                10
+            ),
+
+        start:
+            first.timestamp,
+
+        end:
+            last.timestamp,
+
+        durationMinutes:
+            durationMinutes,
+
+        maxWind:
+            maxWind,
+
+        maxGust:
+            maxGust,
+
+        direction:
+            first.directionName ||
+            ""
+
+    };
+
+}
+
+
+/* =====================================================
+   VISUALIZZA GIORNATE
+===================================================== */
+
+function renderDays(
+    days
+) {
+
+    const container =
+        document.getElementById(
+            "daysList"
+        );
+
+
+    if (
+        days.length === 0
+    ) {
+
+        container.innerHTML =
+            '<div class="no-data">' +
+            'Nessuna giornata ha raggiunto ' +
+            '2 ore consecutive oltre 14 nodi.' +
+            '</div>';
+
+        return;
+
+    }
+
+
+    let html =
+        "";
+
+
+    /*
+     * Dalla più recente
+     * alla più vecchia.
+     */
+
+    const ordered =
+        [...days].reverse();
+
+
+    for (
+        const day of ordered
+    ) {
+
+        const date =
+            formatDateFromTimestamp(
+                day.date +
+                " 00:00:00"
+            );
+
+
+        const start =
+            formatTime(
+                day.start
+            );
+
+
+        const end =
+            formatTime(
+                day.end
+            );
+
+
+        const duration =
+            formatDuration(
+                day.durationMinutes
+            );
+
+
+        html +=
+
+            '<div class="day-card">' +
+
+                '<div class="day-top">' +
+
+                    '<div class="day-date">' +
+                        date +
+                    '</div>' +
+
+                    '<div class="day-duration">' +
+                        duration +
+                    '</div>' +
+
+                '</div>' +
+
+
+                '<div class="day-grid">' +
+
+                    '<div class="day-info">' +
+
+                        '<div class="day-info-label">' +
+                            'INIZIO' +
+                        '</div>' +
+
+                        '<div class="day-info-value">' +
+                            start +
+                        '</div>' +
+
+                    '</div>' +
+
+
+                    '<div class="day-info">' +
+
+                        '<div class="day-info-label">' +
+                            'FINE' +
+                        '</div>' +
+
+                        '<div class="day-info-value">' +
+                            end +
+                        '</div>' +
+
+                    '</div>' +
+
+
+                    '<div class="day-info">' +
+
+                        '<div class="day-info-label">' +
+                            'VENTO MEDIO MAX' +
+                        '</div>' +
+
+                        '<div class="day-info-value">' +
+                            day.maxWind.toFixed(1) +
+                            ' kt' +
+                        '</div>' +
+
+                    '</div>' +
+
+
+                    '<div class="day-info">' +
+
+                        '<div class="day-info-label">' +
+                            'RAFFICA MAX' +
+                        '</div>' +
+
+                        '<div class="day-info-value">' +
+                            day.maxGust.toFixed(1) +
+                            ' kt' +
+                        '</div>' +
+
+                    '</div>' +
+
+                '</div>' +
+
+            '</div>';
+
+    }
+
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =====================================================
+   DATA
+===================================================== */
+
+function parseStationDate(
+    value
+) {
+
+    if (
+        !value
+    ) {
+        return NaN;
+    }
+
+
+    const match =
+        String(value).match(
+            /^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/
+        );
+
+
+    if (!match) {
+
+        return NaN;
+
+    }
+
+
+    return new Date(
+        Number(match[1]),
+        Number(match[2]) - 1,
+        Number(match[3]),
+        Number(match[4]),
+        Number(match[5]),
+        Number(match[6] || 0)
     );
 
 }
 
-function formatMeasurement(item) {
 
-    if (!item) {
-        return "-";
-    }
+/* =====================================================
+   ORA
+===================================================== */
 
-    let text =
-        item.timestamp || "-";
+function formatTime(
+    timestamp
+) {
 
-    if (
-        typeof item.windKnots ===
-        "number"
-    ) {
-        text +=
-            " · " +
-            item.windKnots.toFixed(1) +
-            " kt";
-    }
+    const date =
+        parseStationDate(
+            timestamp
+        );
+
 
     if (
-        item.directionName
+        Number.isNaN(
+            date.getTime()
+        )
     ) {
-        text +=
-            " · " +
-            item.directionName;
+
+        return "--:--";
+
     }
 
-    return text;
+
+    return (
+        String(
+            date.getHours()
+        ).padStart(
+            2,
+            "0"
+        ) +
+        ":" +
+        String(
+            date.getMinutes()
+        ).padStart(
+            2,
+            "0"
+        )
+    );
 
 }
 
-function escapeHtml(value) {
+
+/* =====================================================
+   DATA ITALIANA
+===================================================== */
+
+function formatDateFromTimestamp(
+    timestamp
+) {
+
+    const date =
+        parseStationDate(
+            timestamp
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return timestamp;
+
+    }
+
+
+    return (
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        ) +
+        "/" +
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        ) +
+        "/" +
+        date.getFullYear()
+    );
+
+}
+
+
+/* =====================================================
+   DURATA
+===================================================== */
+
+function formatDuration(
+    minutes
+) {
+
+    const hours =
+        Math.floor(
+            minutes / 60
+        );
+
+    const mins =
+        Math.round(
+            minutes % 60
+        );
+
+
+    if (
+        mins === 0
+    ) {
+
+        return (
+            hours +
+            " h"
+        );
+
+    }
+
+
+    return (
+        hours +
+        " h " +
+        mins +
+        " min"
+    );
+
+}
+
+
+/* =====================================================
+   PERIODO
+===================================================== */
+
+function formatPeriod(
+    period
+) {
+
+    if (
+        !period ||
+        !period.from ||
+        !period.to
+    ) {
+
+        return "-";
+
+    }
+
+
+    return (
+        formatDateFromTimestamp(
+            period.from +
+            " 00:00:00"
+        ) +
+        " → " +
+        formatDateFromTimestamp(
+            period.to +
+            " 00:00:00"
+        )
+    );
+
+}
+
+
+/* =====================================================
+   SICUREZZA HTML
+===================================================== */
+
+function escapeHtml(
+    value
+) {
 
     return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
+
+
+/* =====================================================
+   AVVIO
+===================================================== */
 
 loadData();
 
