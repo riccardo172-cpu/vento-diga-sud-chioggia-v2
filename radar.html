@@ -36,14 +36,14 @@ body {
 
 
 /* =====================================================
-   CONTENITORE PRINCIPALE (Più stretto per Smartphone)
+   CONTENITORE PRINCIPALE (Stretto per Smartphone)
    ===================================================== */
 
 .container {
     width: 100%;
-    max-width: 480px;
+    max-width: 420px; /* Larghezza ideale per smartphone */
     margin: 0 auto;
-    padding: 6px;
+    padding: 8px;
 }
 
 
@@ -53,7 +53,7 @@ body {
 
 .header {
     text-align: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .title {
@@ -70,25 +70,24 @@ body {
 
 
 /* =====================================================
-   CORNICE BLU ESTERNA
-   Altezza aumentata a 620px per contenere le scritte in basso
+   CORNICE BLU RADAR
    ===================================================== */
 
 .radar-card {
     width: 100%;
-    height: 620px;
+    height: 520px;
     margin: 0 auto;
     background: #0b1d2b;
     border: 1px solid #1c607d;
     border-radius: 12px;
-    padding: 3px;
+    padding: 4px;
     overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
 }
 
 
 /* =====================================================
-   FINESTRA DI RITAGLIO
+   FINESTRA RADAR & IFRAME
    ===================================================== */
 
 .radar-wrapper {
@@ -99,22 +98,12 @@ body {
     position: relative;
 }
 
-
-/* =====================================================
-   IFRAME RADAR
-   Centrato su Sottomarina/Chioggia e ritagliato per mostrare
-   interamente i pulsanti in basso
-   ===================================================== */
-
 .radar-frame {
-    position: absolute;
-    top: -95px;
-    left: 50%;
-    width: 820px;
-    height: 750px;
+    width: 100%;
+    height: 100%;
     border: 0;
     background: #071522;
-    transform: translateX(-50%);
+    border-radius: 8px;
 }
 
 
@@ -124,14 +113,14 @@ body {
 
 .info {
     width: 100%;
-    margin: 6px 0 0 0;
+    margin: 8px 0 0 0;
     background: #0b1d2b;
     border: 1px solid #17435b;
     border-radius: 9px;
     padding: 8px;
     text-align: center;
     color: #82a7b8;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 
@@ -142,8 +131,8 @@ body {
 .button {
     display: block;
     width: 100%;
-    margin: 6px 0 0 0;
-    padding: 11px;
+    margin: 8px 0 0 0;
+    padding: 12px;
     border-radius: 9px;
     border: 1px solid #2182a6;
     background: #0d3a50;
@@ -158,35 +147,6 @@ body {
     background: #14516b;
 }
 
-
-/* =====================================================
-   RESPONSIVE SMARTPHONE
-   ===================================================== */
-
-@media (max-width: 480px) {
-    .radar-card {
-        height: 580px;
-    }
-
-    .radar-frame {
-        top: -90px;
-        transform: translateX(-50%) scale(0.92);
-        transform-origin: top center;
-    }
-}
-
-@media (max-width: 380px) {
-    .radar-card {
-        height: 540px;
-    }
-
-    .radar-frame {
-        top: -85px;
-        transform: translateX(-50%) scale(0.85);
-        transform-origin: top center;
-    }
-}
-
 </style>
 
 </head>
@@ -199,14 +159,9 @@ body {
 
     <!-- TESTATA -->
     <div class="header">
-        <div class="title">
-            Sottomarina
-        </div>
-        <div class="subtitle">
-            Radar meteorologico
-        </div>
+        <div class="title">Sottomarina</div>
+        <div class="subtitle">Radar meteorologico</div>
     </div>
-
 
     <!-- RADAR -->
     <div class="radar-card">
@@ -214,24 +169,20 @@ body {
             <iframe
                 id="radar"
                 class="radar-frame"
-                src="https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.28&zoom=8.5&loop=true"
-                title="Radar Meteo & Radar"
+                src="https://www.meteoeradar.it/radar-meteo?center=45.22,12.28&zoom=8.5&loop=true"
+                title="Radar Meteo Sottomarina"
                 allowfullscreen>
             </iframe>
         </div>
     </div>
-
 
     <!-- INFORMAZIONI -->
     <div class="info">
         Radar Meteo & Radar · animazione radar
     </div>
 
-
     <!-- AGGIORNA -->
-    <button
-        class="button"
-        onclick="reloadRadar()">
+    <button class="button" onclick="reloadRadar()">
         AGGIORNA RADAR
     </button>
 
@@ -242,7 +193,7 @@ body {
 
 function reloadRadar() {
     const radar = document.getElementById("radar");
-    radar.src = "https://www.meteoeradar.it/radar-meteo?center=45.22%2C12.28&zoom=8.5&loop=true&t=" + Date.now();
+    radar.src = "https://www.meteoeradar.it/radar-meteo?center=45.22,12.28&zoom=8.5&loop=true&t=" + Date.now();
 }
 
 </script>
