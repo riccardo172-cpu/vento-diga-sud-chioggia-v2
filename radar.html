@@ -34,58 +34,90 @@ body {
     overflow-x: hidden;
 }
 
+/* CONTENITORE MOBILE */
+
 .container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 12px;
+    padding: 8px;
 }
+
+/* TESTATA */
 
 .header {
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .title {
-    font-size: 23px;
+    font-size: 21px;
     font-weight: bold;
     color: #ffffff;
     margin-bottom: 3px;
 }
 
 .subtitle {
-    font-size: 13px;
+    font-size: 12px;
     color: #82d9f7;
 }
 
+/* RADAR */
+
 .radar-card {
+    width: 100%;
     background: #0b1d2b;
     border: 1px solid #1c607d;
-    border-radius: 15px;
-    padding: 8px;
+    border-radius: 14px;
+    padding: 5px;
     box-shadow: 0 4px 18px rgba(0,0,0,0.25);
-    overflow: hidden;
+}
+
+/*
+   Il radar viene mantenuto leggermente più largo
+   della schermata per evitare che gli elementi
+   laterali vengano tagliati.
+*/
+
+.radar-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/*
+   Larghezza minima interna del radar.
+   Su smartphone permette alla pagina radar
+   di mantenere tutti i suoi strumenti.
+*/
+
+.radar-inner {
+    width: 620px;
+    min-width: 620px;
 }
 
 .radar-frame {
     display: block;
-    width: 100%;
-    height: 720px;
+    width: 620px;
+    min-width: 620px;
+    height: 620px;
     border: 0;
     border-radius: 10px;
     background: #071522;
 }
 
-.info {
-    margin-top: 10px;
-    background: #0b1d2b;
-    border: 1px solid #17435b;
-    border-radius: 10px;
-    padding: 10px;
+/* INDICAZIONE */
+
+.swipe-info {
     text-align: center;
     color: #82a7b8;
-    font-size: 11px;
+    font-size: 10px;
+    margin-top: 7px;
 }
+
+/* PULSANTE */
 
 .button {
     width: 100%;
@@ -104,25 +136,43 @@ body {
     background: #14516b;
 }
 
-@media (max-width: 600px) {
+/* INFORMAZIONI */
+
+.info {
+    margin-top: 9px;
+    background: #0b1d2b;
+    border: 1px solid #17435b;
+    border-radius: 10px;
+    padding: 9px;
+    text-align: center;
+    color: #82a7b8;
+    font-size: 10px;
+}
+
+/* SMARTPHONE PICCOLO */
+
+@media (max-width: 380px) {
 
     .container {
-        padding: 8px;
+        padding: 6px;
     }
 
     .title {
-        font-size: 21px;
+        font-size: 20px;
+    }
+
+    .radar-card {
+        padding: 4px;
+    }
+
+    .radar-inner {
+        width: 620px;
+        min-width: 620px;
     }
 
     .radar-frame {
-        height: 650px;
-    }
-
-}
-
-@media (max-width: 400px) {
-
-    .radar-frame {
+        width: 620px;
+        min-width: 620px;
         height: 590px;
     }
 
@@ -154,13 +204,40 @@ body {
 
     <div class="radar-card">
 
-        <iframe
-            id="radar"
-            class="radar-frame"
-            src="https://www.meteoeradar.it/radar-meteo?center=45.66%2C13.36&zoom=5.69&loop=true"
-            title="Radar Meteo & Radar"
-            allowfullscreen>
-        </iframe>
+
+        <div class="radar-wrapper">
+
+
+            <div class="radar-inner">
+
+
+                <iframe
+
+                    id="radar"
+
+                    class="radar-frame"
+
+                    src="https://www.meteoeradar.it/radar-meteo?center=45.66%2C13.36&zoom=5.69&loop=true"
+
+                    title="Radar Meteo & Radar"
+
+                    allowfullscreen>
+
+                </iframe>
+
+
+            </div>
+
+
+        </div>
+
+
+        <div class="swipe-info">
+
+            Scorri lateralmente se necessario
+
+        </div>
+
 
     </div>
 
