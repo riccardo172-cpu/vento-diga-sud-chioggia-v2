@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Statistiche vento – Diga Sud Chioggia</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #071522;
+        color: #ffffff;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        margin: 0 0 6px 0;
+        font-size: 28px;
+        color: #ffffff;
+    }
+
+    .subtitle {
+        color: #8fdfff;
+        margin-bottom: 22px;
+        font-size: 15px;
+    }
+
+    .status {
+        background: #0d2233;
+        border: 1px solid #1c4058;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .status-title {
+        font-size: 13px;
+        color: #8fdfff;
+        margin-bottom: 5px;
+    }
+
+    .status-text {
+        font-size: 15px;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .card {
+        background: #0d2233;
+        border: 1px solid #1c4058;
+        border-radius: 12px;
+        padding: 18px;
+        min-height: 105px;
+    }
+
+    .card-label {
+        font-size: 13px;
+        color: #8fdfff;
+        margin-bottom: 10px;
+    }
+
+    .card-value {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .card-small {
+        font-size: 13px;
+        color: #a9bac5;
+        margin-top: 5px;
+    }
+
+    .section {
+        background: #0d2233;
+        border: 1px solid #1c4058;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .section h2 {
+        margin: 0 0 15px 0;
+        font-size: 19px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .info {
+        background: #091b29;
+        border-radius: 9px;
+        padding: 12px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #8fdfff;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 15px;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 35px 10px;
+        color: #8fdfff;
+    }
+
+    .error {
+        background: #351719;
+        border: 1px solid #7d3438;
+        color: #ffb4b4;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .refresh {
+        margin-top: 18px;
+        padding: 11px 18px;
+        border: none;
+        border-radius: 8px;
+        background: #19a7d8;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .refresh:hover {
+        background: #168db7;
+    }
+
+    @media (max-width: 800px) {
+        .cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .container {
+            padding: 12px;
+        }
+
+        h1 {
+            font-size: 23px;
+        }
+
+        .cards {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .card {
+            padding: 13px;
+        }
+
+        .card-value {
+            font-size: 23px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Statistiche vento</h1>
+
+    <div class="subtitle">
+        Diga Sud Chioggia · vento medio superiore a 14 nodi
+    </div>
+
+    <div class="status">
+        <div class="status-title">STATO DATI</div>
+        <div id="statusText" class="status-text">
+            Caricamento dati...
+        </div>
+    </div>
+
+    <div id="loading" class="loading">
+        Sto leggendo i dati della stazione...
+    </div>
+
+    <div id="content" style="display:none;">
+
+        <div class="cards">
+
+            <div class="card">
+                <div class="card-label">RILEVAZIONI &gt; 14 KT</div>
+                <div id="qualifying" class="card-value">-</div>
+                <div class="card-small">ultimi 3 mesi</div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">MISURE TOTALI</div>
+                <div id="total" class="card-value">-</div>
+                <div class="card-small">dati disponibili</div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">VENTO MEDIO MASSIMO</div>
+                <div id="maxWind" class="card-value">-</div>
+                <div class="card-small">tra le rilevazioni &gt; 14 kt</div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">RAFFICA MASSIMA</div>
+                <div id="maxGust" class="card-value">-</div>
+                <div class="card-small">tra le rilevazioni disponibili</div>
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Periodo analizzato</h2>
+
+            <div class="info-grid">
+
+                <div class="info">
+                    <div class="info-label">DAL</div>
+                    <div id="periodFrom" class="info-value">-</div>
+                </div>
+
+                <div class="info">
+                    <div class="info-label">AL</div>
+                    <div id="periodTo" class="info-value">-</div>
+                </div>
+
+                <div class="info">
+                    <div class="info-label">SOGLIA</div>
+                    <div class="info-value">Oltre 14 nodi</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Prima e ultima rilevazione utile</h2>
+
+            <div class="info-grid">
+
+                <div class="info">
+                    <div class="info-label">PRIMA</div>
+                    <div id="firstData" class="info-value">-</div>
+                </div>
+
+                <div class="info">
+                    <div class="info-label">ULTIMA</div>
+                    <div id="lastData" class="info-value">-</div>
+                </div>
+
+                <div class="info">
+                    <div class="info-label">AGGIORNAMENTO</div>
+                    <div id="updated" class="info-value">-</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <button class="refresh" onclick="loadData()">
+            AGGIORNA DATI
+        </button>
+
+    </div>
+
+    <div id="error"></div>
+
+</div>
+
+<script>
+
+const WORKER_URL =
+    "https://statistica-diga-sud.riccardo172.workers.dev/";
+
+async function loadData() {
+
+    const loading =
+        document.getElementById("loading");
+
+    const content =
+        document.getElementById("content");
+
+    const error =
+        document.getElementById("error");
+
+    const statusText =
+        document.getElementById("statusText");
+
+    loading.style.display = "block";
+    content.style.display = "none";
+    error.innerHTML = "";
+
+    statusText.textContent =
+        "Caricamento dati...";
+
+    try {
+
+        const response =
+            await fetch(
+                WORKER_URL +
+                "?_=" +
+                Date.now(),
+                {
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Errore HTTP " +
+                response.status
+            );
+
+        }
+
+        const result =
+            await response.json();
+
+        if (!result.ok) {
+
+            throw new Error(
+                result.error ||
+                "Il Worker ha restituito un errore"
+            );
+
+        }
+
+        const data =
+            Array.isArray(result.data)
+                ? result.data
+                : [];
+
+        if (data.length === 0) {
+
+            throw new Error(
+                "Nessuna rilevazione superiore a 14 nodi."
+            );
+
+        }
+
+        document.getElementById(
+            "qualifying"
+        ).textContent =
+            result.qualifyingMeasurements
+            .toLocaleString("it-IT");
+
+        document.getElementById(
+            "total"
+        ).textContent =
+            result.totalMeasurements
+            .toLocaleString("it-IT");
+
+        let maxWind = 0;
+        let maxGust = 0;
+
+        for (const item of data) {
+
+            if (
+                typeof item.windKnots ===
+                "number" &&
+                item.windKnots > maxWind
+            ) {
+                maxWind =
+                    item.windKnots;
+            }
+
+            if (
+                typeof item.maxKnots ===
+                "number" &&
+                item.maxKnots > maxGust
+            ) {
+                maxGust =
+                    item.maxKnots;
+            }
+
+        }
+
+        document.getElementById(
+            "maxWind"
+        ).textContent =
+            maxWind.toFixed(1) +
+            " kt";
+
+        document.getElementById(
+            "maxGust"
+        ).textContent =
+            maxGust.toFixed(1) +
+            " kt";
+
+        document.getElementById(
+            "periodFrom"
+        ).textContent =
+            formatDate(
+                result.period.from
+            );
+
+        document.getElementById(
+            "periodTo"
+        ).textContent =
+            formatDate(
+                result.period.to
+            );
+
+        const first =
+            data[0];
+
+        const last =
+            data[data.length - 1];
+
+        document.getElementById(
+            "firstData"
+        ).textContent =
+            formatMeasurement(first);
+
+        document.getElementById(
+            "lastData"
+        ).textContent =
+            formatMeasurement(last);
+
+        const now =
+            new Date();
+
+        document.getElementById(
+            "updated"
+        ).textContent =
+            now.toLocaleString(
+                "it-IT"
+            );
+
+        statusText.textContent =
+            "Dati caricati correttamente · " +
+            data.length.toLocaleString("it-IT") +
+            " rilevazioni oltre 14 nodi.";
+
+        loading.style.display =
+            "none";
+
+        content.style.display =
+            "block";
+
+    } catch (err) {
+
+        loading.style.display =
+            "none";
+
+        content.style.display =
+            "none";
+
+        statusText.textContent =
+            "Errore nel caricamento";
+
+        error.innerHTML =
+            '<div class="error">' +
+            escapeHtml(
+                err.message
+            ) +
+            "</div>";
+
+    }
+
+}
+
+function formatDate(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+    const parts =
+        value.split("-");
+
+    if (parts.length !== 3) {
+        return value;
+    }
+
+    return (
+        parts[2] +
+        "/" +
+        parts[1] +
+        "/" +
+        parts[0]
+    );
+
+}
+
+function formatMeasurement(item) {
+
+    if (!item) {
+        return "-";
+    }
+
+    let text =
+        item.timestamp || "-";
+
+    if (
+        typeof item.windKnots ===
+        "number"
+    ) {
+        text +=
+            " · " +
+            item.windKnots.toFixed(1) +
+            " kt";
+    }
+
+    if (
+        item.directionName
+    ) {
+        text +=
+            " · " +
+            item.directionName;
+    }
+
+    return text;
+
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>
