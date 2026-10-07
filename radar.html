@@ -36,7 +36,7 @@ body {
 
 
 /* =====================================================
-   CONTENITORE PRINCIPALE (Alinea tutto su smartphone)
+   CONTENITORE PRINCIPALE (Stretto per smartphone)
    ===================================================== */
 
 .container {
@@ -141,7 +141,7 @@ body {
 
 
 /* =====================================================
-   RESPONSIVE PER SMARTPHONE PICCOLI
+   RESPONSIVE SMARTPHONE
    ===================================================== */
 
 @media (max-width: 440px) {
@@ -176,7 +176,7 @@ body {
         <iframe
             id="radar"
             class="radar-frame"
-            src="https://www.meteoblue.com/it/tempo/widget/map/sottomarina_italia_3166299?windAnimation=0&gust=0&satellite=0&cloudsAndPrecipitation=1&temperature=0&sunshine=0&extremeForecast=0&geopotentialHeight=0&skyGazer=0&colordepth=8&hpa=0&pressure=0&wave=0&validrange=0&domain=NMM&flat=45.22&flon=12.28&zoom=9"
+            src="https://www.meteoblue.com/en/weather/maps/widget/#coords=9/45.22/12.28&map=radar~rain~none~none~none"
             title="Radar Meteo Sottomarina"
             allowfullscreen>
         </iframe>
@@ -203,7 +203,7 @@ body {
 
 function reloadRadar() {
     const radar = document.getElementById("radar");
-    radar.src = "https://www.meteoblue.com/it/tempo/widget/map/sottomarina_italia_3166299?windAnimation=0&gust=0&satellite=0&cloudsAndPrecipitation=1&temperature=0&sunshine=0&extremeForecast=0&geopotentialHeight=0&skyGazer=0&colordepth=8&hpa=0&pressure=0&wave=0&validrange=0&domain=NMM&flat=45.22&flon=12.28&zoom=9&t=" + Date.now();
+    radar.src = "https://www.meteoblue.com/en/weather/maps/widget/#coords=9/45.22/12.28&map=radar~rain~none~none~none&t=" + Date.now();
 }
 
 </script>
