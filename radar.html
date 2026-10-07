@@ -36,7 +36,7 @@ body {
 
 
 /* =====================================================
-   CONTENITORE PRINCIPALE (Alinea tutto su smartphone)
+   CONTENITORE PRINCIPALE (Alinea tutto per smartphone)
    ===================================================== */
 
 .container {
@@ -70,12 +70,52 @@ body {
 
 
 /* =====================================================
+   SELETTORE PULSANTI (Radar, Satellite, Torna al Sito)
+   ===================================================== */
+
+.selector-grid {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.btn-select {
+    flex: 1;
+    padding: 9px 4px;
+    background: #0b1d2b;
+    border: 1px solid #1c607d;
+    border-radius: 8px;
+    color: #82a7b8;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-select.active {
+    background: #2182a6;
+    color: #ffffff;
+    border-color: #55caef;
+}
+
+.btn-home {
+    background: #14496b;
+    border-color: #2b84b8;
+    color: #e0f2fe;
+}
+
+
+/* =====================================================
    CORNICE BLU RADAR
    ===================================================== */
 
 .radar-card {
     width: 100%;
-    height: 500px;
+    height: 480px;
     margin: 0 auto;
     background: #0b1d2b;
     border: 1px solid #1c607d;
@@ -87,7 +127,7 @@ body {
 
 
 /* =====================================================
-   IFRAME RADAR RAINVIEWER
+   IFRAME RADAR WINDY
    ===================================================== */
 
 .radar-frame {
@@ -100,7 +140,7 @@ body {
 
 
 /* =====================================================
-   INFORMAZIONI
+   INFORMAZIONI E PULSANTE AGGIORNA
    ===================================================== */
 
 .info {
@@ -114,11 +154,6 @@ body {
     color: #82a7b8;
     font-size: 11px;
 }
-
-
-/* =====================================================
-   PULSANTE AGGIORNA
-   ===================================================== */
 
 .button {
     display: block;
@@ -150,7 +185,7 @@ body {
     }
 
     .radar-card {
-        height: 460px;
+        height: 440px;
     }
 }
 
@@ -167,16 +202,24 @@ body {
     <!-- TESTATA -->
     <div class="header">
         <div class="title">Sottomarina</div>
-        <div class="subtitle">Radar meteorologico · RainViewer</div>
+        <div class="subtitle">Radar e Satellite Meteo</div>
     </div>
 
 
-    <!-- RADAR -->
+    <!-- 3 PULSANTI: RADAR, SATELLITE, RITORNO -->
+    <div class="selector-grid">
+        <button id="btn-radar" class="btn-select active" onclick="setLayer('radar')">Radar Pioggia</button>
+        <button id="btn-sat" class="btn-select" onclick="setLayer('sat')">Satellite Nuvole</button>
+        <a href="https://riccardo172-cpu.github.io/vento-diga-sud-chioggia-v2/" class="btn-select btn-home">Torna al Sito</a>
+    </div>
+
+
+    <!-- RADAR / SATELLITE MAP -->
     <div class="radar-card">
         <iframe
             id="radar"
             class="radar-frame"
-            src="https://www.rainviewer.com/map.html?loc=45.218,12.278,9.5&oMaps=20,1,1&bMaps=1,1,1&s=0&3d=0&v=0&layer=radar&sm=1&sn=1"
+            src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=9&overlay=radar&product=radar&level=surface&lat=45.218&lon=12.278"
             title="Radar Meteo Sottomarina"
             allowfullscreen>
         </iframe>
@@ -184,16 +227,16 @@ body {
 
 
     <!-- INFORMAZIONI -->
-    <div class="info">
-        RainViewer · Radar precipitazioni in tempo reale
+    <div id="info-text" class="info">
+        Windy · Radar Precipitazioni in tempo reale
     </div>
 
 
-    <!-- AGGIORNA -->
+    <!-- AGGIORNA MAPPA -->
     <button
         class="button"
         onclick="reloadRadar()">
-        AGGIORNA RADAR
+        AGGIORNA MAPPA
     </button>
 
 </div>
@@ -201,9 +244,36 @@ body {
 
 <script>
 
+let currentLayer = 'radar';
+
+const urls = {
+    radar: "https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=9&overlay=radar&product=radar&level=surface&lat=45.218&lon=12.278",
+    sat: "https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=9&overlay=satellite&product=satellite&level=surface&lat=45.218&lon=12.278"
+};
+
+const infos = {
+    radar: "Windy · Radar Precipitazioni in tempo reale",
+    sat: "Windy · Satellite Copertura Nuvolosa"
+};
+
+function setLayer(layer) {
+    currentLayer = layer;
+
+    // Gestione attivo/inattivo sui pulsanti
+    document.getElementById('btn-radar').classList.remove('active');
+    document.getElementById('btn-sat').classList.remove('active');
+    document.getElementById('btn-' + layer).classList.add('active');
+
+    // Aggiornamento testo informativo
+    document.getElementById('info-text').innerText = infos[layer];
+
+    // Cambia layer nella mappa
+    document.getElementById('radar').src = urls[layer];
+}
+
 function reloadRadar() {
     const radar = document.getElementById("radar");
-    radar.src = "https://www.rainviewer.com/map.html?loc=45.218,12.278,9.5&oMaps=20,1,1&bMaps=1,1,1&s=0&3d=0&v=0&layer=radar&sm=1&sn=1&t=" + Date.now();
+    radar.src = urls[currentLayer] + "&t=" + Date.now();
 }
 
 </script>
