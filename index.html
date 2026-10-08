@@ -124,6 +124,25 @@ body {
   margin-top: 7px;
 }
 
+/* TEMPERATURA ARIA */
+
+.temperature-box {
+  margin-top: 12px;
+  background: rgba(17, 42, 57, 0.88);
+  border: 1px solid rgba(93, 166, 199, 0.25);
+  border-radius: 18px;
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.temperature-value {
+  margin-top: 6px;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 700;
+}
+
 /* BUSSOLA */
 
 .compass-section {
@@ -380,6 +399,50 @@ body {
   transform: scale(0.97);
 }
 
+/* PULSANTI 2 x 2 */
+
+.action-buttons {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(93, 166, 199, 0.35);
+  background: rgba(17, 42, 57, 0.88);
+  color: #9fd8ed;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1.2px;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.action-button:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 360px) {
+  .action-button {
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
 /* FOOTER */
 
 .footer {
@@ -505,6 +568,23 @@ body {
   </div>
 
 
+  <div class="temperature-box">
+
+    <div class="wind-label">
+      TEMPERATURA ARIA
+    </div>
+
+    <div class="temperature-value" id="airTemperature">
+      --
+    </div>
+
+    <div class="wind-unit">
+      °C
+    </div>
+
+  </div>
+
+
   <div class="compass-section">
 
     <div class="direction-title">
@@ -550,30 +630,40 @@ body {
   </div>
 
 
-  <!-- PULSANTE AGGIORNA DATI -->
+  <!-- STATO TECNICO -->
 
-  <div class="status" id="status">
+  <div class="status" id="status" style="display:none;"></div>
+
+  <!-- QUATTRO PULSANTI SIMMETRICI 2 x 2 -->
+
+  <div class="action-buttons">
 
     <button
+      class="action-button"
       type="button"
       id="refreshButton"
       onclick="loadData()">
-
       AGGIORNA DATI
-
     </button>
 
-  </div>
-
-
-  <div class="graph-button-container">
+    <a
+      class="action-button"
+      href="https://www.windguru.cz/49147"
+      target="_blank"
+      rel="noopener noreferrer">
+      WINDGURU
+    </a>
 
     <a
-      class="graph-button"
+      class="action-button"
+      href="https://riccardo172-cpu.github.io/vento-diga-sud-chioggia-v2/radar.html">
+      RADAR METEO
+    </a>
+
+    <a
+      class="action-button"
       href="grafico.html">
-
       GRAFICO 24 ORE
-
     </a>
 
   </div>
@@ -605,6 +695,14 @@ body {
 
 const API_URL =
   "https://vento-diga-sud.riccardo172.workers.dev/";
+
+const TEMPERATURE_URL =
+  "https://api.open-meteo.com/v1/forecast" +
+  "?latitude=45.216" +
+  "&longitude=12.288" +
+  "&current=temperature_2m" +
+  "&temperature_unit=celsius" +
+  "&timezone=Europe%2FRome";
 
 
 function formatTimestamp(timestamp) {
@@ -700,6 +798,58 @@ function setStatus(type, text) {
 
   refreshButton.textContent =
     "AGGIORNA DATI";
+
+}
+
+
+async function loadTemperature() {
+
+  const temperatureElement =
+    document.getElementById("airTemperature");
+
+  try {
+
+    const response =
+      await fetch(
+        TEMPERATURE_URL + "&t=" + Date.now(),
+        {
+          cache: "no-store"
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    const result =
+      await response.json();
+
+    const temperature =
+      Number(
+        result &&
+        result.current &&
+        result.current.temperature_2m
+      );
+
+    if (!Number.isFinite(temperature)) {
+      throw new Error(
+        "Temperatura non valida"
+      );
+    }
+
+    temperatureElement.textContent =
+      temperature.toFixed(1);
+
+  } catch (error) {
+
+    console.error(error);
+
+    temperatureElement.textContent =
+      "--";
+
+  }
 
 }
 
@@ -878,12 +1028,18 @@ async function loadData() {
 /* CARICAMENTO INIZIALE */
 
 loadData();
+loadTemperature();
 
 
 /* AGGIORNAMENTO OGNI 5 MINUTI */
 
 setInterval(
   loadData,
+  5 * 60 * 1000
+);
+
+setInterval(
+  loadTemperature,
   5 * 60 * 1000
 );
 
