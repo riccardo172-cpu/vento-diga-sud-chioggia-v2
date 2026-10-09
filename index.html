@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-
 <meta charset="UTF-8">
 
-<!-- PREVIEW WHATSAPP -->
 <meta property="og:title" content="Vento Diga Sud Chioggia">
 <meta property="og:description" content="Vento medio, vento max e direzione del vento in tempo reale.">
 <meta property="og:image" content="https://riccardo172-cpu.github.io/vento-diga-sud-chioggia-v2/preview.jpg">
@@ -16,7 +14,6 @@
 <title>Vento Diga Sud Chioggia</title>
 
 <style>
-
 * {
   box-sizing: border-box;
 }
@@ -36,29 +33,21 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      #123b56 0%,
-      #071522 45%,
-      #040d14 100%
-    );
+  background: radial-gradient(circle at 50% 0%, #123b56 0%, #071522 45%, #040d14 100%);
 }
 
 .app {
   width: 100%;
   max-width: 520px;
   min-height: 100vh;
-  padding: 22px 18px 18px;
+  padding: 18px 18px 14px;
   display: flex;
   flex-direction: column;
 }
 
-/* TITOLO */
-
 .header {
   text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .header .small {
@@ -93,7 +82,7 @@ body {
   background: rgba(17, 42, 57, 0.88);
   border: 1px solid rgba(93, 166, 199, 0.25);
   border-radius: 18px;
-  padding: 17px 12px;
+  padding: 12px 10px;
   text-align: center;
   box-shadow: 0 8px 25px rgba(0,0,0,0.25);
 }
@@ -106,8 +95,8 @@ body {
 }
 
 .wind-value {
-  margin-top: 7px;
-  font-size: 38px;
+  margin-top: 6px;
+  font-size: 36px;
   line-height: 1;
   font-weight: 700;
 }
@@ -121,24 +110,24 @@ body {
 .wind-ms {
   font-size: 12px;
   color: #6f8b9b;
-  margin-top: 7px;
+  margin-top: 5px;
 }
 
-/* TEMPERATURA ARIA */
+/* TEMPERATURA */
 
 .temperature-box {
-  margin-top: 12px;
+  margin-top: 10px;
   background: rgba(17, 42, 57, 0.88);
   border: 1px solid rgba(93, 166, 199, 0.25);
   border-radius: 18px;
-  padding: 14px 12px;
+  padding: 11px 12px;
   text-align: center;
   box-shadow: 0 8px 25px rgba(0,0,0,0.25);
 }
 
 .temperature-value {
-  margin-top: 6px;
-  font-size: 30px;
+  margin-top: 5px;
+  font-size: 28px;
   line-height: 1;
   font-weight: 700;
 }
@@ -146,11 +135,11 @@ body {
 /* BUSSOLA */
 
 .compass-section {
-  margin-top: 22px;
+  margin-top: 15px;
   background: rgba(10, 30, 43, 0.82);
   border: 1px solid rgba(93, 166, 199, 0.22);
   border-radius: 22px;
-  padding: 20px 15px 18px;
+  padding: 14px 15px 13px;
   text-align: center;
   box-shadow: 0 8px 30px rgba(0,0,0,0.25);
 }
@@ -160,7 +149,7 @@ body {
   letter-spacing: 2px;
   color: #7fb9d5;
   font-weight: bold;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .compass {
@@ -174,21 +163,9 @@ body {
   position: relative;
   border-radius: 50%;
   border: 2px solid rgba(137, 190, 215, 0.45);
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(30, 74, 97, 0.65) 0%,
-      rgba(8, 28, 42, 0.9) 68%,
-      rgb(4, 15, 23) 100%
-    );
-
-  box-shadow:
-    inset 0 0 35px rgba(0,0,0,0.45),
-    0 10px 30px rgba(0,0,0,0.3);
+  background: radial-gradient(circle, rgba(30, 74, 97, 0.65) 0%, rgba(8, 28, 42, 0.9) 68%, rgb(4, 15, 23) 100%);
+  box-shadow: inset 0 0 35px rgba(0,0,0,0.45), 0 10px 30px rgba(0,0,0,0.3);
 }
-
-/* ANELLI */
 
 .compass::before {
   content: "";
@@ -205,8 +182,6 @@ body {
   border-radius: 50%;
   border: 1px solid rgba(137, 190, 215, 0.12);
 }
-
-/* PUNTI CARDINALI */
 
 .cardinal {
   position: absolute;
@@ -240,8 +215,6 @@ body {
   transform: translateY(-50%);
 }
 
-/* TACCHETTE */
-
 .tick {
   position: absolute;
   left: 50%;
@@ -264,8 +237,6 @@ body {
 .t10 { transform: translate(-50%, -135px) rotate(270deg); }
 .t11 { transform: translate(-50%, -135px) rotate(300deg); }
 .t12 { transform: translate(-50%, -135px) rotate(330deg); }
-
-/* FRECCIA */
 
 .arrow {
   position: absolute;
@@ -308,10 +279,8 @@ body {
   box-shadow: 0 0 10px rgba(85,214,255,0.45);
 }
 
-/* DIREZIONE */
-
 .direction-name {
-  margin-top: 15px;
+  margin-top: 12px;
   font-size: 23px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -323,7 +292,7 @@ body {
   color: #8faebd;
 }
 
-/* STATO / PULSANTE AGGIORNAMENTO */
+/* STATO E AGGIORNAMENTO */
 
 .status {
   margin-top: 18px;
@@ -342,24 +311,6 @@ body {
   letter-spacing: 1.5px;
 }
 
-.status button {
-  display: inline-block;
-  padding: 8px 15px;
-  border-radius: 20px;
-  background: rgba(40, 170, 110, 0.16);
-  border: 1px solid rgba(70, 220, 150, 0.25);
-  color: #6ee0aa;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-}
-
-.status button:active {
-  transform: scale(0.97);
-}
-
 .status.warning span {
   background: rgba(220, 170, 40, 0.12);
   border-color: rgba(220, 190, 70, 0.25);
@@ -372,37 +323,10 @@ body {
   color: #ff8585;
 }
 
-/* PULSANTE GRAFICO 24 ORE */
-
-.graph-button-container {
-  margin-top: 12px;
-  text-align: center;
-}
-
-.graph-button {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(93, 166, 199, 0.35);
-  background: rgba(17, 42, 57, 0.88);
-  color: #9fd8ed;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  transition: opacity 0.2s ease, transform 0.1s ease;
-}
-
-.graph-button:active {
-  transform: scale(0.97);
-}
-
-/* PULSANTI 2 x 2 */
+/* PULSANTI */
 
 .action-buttons {
-  margin-top: 14px;
+  margin-top: 12px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -434,20 +358,124 @@ body {
   transform: scale(0.97);
 }
 
-@media (max-width: 360px) {
-  .action-button {
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding-left: 5px;
-    padding-right: 5px;
-  }
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* PULSANTE WEBCAM A TUTTA LARGHEZZA */
+
+.webcam-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 14px;
+  padding: 12px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(85, 214, 255, 0.55);
+  background: linear-gradient(135deg, rgba(18, 74, 100, 0.95), rgba(17, 42, 57, 0.95));
+  color: #b8efff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  text-align: center;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.webcam-button:active {
+  transform: scale(0.98);
+}
+
+/* SCHERMATA WEBCAM */
+
+.webcam-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: #02080d;
+  flex-direction: column;
+}
+
+.webcam-screen.active {
+  display: flex;
+}
+
+.webcam-topbar {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(10px, env(safe-area-inset-top)) 12px 10px;
+  background: #071522;
+  border-bottom: 1px solid rgba(93, 166, 199, 0.3);
+}
+
+.webcam-home {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border: 1px solid rgba(93, 166, 199, 0.4);
+  border-radius: 18px;
+  background: #112a39;
+  color: #b8efff;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.7px;
+  cursor: pointer;
+}
+
+.webcam-heading {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  color: #9fd8ed;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.webcam-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.webcam-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.webcam-note {
+  flex: 0 0 auto;
+  padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+  text-align: center;
+  background: #071522;
+  color: #819eae;
+  font-size: 11px;
 }
 
 /* FOOTER */
 
 .footer {
   margin-top: auto;
-  padding-top: 18px;
+  padding-top: 14px;
   text-align: center;
   font-size: 11px;
   color: #647e8c;
@@ -461,7 +489,6 @@ body {
 /* SCHERMI PICCOLI */
 
 @media (max-width: 360px) {
-
   .app {
     padding-left: 12px;
     padding-right: 12px;
@@ -495,105 +522,75 @@ body {
   .t11 { transform: translate(-50%, -110px) rotate(300deg); }
   .t12 { transform: translate(-50%, -110px) rotate(330deg); }
 
+  .webcam-home {
+    padding: 9px 10px;
+    font-size: 10px;
+  }
+
+  .webcam-heading {
+    font-size: 10px;
+  }
 }
 
-</style>
+/* ORIENTAMENTO ORIZZONTALE */
 
+@media (orientation: landscape) and (max-height: 550px) {
+  .webcam-topbar {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .webcam-home {
+    padding: 7px 12px;
+  }
+
+  .webcam-note {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="app" id="homeScreen">
 
   <div class="header">
-
-    <div class="small">
-      STAZIONE METEOROLOGICA
-    </div>
-
-    <h1>
-      VENTO DIGA SUD
-    </h1>
-
-    <div class="location">
-      Chioggia · Sottomarina
-    </div>
-
+    <div class="small">STAZIONE METEOROLOGICA</div>
+    <h1>VENTO DIGA SUD</h1>
+    <div class="location">Chioggia · Sottomarina</div>
   </div>
-
 
   <div class="wind-boxes">
 
     <div class="wind-box">
-
-      <div class="wind-label">
-        VENTO MEDIO
-      </div>
-
-      <div class="wind-value" id="windKnots">
-        --
-      </div>
-
-      <div class="wind-unit">
-        nodi
-      </div>
-
-      <div class="wind-ms" id="windMs">
-        -- m/s
-      </div>
-
+      <div class="wind-label">VENTO MEDIO</div>
+      <div class="wind-value" id="windKnots">--</div>
+      <div class="wind-unit">nodi</div>
+      <div class="wind-ms" id="windMs">-- m/s</div>
     </div>
-
 
     <div class="wind-box">
-
-      <div class="wind-label">
-        VENTO MAX
-      </div>
-
-      <div class="wind-value" id="maxKnots">
-        --
-      </div>
-
-      <div class="wind-unit">
-        nodi
-      </div>
-
-      <div class="wind-ms" id="maxMs">
-        -- m/s
-      </div>
-
+      <div class="wind-label">VENTO MAX</div>
+      <div class="wind-value" id="maxKnots">--</div>
+      <div class="wind-unit">nodi</div>
+      <div class="wind-ms" id="maxMs">-- m/s</div>
     </div>
 
   </div>
-
 
   <div class="temperature-box">
-
-    <div class="wind-label">
-      TEMPERATURA ARIA
-    </div>
-
-    <div class="temperature-value" id="airTemperature">
-      --
-    </div>
-
-    <div class="wind-unit">
-      °C
-    </div>
-
+    <div class="wind-label">TEMPERATURA ARIA</div>
+    <div class="temperature-value" id="airTemperature">--</div>
+    <div class="wind-unit">°C</div>
   </div>
-
 
   <div class="compass-section">
 
-    <div class="direction-title">
-      DIREZIONE DEL VENTO
-    </div>
-
+    <div class="direction-title">DIREZIONE DEL VENTO</div>
 
     <div class="compass">
-
       <div class="cardinal north">N</div>
       <div class="cardinal east">E</div>
       <div class="cardinal south">S</div>
@@ -613,28 +610,26 @@ body {
       <div class="tick t12"></div>
 
       <div class="arrow" id="arrow"></div>
-
       <div class="center-dot"></div>
-
     </div>
 
-
-    <div class="direction-name" id="directionName">
-      --
-    </div>
-
-    <div class="direction-degrees" id="directionDegrees">
-      --°
-    </div>
+    <div class="direction-name" id="directionName">--</div>
+    <div class="direction-degrees" id="directionDegrees">--°</div>
 
   </div>
 
-
-  <!-- STATO TECNICO -->
-
   <div class="status" id="status" style="display:none;"></div>
 
-  <!-- QUATTRO PULSANTI SIMMETRICI 2 x 2 -->
+  <!-- WEBCAM EVOLUTION A TUTTA LARGHEZZA -->
+
+  <button
+    class="webcam-button"
+    type="button"
+    onclick="openWebcam()">
+    ▶ WEBCAM EVOLUTION
+  </button>
+
+  <!-- I QUATTRO PULSANTI ORIGINALI -->
 
   <div class="action-buttons">
 
@@ -668,31 +663,54 @@ body {
 
   </div>
 
-
   <div class="footer">
-
     <div>
       Ultimo dato:
-      <strong id="timestamp">
-        --
-      </strong>
+      <strong id="timestamp">--</strong>
     </div>
-
-    <div>
-      Dati: Comune di Venezia · Diga Sud Chioggia
-    </div>
-
-    <div>
-      Aggiornamento automatico ogni 5 minuti
-    </div>
-
+    <div>Dati: Comune di Venezia · Diga Sud Chioggia</div>
+    <div>Aggiornamento automatico ogni 5 minuti</div>
   </div>
 
 </div>
 
+<!-- SCHERMATA WEBCAM A PIENO SCHERMO -->
+
+<div class="webcam-screen" id="webcamScreen" aria-hidden="true">
+
+  <div class="webcam-topbar">
+
+    <button
+      class="webcam-home"
+      type="button"
+      onclick="closeWebcam()">
+      ← TORNA A HOME
+    </button>
+
+    <div class="webcam-heading">
+      WEBCAM EVOLUTION
+    </div>
+
+  </div>
+
+  <div class="webcam-frame">
+    <iframe
+      id="evolutionWebcam"
+      title="Webcam Evolution"
+      src="about:blank"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+  </div>
+
+  <div class="webcam-note">
+    Webcam Evolution · Se il video non appare, apri la webcam direttamente dal sito del gestore.
+  </div>
+
+</div>
 
 <script>
-
 const API_URL =
   "https://vento-diga-sud.riccardo172.workers.dev/";
 
@@ -704,9 +722,86 @@ const TEMPERATURE_URL =
   "&temperature_unit=celsius" +
   "&timezone=Europe%2FRome";
 
+/* WEBCAM EVOLUTION */
+
+const WEBCAM_URL =
+  "https://ipcamlive.com/player/player.php?alias=5727502f23ac2";
+
+let previousBodyOverflow = "";
+
+async function openWebcam() {
+  const screen = document.getElementById("webcamScreen");
+  const iframe = document.getElementById("evolutionWebcam");
+
+  previousBodyOverflow = document.body.style.overflow;
+
+  screen.classList.add("active");
+  screen.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  /*
+   * Carica la webcam solo quando viene aperta.
+   * Evita di caricarla inutilmente nella schermata principale.
+   */
+
+  if (iframe.src === "about:blank" ||
+      iframe.getAttribute("src") === "about:blank") {
+    iframe.src = WEBCAM_URL;
+  }
+
+  /*
+   * Richiede la modalità landscape sui browser compatibili.
+   * Alcuni browser consentono il blocco orientamento
+   * soltanto quando la pagina è installata come app.
+   */
+
+  try {
+    if (screen.requestFullscreen && !document.fullscreenElement) {
+      await screen.requestFullscreen();
+    }
+
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock("landscape");
+    }
+  } catch (error) {
+    console.log("Orientamento orizzontale non disponibile:", error);
+  }
+}
+
+async function closeWebcam() {
+  const screen = document.getElementById("webcamScreen");
+
+  screen.classList.remove("active");
+  screen.setAttribute("aria-hidden", "true");
+
+  document.body.style.overflow = previousBodyOverflow;
+
+  try {
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  } catch (error) {
+    console.log("Impossibile ripristinare l'orientamento:", error);
+  }
+
+  try {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      await document.exitFullscreen();
+    }
+  } catch (error) {
+    console.log("Uscita dalla modalità schermo intero non disponibile:", error);
+  }
+}
+
+/* ESC PER TORNARE ALLA HOME */
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") {
+    closeWebcam();
+  }
+});
 
 function formatTimestamp(timestamp) {
-
   if (!timestamp) {
     return "--";
   }
@@ -723,24 +818,18 @@ function formatTimestamp(timestamp) {
     return timestamp;
   }
 
-  return stationDate.toLocaleString(
-    "it-IT",
-    {
-      timeZone: "Europe/Rome",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    }
-  );
-
+  return stationDate.toLocaleString("it-IT", {
+    timeZone: "Europe/Rome",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
 }
 
-
 function getTimestampDate(timestamp) {
-
   if (!timestamp) {
     return null;
   }
@@ -753,12 +842,9 @@ function getTimestampDate(timestamp) {
   }
 
   return date;
-
 }
 
-
 function clearWindValues() {
-
   document.getElementById("windKnots").textContent = "--";
   document.getElementById("windMs").textContent = "-- m/s";
 
@@ -770,14 +856,10 @@ function clearWindValues() {
 
   document.getElementById("arrow").style.transform =
     "translate(-50%, -82px) rotate(0deg)";
-
 }
 
-
 function setStatus(type, text) {
-
-  const status =
-    document.getElementById("status");
+  const status = document.getElementById("status");
 
   status.className = "status";
 
@@ -789,139 +871,76 @@ function setStatus(type, text) {
     status.classList.add("error");
   }
 
-  /*
-   * Il pulsante rimane sempre "AGGIORNA DATI".
-   */
-
   const refreshButton =
     document.getElementById("refreshButton");
 
-  refreshButton.textContent =
-    "AGGIORNA DATI";
-
+  refreshButton.textContent = "AGGIORNA DATI";
 }
 
-
 async function loadTemperature() {
-
   const temperatureElement =
     document.getElementById("airTemperature");
 
   try {
-
-    const response =
-      await fetch(
-        TEMPERATURE_URL + "&t=" + Date.now(),
-        {
-          cache: "no-store"
-        }
-      );
+      
+    const response = await fetch(
+      TEMPERATURE_URL + "&t=" + Date.now(),
+      { cache: "no-store" }
+    );
 
     if (!response.ok) {
-      throw new Error(
-        "HTTP " + response.status
-      );
+      throw new Error("HTTP " + response.status);
     }
 
-    const result =
-      await response.json();
+    const result = await response.json();
 
-    const temperature =
-      Number(
-        result &&
-        result.current &&
-        result.current.temperature_2m
-      );
+    const temperature = Number(
+      result &&
+      result.current &&
+      result.current.temperature_2m
+    );
 
     if (!Number.isFinite(temperature)) {
-      throw new Error(
-        "Temperatura non valida"
-      );
+      throw new Error("Temperatura non valida");
     }
 
-    temperatureElement.textContent =
-      temperature.toFixed(1);
+    temperatureElement.textContent = temperature.toFixed(1);
 
   } catch (error) {
-
     console.error(error);
-
-    temperatureElement.textContent =
-      "--";
-
+    temperatureElement.textContent = "--";
   }
-
 }
 
-
 async function loadData() {
-
   const refreshButton =
     document.getElementById("refreshButton");
 
-
   try {
-
-    /*
-     * Piccolo feedback durante l'aggiornamento,
-     * senza modificare la grafica del pulsante.
-     */
-
     refreshButton.disabled = true;
 
-
-    const response =
-      await fetch(
-        API_URL + "?t=" + Date.now(),
-        {
-          cache: "no-store"
-        }
-      );
-
+    const response = await fetch(
+      API_URL + "?t=" + Date.now(),
+      { cache: "no-store" }
+    );
 
     if (!response.ok) {
-      throw new Error(
-        "HTTP " + response.status
-      );
+      throw new Error("HTTP " + response.status);
     }
 
+    const result = await response.json();
 
-    const result =
-      await response.json();
-
-
-    if (
-      !result ||
-      result.ok !== true ||
-      !result.data
-    ) {
-
-      throw new Error(
-        "Dati non validi"
-      );
-
+    if (!result || result.ok !== true || !result.data) {
+      throw new Error("Dati non validi");
     }
 
+    const data = result.data;
 
-    const data =
-      result.data;
-
-
-    const direction =
-      Number(data.direction);
-
-    const windMs =
-      Number(data.windMs);
-
-    const windKnots =
-      Number(data.windKnots);
-
-    const maxMs =
-      Number(data.maxMs);
-
-    const maxKnots =
-      Number(data.maxKnots);
-
+    const direction = Number(data.direction);
+    const windMs = Number(data.windMs);
+    const windKnots = Number(data.windKnots);
+    const maxMs = Number(data.maxMs);
+    const maxKnots = Number(data.maxKnots);
 
     if (
       !Number.isFinite(direction) ||
@@ -930,46 +949,26 @@ async function loadData() {
       !Number.isFinite(maxMs) ||
       !Number.isFinite(maxKnots)
     ) {
-
-      throw new Error(
-        "Valori vento non validi"
-      );
-
+      throw new Error("Valori vento non validi");
     }
 
-
-    const timestampDate =
-      getTimestampDate(data.timestamp);
-
+    const timestampDate = getTimestampDate(data.timestamp);
 
     document.getElementById("timestamp").textContent =
       formatTimestamp(data.timestamp);
 
-
     if (timestampDate) {
-
       const ageMinutes =
         (Date.now() - timestampDate.getTime()) / 60000;
 
-
-      if (
-        ageMinutes < 0 ||
-        ageMinutes > 15
-      ) {
-
+      if (ageMinutes < 0 || ageMinutes > 15) {
         clearWindValues();
 
-        setStatus(
-          "warning",
-          "DATI NON AGGIORNATI"
-        );
+        setStatus("warning", "DATI NON AGGIORNATI");
 
         return;
-
       }
-
     }
-
 
     document.getElementById("windKnots").textContent =
       windKnots.toFixed(1);
@@ -977,72 +976,44 @@ async function loadData() {
     document.getElementById("windMs").textContent =
       windMs.toFixed(1) + " m/s";
 
-
     document.getElementById("maxKnots").textContent =
       maxKnots.toFixed(1);
 
     document.getElementById("maxMs").textContent =
       maxMs.toFixed(1) + " m/s";
 
-
     document.getElementById("directionName").textContent =
       data.directionName || "--";
-
 
     document.getElementById("directionDegrees").textContent =
       Math.round(direction) + "°";
 
-
     document.getElementById("arrow").style.transform =
-      "translate(-50%, -82px) rotate(" +
-      direction +
-      "deg)";
+      "translate(-50%, -82px) rotate(" + direction + "deg)";
 
-
-    setStatus(
-      "ok",
-      "AGGIORNA DATI"
-    );
-
+    setStatus("ok", "AGGIORNA DATI");
 
   } catch (error) {
-
     console.error(error);
 
     clearWindValues();
 
-    setStatus(
-      "error",
-      "AGGIORNA DATI"
-    );
+    setStatus("error", "AGGIORNA DATI");
 
   } finally {
-
     refreshButton.disabled = false;
-
   }
-
 }
-
 
 /* CARICAMENTO INIZIALE */
 
 loadData();
 loadTemperature();
 
+/* AGGIORNAMENTO AUTOMATICO OGNI 5 MINUTI */
 
-/* AGGIORNAMENTO OGNI 5 MINUTI */
-
-setInterval(
-  loadData,
-  5 * 60 * 1000
-);
-
-setInterval(
-  loadTemperature,
-  5 * 60 * 1000
-);
-
+setInterval(loadData, 5 * 60 * 1000);
+setInterval(loadTemperature, 5 * 60 * 1000);
 </script>
 
 </body>
