@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -846,17 +845,79 @@ document.addEventListener("keydown", function(event) {
   }
 });
 
+/*
+ * Converte l'orario della stazione, che arriva senza fuso orario,
+ * trattandolo sempre come ora locale di Europe/Rome. In questo modo
+ * non dipende dal fuso impostato sul telefono e rispetta ora solare/legale.
+ */
+function getTimestampDate(timestamp) {
+  if (!timestamp) return null;
+
+  // Se la sorgente fornisce già Z o un offset (+02:00, -05:00), rispettalo.
+  const normalized = String(timestamp).trim().replace(" ", "T");
+
+  if (/(Z|[+-]\d{2}:?\d{2})$/i.test(normalized)) {
+    const explicitDate = new Date(normalized);
+    return Number.isNaN(explicitDate.getTime()) ? null : explicitDate;
+  }
+
+  const match = normalized.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/
+  );
+
+  if (!match) return null;
+
+  const parts = match.slice(1).map((value) => Number(value || 0));
+  const [year, month, day, hour, minute, second = 0] = parts;
+  const wallClockAsUtc = Date.UTC(
+    year, month - 1, day, hour, minute, second
+  );
+
+  // Ricava l'offset Europe/Rome per la data, ora legale inclusa.
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Rome",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  });
+
+  let candidate = new Date(wallClockAsUtc);
+
+  for (let i = 0; i < 3; i++) {
+    const values = {};
+
+    for (const part of formatter.formatToParts(candidate)) {
+      if (part.type !== "literal") {
+        values[part.type] = Number(part.value);
+      }
+    }
+
+    const representedAsUtc = Date.UTC(
+      values.year,
+      values.month - 1,
+      values.day,
+      values.hour,
+      values.minute,
+      values.second
+    );
+
+    const offsetMs = representedAsUtc - candidate.getTime();
+    candidate = new Date(wallClockAsUtc - offsetMs);
+  }
+
+  return Number.isNaN(candidate.getTime()) ? null : candidate;
+}
+
 function formatTimestamp(timestamp) {
-  if (!timestamp) {
-    return "--";
-  }
+  if (!timestamp) return "--";
 
-  const stationDate =
-    new Date(timestamp.replace(" ", "T") + "+01:00");
+  const stationDate = getTimestampDate(timestamp);
 
-  if (Number.isNaN(stationDate.getTime())) {
-    return timestamp;
-  }
+  if (!stationDate) return timestamp;
 
   return stationDate.toLocaleString("it-IT", {
     timeZone: "Europe/Rome",
@@ -867,21 +928,6 @@ function formatTimestamp(timestamp) {
     minute: "2-digit",
     second: "2-digit"
   });
-}
-
-function getTimestampDate(timestamp) {
-  if (!timestamp) {
-    return null;
-  }
-
-  const date =
-    new Date(timestamp.replace(" ", "T") + "+01:00");
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return date;
 }
 
 function clearWindValues() {
@@ -898,7 +944,7 @@ function clearWindValues() {
     "translate(-50%, -57px) rotate(0deg)";
 }
 
-function setStatus(type, text) {
+function setStatus(type, message) {
   const status = document.getElementById("status");
 
   status.className = "status";
@@ -911,10 +957,20 @@ function setStatus(type, text) {
     status.classList.add("error");
   }
 
-  const refreshButton =
-    document.getElementById("refreshButton");
-
+  // Mantiene il pulsante sempre con la sua etichetta originale.
+  const refreshButton = document.getElementById("refreshButton");
   refreshButton.textContent = "AGGIORNA DATI";
+
+  // Mostra lo stato soltanto se è stato creato un messaggio.
+  if (message) {
+    status.innerHTML = "";
+    const span = document.createElement("span");
+    span.textContent = message;
+    status.appendChild(span);
+    status.style.display = "block";
+  } else {
+    status.style.display = "none";
+  }
 }
 
 async function loadTemperature() {
@@ -946,14 +1002,13 @@ async function loadTemperature() {
     temperatureElement.textContent = temperature.toFixed(1);
 
   } catch (error) {
-    console.error(error);
+    console.error("Errore temperatura:", error);
     temperatureElement.textContent = "--";
   }
 }
 
 async function loadData() {
-  const refreshButton =
-    document.getElementById("refreshButton");
+  const refreshButton = document.getElementById("refreshButton");
 
   try {
     refreshButton.disabled = true;
@@ -996,11 +1051,16 @@ async function loadData() {
     document.getElementById("timestamp").textContent =
       formatTimestamp(data.timestamp);
 
+    /*
+     * Se il timestamp non è interpretabile, non blocchiamo i valori del
+     * vento solo per questo motivo. Se è valido, controlliamo che i dati
+     * non siano troppo vecchi o eccessivamente nel futuro.
+     */
     if (timestampDate) {
       const ageMinutes =
         (Date.now() - timestampDate.getTime()) / 60000;
 
-      if (ageMinutes < 0 || ageMinutes > 15) {
+      if (ageMinutes < -2 || ageMinutes > 15) {
         clearWindValues();
         setStatus("warning", "DATI NON AGGIORNATI");
         return;
@@ -1028,13 +1088,13 @@ async function loadData() {
     document.getElementById("arrow").style.transform =
       "translate(-50%, -57px) rotate(" + direction + "deg)";
 
-    setStatus("ok", "AGGIORNA DATI");
+    setStatus("ok", "DATI AGGIORNATI");
 
   } catch (error) {
-    console.error(error);
+    console.error("Errore caricamento dati vento:", error);
 
     clearWindValues();
-    setStatus("error", "AGGIORNA DATI");
+    setStatus("error", "ERRORE NEL CARICAMENTO DEI DATI");
 
   } finally {
     refreshButton.disabled = false;
