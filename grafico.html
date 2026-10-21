@@ -99,6 +99,12 @@ canvas{display:block;height:350px}
 const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
 const MAX_SAMPLES = 48;
 
+// Il Comune dichiara che i timestamp sono sempre in ora solare UTC+1.
+// Li convertiamo nel fuso italiano, che passa automaticamente da UTC+2
+// a UTC+1 quando termina l'ora legale.
+const SOURCE_TIME_ZONE_OFFSET = "+01:00";
+const ITALY_TIME_ZONE = "Europe/Rome";
+
 const canvas = document.getElementById("windChart");
 const ctx = canvas.getContext("2d");
 const chartWrap = document.getElementById("chartWrap");
@@ -109,14 +115,55 @@ let historyData = [];
 
 function parseTimestamp(value) {
   if (!value) return NaN;
-  const normalized = String(value).replace(" ", "T");
-  return new Date(normalized).getTime();
+
+  const match = String(value).match(
+    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
+  );
+
+  if (!match) return NaN;
+
+  const normalized =
+    match[1] + "-" + match[2] + "-" + match[3] +
+    "T" + match[4] + ":" + match[5] + ":" + (match[6] || "00") +
+    SOURCE_TIME_ZONE_OFFSET;
+
+  const date = new Date(normalized);
+  return date.getTime();
+}
+
+function formatItalianTime(value, includeDate = false) {
+  const timestamp = parseTimestamp(value);
+
+  if (!Number.isFinite(timestamp)) return "--:--";
+
+  const date = new Date(timestamp);
+
+  const options = includeDate
+    ? {
+        timeZone: ITALY_TIME_ZONE,
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }
+    : {
+        timeZone: ITALY_TIME_ZONE,
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      };
+
+  const formatted = new Intl.DateTimeFormat("it-IT", options).format(date);
+
+  return includeDate
+    ? formatted.replace(",", "")
+    : formatted;
 }
 
 function formatHour(value) {
-  const s = String(value || "");
-  const match = s.match(/(\d{2}):(\d{2})/);
-  return match ? match[1] + ":" + match[2] : "--:--";
+  return formatItalianTime(value, false);
 }
 
 function directionName(deg) {
@@ -345,7 +392,7 @@ async function loadGraph() {
     const latest = history[history.length - 1];
     updated.textContent =
       "Campioni disponibili: " + history.length + " / " + MAX_SAMPLES +
-      " · Ultimo dato: " + latest.timestamp +
+      " · Ultimo dato: " + formatItalianTime(latest.timestamp, true) +
       " · Vento medio: " + latest.wind.toFixed(1) +
       " nodi · Raffica: " + latest.gust.toFixed(1) + " nodi";
 
