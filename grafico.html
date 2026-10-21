@@ -1,1442 +1,314 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Grafico 24 Ore · Vento Diga Sud</title>
-
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-
-  font-family:Arial,Helvetica,sans-serif;
-
-  background:#071522;
-  color:white;
-}
-
-body{
-  min-height:100vh;
-
-  display:flex;
-  justify-content:center;
-
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      #123b56 0%,
-      #071522 45%,
-      #040d14 100%
-    );
-}
-
-.app{
-  width:100%;
-  max-width:760px;
-  min-height:100vh;
-
-  padding:22px 10px 18px;
-
-  display:flex;
-  flex-direction:column;
-}
-
-
-/* =====================================================
-   HEADER
-   ===================================================== */
-
-.header{
-  text-align:center;
-  margin-bottom:16px;
-}
-
-.header .small{
-  font-size:12px;
-  letter-spacing:3px;
-  color:#75b9d8;
-  margin-bottom:6px;
-}
-
-.header h1{
-  margin:0;
-
-  font-size:24px;
-  letter-spacing:1.5px;
-}
-
-.header .location{
-  margin-top:6px;
-
-  font-size:13px;
-  color:#8ca5b5;
-}
-
-
-/* =====================================================
-   CONTENITORE SCORRIMENTO UNICO
-   ===================================================== */
-
-/*
-   IMPORTANTE:
-
-   FRECCE + GRAFICO sono dentro
-   QUESTO UNICO contenitore.
-
-   Quindi quando si scorre orizzontalmente
-   con il dito, tutto rimane perfettamente
-   sincronizzato.
-*/
-
-.timeline-scroll{
-
-  width:100%;
-
-  overflow-x:auto;
-  overflow-y:hidden;
-
-  -webkit-overflow-scrolling:touch;
-
-  scrollbar-width:thin;
-}
-
-
-/*
-   L'intera timeline ha una larghezza
-   interna sufficiente per visualizzare
-   comodamente 24 ore.
-
-   Direzioni e grafico usano
-   esattamente la stessa larghezza.
-*/
-
-.timeline-inner{
-
-  width:1100px;
-
-  padding:0 2px;
-}
-
-
-/* =====================================================
-   DIREZIONE
-   ===================================================== */
-
-.direction-card{
-
-  width:1100px;
-
-  background:rgba(10,30,43,.82);
-
-  border:1px solid rgba(93,166,199,.22);
-
-  border-radius:22px;
-
-  box-shadow:
-    0 8px 30px rgba(0,0,0,.25);
-
-  padding:12px 8px 10px;
-
-  margin-bottom:14px;
-}
-
-.direction-label{
-
-  font-size:11px;
-
-  letter-spacing:2px;
-
-  color:#7fb9d5;
-
-  font-weight:bold;
-
-  text-align:center;
-
-  margin-bottom:10px;
-}
-
-
-/*
-   24 colonne.
-
-   Questa griglia ha la stessa identica
-   larghezza utilizzata dal grafico.
-*/
-
-.direction-grid{
-
-  width:100%;
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(24,1fr);
-
-  align-items:start;
-
-  padding-left:42px;
-  padding-right:18px;
-}
-
-.direction-cell{
-
-  text-align:center;
-
-  min-width:40px;
-}
-
-.direction-hour{
-
-  font-size:12px;
-
-  color:#9db8c6;
-
-  margin-bottom:6px;
-
-  font-weight:bold;
-}
-
-.hourly-arrow{
-
-  height:32px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-}
-
-.hourly-arrow span{
-
-  display:block;
-
-  width:0;
-  height:0;
-
-  border-left:6px solid transparent;
-  border-right:6px solid transparent;
-
-  border-bottom:20px solid #55d6ff;
-
-  filter:
-    drop-shadow(
-      0 0 4px rgba(85,214,255,.5)
-    );
-
-  transform-origin:50% 15px;
-}
-
-.hourly-name{
-
-  font-size:9px;
-
-  color:#c1d4dd;
-
-  font-weight:bold;
-
-  white-space:nowrap;
-
-  margin-top:4px;
-}
-
-.hourly-degrees{
-
-  font-size:9px;
-
-  color:#718b99;
-
-  margin-top:2px;
-}
-
-
-/* =====================================================
-   GRAFICO
-   ===================================================== */
-
-.chart-card{
-
-  width:1100px;
-
-  background:rgba(10,30,43,.82);
-
-  border:1px solid rgba(93,166,199,.22);
-
-  border-radius:22px;
-
-  box-shadow:
-    0 8px 30px rgba(0,0,0,.25);
-
-  padding:15px 10px 12px;
-}
-
-.chart-title{
-
-  font-size:11px;
-
-  letter-spacing:2px;
-
-  color:#7fb9d5;
-
-  font-weight:bold;
-
-  text-align:center;
-
-  margin-bottom:8px;
-}
-
-
-/*
-   NESSUN ALTRO SCROLL QUI.
-
-   Il movimento orizzontale è gestito
-   esclusivamente da .timeline-scroll.
-*/
-
-.chart-wrap{
-
-  position:relative;
-
-  width:100%;
-
-  height:350px;
-}
-
-canvas{
-
-  display:block;
-
-  width:100%;
-  height:350px;
-}
-
-
-/* =====================================================
-   LEGENDA
-   ===================================================== */
-
-.legend{
-
-  display:flex;
-
-  justify-content:center;
-
-  gap:22px;
-
-  flex-wrap:wrap;
-
-  margin-top:10px;
-
-  font-size:11px;
-
-  color:#a8bac5;
-}
-
-.legend-item{
-
-  display:inline-flex;
-
-  align-items:center;
-
-  gap:7px;
-}
-
-.legend-line{
-
-  width:24px;
-  height:3px;
-
-  border-radius:3px;
-}
-
-.legend-wind{
-  background:#ffd83d;
-}
-
-.legend-gust{
-  background:#ff5555;
-}
-
-
-/* =====================================================
-   AGGIORNAMENTO
-   ===================================================== */
-
-.updated{
-
-  text-align:center;
-
-  margin-top:9px;
-
-  font-size:10px;
-
-  color:#647e8c;
-}
-
-.error{
-  color:#ff8585;
-}
-
-
-/* =====================================================
-   INDICAZIONE SCORRIMENTO
-   ===================================================== */
-
-.scroll-hint{
-
-  text-align:center;
-
-  margin-top:7px;
-
-  font-size:9px;
-
-  letter-spacing:1.4px;
-
-  color:#607b89;
-}
-
-
-/* =====================================================
-   PULSANTE
-   ===================================================== */
-
-.buttons{
-
-  display:flex;
-
-  justify-content:center;
-
-  margin-top:14px;
-}
-
-.back-button{
-
-  display:inline-block;
-
-  padding:10px 20px;
-
-  border-radius:20px;
-
-  border:1px solid rgba(93,166,199,.35);
-
-  background:rgba(17,42,57,.88);
-
-  color:#9fd8ed;
-
-  font-size:11px;
-
-  font-weight:bold;
-
-  letter-spacing:1.5px;
-
-  text-decoration:none;
-
-  box-shadow:
-    0 5px 15px rgba(0,0,0,.2);
-}
-
-.back-button:active{
-  transform:scale(.97);
-}
-
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
-
-.footer{
-
-  margin-top:auto;
-
-  padding-top:18px;
-
-  text-align:center;
-
-  font-size:10px;
-
-  color:#647e8c;
-
-  line-height:1.5;
-}
-
-
-/* =====================================================
-   MOBILE
-   ===================================================== */
-
-@media(max-width:700px){
-
-  .app{
-    padding-left:6px;
-    padding-right:6px;
-  }
-
-  /*
-     Sul cellulare la timeline è volutamente
-     più larga dello schermo.
-
-     Si scorre con un unico movimento.
-  */
-
-  .timeline-scroll{
-    margin-left:0;
-    margin-right:0;
-  }
-
-  .header h1{
-    font-size:23px;
-  }
-
-}
-
-
-/* =====================================================
-   DESKTOP
-   ===================================================== */
-
-@media(min-width:701px){
-
-  /*
-     Su desktop manteniamo la timeline
-     orizzontalmente scorrevole.
-  */
-
-  .timeline-scroll{
-    max-width:100%;
-  }
-
-}
-
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#071522;color:white}
+body{min-height:100vh;display:flex;justify-content:center;background:radial-gradient(circle at 50% 0%,#123b56 0%,#071522 45%,#040d14 100%)}
+.app{width:100%;max-width:760px;min-height:100vh;padding:22px 10px 18px;display:flex;flex-direction:column}
+.header{text-align:center;margin-bottom:16px}
+.header .small{font-size:12px;letter-spacing:3px;color:#75b9d8;margin-bottom:6px}
+.header h1{margin:0;font-size:24px;letter-spacing:1.5px}
+.header .location{margin-top:6px;font-size:13px;color:#8ca5b5}
+.timeline-scroll{width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.timeline-inner{width:1800px;padding:0 2px}
+.direction-card,.chart-card{width:1800px;background:rgba(10,30,43,.82);border:1px solid rgba(93,166,199,.22);border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.direction-card{padding:12px 8px 10px;margin-bottom:14px}
+.direction-label,.chart-title{font-size:11px;letter-spacing:2px;color:#7fb9d5;font-weight:bold;text-align:center}
+.direction-label{margin-bottom:10px}
+.direction-grid{width:100%;display:grid;grid-template-columns:repeat(48,minmax(35px,1fr));align-items:start;padding:0 50px}
+.direction-cell{text-align:center;min-width:35px}
+.direction-hour{font-size:11px;color:#9db8c6;margin-bottom:6px;font-weight:bold}
+.hourly-arrow{height:30px;display:flex;align-items:center;justify-content:center}
+.hourly-arrow span{display:block;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:20px solid #55d6ff;filter:drop-shadow(0 0 4px rgba(85,214,255,.5));transform-origin:50% 15px}
+.hourly-name{font-size:9px;color:#c1d4dd;font-weight:bold;white-space:nowrap;margin-top:4px}
+.hourly-degrees{font-size:9px;color:#718b99;margin-top:2px}
+.chart-card{padding:15px 10px 12px}
+.chart-title{text-align:center;margin-bottom:8px}
+.chart-wrap{position:relative;width:100%;height:430px}
+canvas{display:block;width:100%;height:430px}
+.legend{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:#a8bac5}
+.legend-item{display:inline-flex;align-items:center;gap:7px}
+.legend-line{width:24px;height:3px;border-radius:3px}
+.legend-wind{background:#ffd83d}
+.legend-gust{background:#ff5555}
+.updated{text-align:center;margin-top:9px;font-size:10px;color:#8aa2af}
+.error{color:#ff8585}
+.scroll-hint{text-align:center;margin-top:7px;font-size:9px;letter-spacing:1.4px;color:#607b89}
+.buttons{display:flex;justify-content:center;margin-top:14px}
+.back-button{display:inline-block;padding:10px 20px;border-radius:20px;border:1px solid rgba(93,166,199,.35);background:rgba(17,42,57,.88);color:#9fd8ed;font-size:11px;font-weight:bold;letter-spacing:1.5px;text-decoration:none;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+.back-button:active{transform:scale(.97)}
+.footer{margin-top:auto;padding-top:18px;text-align:center;font-size:10px;color:#647e8c;line-height:1.5}
+@media(max-width:700px){.app{padding-left:6px;padding-right:6px}.header h1{font-size:23px}}
 </style>
-
 </head>
-
 <body>
-
 <div class="app">
-
-
-  <!-- =================================================
-       HEADER
-       ================================================= -->
-
   <div class="header">
-
-    <div class="small">
-      STAZIONE METEOROLOGICA
-    </div>
-
-    <h1>
-      GRAFICO 24 ORE
-    </h1>
-
-    <div class="location">
-      Chioggia · Sottomarina
-    </div>
-
+    <div class="small">STAZIONE METEOROLOGICA</div>
+    <h1>GRAFICO 24 ORE</h1>
+    <div class="location">Chioggia · Sottomarina</div>
   </div>
 
-
-  <!-- =================================================
-       UNICO SCORRIMENTO ORIZZONTALE
-       ================================================= -->
-
-  <div class="timeline-scroll">
-
+  <div class="timeline-scroll" id="timelineScroll">
     <div class="timeline-inner">
-
-
-      <!-- ===============================================
-           DIREZIONE DEL VENTO
-           =============================================== -->
-
       <div class="direction-card">
-
-        <div class="direction-label">
-          DIREZIONE DEL VENTO · ORA PER ORA
-        </div>
-
-        <div
-          class="direction-grid"
-          id="directionGrid">
-        </div>
-
+        <div class="direction-label">DIREZIONE DEL VENTO · OGNI 30 MINUTI</div>
+        <div class="direction-grid" id="directionGrid"></div>
       </div>
-
-
-      <!-- ===============================================
-           GRAFICO
-           =============================================== -->
 
       <div class="chart-card">
-
-        <div class="chart-title">
-          VENTO DELLE ULTIME 24 ORE · NODI
-        </div>
-
+        <div class="chart-title">VENTO DELLE ULTIME 24 ORE · NODI</div>
         <div class="chart-wrap">
-
           <canvas id="windChart"></canvas>
-
         </div>
-
-
-        <!-- LEGENDA -->
-
         <div class="legend">
-
-          <div class="legend-item">
-
-            <span class="legend-line legend-wind"></span>
-
-            <span>
-              VENTO MEDIO
-            </span>
-
-          </div>
-
-
-          <div class="legend-item">
-
-            <span class="legend-line legend-gust"></span>
-
-            <span>
-              RAFFICHE
-            </span>
-
-          </div>
-
+          <div class="legend-item"><span class="legend-line legend-wind"></span><span>VENTO MEDIO</span></div>
+          <div class="legend-item"><span class="legend-line legend-gust"></span><span>RAFFICHE</span></div>
         </div>
-
-
-        <!-- AGGIORNAMENTO -->
-
-        <div
-          class="updated"
-          id="updated">
-
-          Caricamento dati...
-
-        </div>
-
+        <div class="updated" id="updated">Caricamento dati...</div>
       </div>
-
-
     </div>
-
   </div>
 
-
-  <!-- =================================================
-       INDICAZIONE
-       ================================================= -->
-
-  <div class="scroll-hint">
-
-    ← SCORRI ORIZZONTALMENTE PER VEDERE LE 24 ORE →
-
-  </div>
-
-
-  <!-- =================================================
-       PULSANTE
-       ================================================= -->
+  <div class="scroll-hint">← SCORRI ORIZZONTALMENTE PER VEDERE LE 24 ORE →</div>
 
   <div class="buttons">
-
-    <a
-      class="back-button"
-      href="index.html">
-
-      ← RILEVAZIONE VENTO
-
-    </a>
-
+    <a class="back-button" href="index.html">← TORNA A HOME</a>
   </div>
-
-
-  <!-- =================================================
-       FOOTER
-       ================================================= -->
 
   <div class="footer">
-
-    Dati: Comune di Venezia · Diga Sud Chioggia
-
+    Archivio vento · Diga Sud Chioggia
   </div>
-
 </div>
 
-
 <script>
-
-
-/* =====================================================
-   API
-   ===================================================== */
-
-const API_URL =
-  "https://vento-diga-sud-24h.riccardo172.workers.dev/";
-
-
-/* =====================================================
-   CANVAS
-   ===================================================== */
-
-const canvas =
-  document.getElementById("windChart");
-
-const ctx =
-  canvas.getContext("2d");
-
-
+const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
+const canvas = document.getElementById("windChart");
+const ctx = canvas.getContext("2d");
 let historyData = [];
 
-
-/* =====================================================
-   DIMENSIONAMENTO CANVAS
-   ===================================================== */
-
 function resizeCanvas(){
-
-  const ratio =
-    window.devicePixelRatio || 1;
-
-  const width =
-    canvas.clientWidth;
-
-  const height =
-    canvas.clientHeight;
-
-
-  canvas.width =
-    Math.round(width * ratio);
-
-  canvas.height =
-    Math.round(height * ratio);
-
-
-  ctx.setTransform(
-    ratio,
-    0,
-    0,
-    ratio,
-    0,
-    0
-  );
-
+  const ratio = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
 }
 
-
-/* =====================================================
-   DISEGNO GRAFICO
-   ===================================================== */
-
-function drawChart(history){
-
-  if(
-    !history ||
-    !history.length
-  ){
-
-    throw new Error(
-      "Nessun dato storico disponibile"
-    );
-
-  }
-
-
-  historyData =
-    history;
-
-
-  resizeCanvas();
-
-
-  const w =
-    canvas.clientWidth;
-
-  const h =
-    canvas.clientHeight;
-
-
-  const L = 48;
-  const R = 18;
-  const T = 14;
-  const B = 58;
-
-
-  const pw =
-    w - L - R;
-
-  const ph =
-    h - T - B;
-
-
-  /*
-     Massimo valore.
-  */
-
-  const max =
-    Math.max(
-      ...history.map(
-        d =>
-          Math.max(
-            Number(d.wind),
-            Number(d.gust)
-          )
-      ),
-      1
-    );
-
-
-  const yMax =
-    Math.max(
-      5,
-      Math.ceil(max / 5) * 5
-    );
-
-
-  /*
-     Posizione X.
-  */
-
-  const x = i => {
-
-    if(
-      history.length === 1
-    ){
-
-      return L + pw / 2;
-
-    }
-
-    return (
-      L +
-      i /
-      (history.length - 1) *
-      pw
-    );
-
-  };
-
-
-  /*
-     Posizione Y.
-  */
-
-  const y = v =>
-    T +
-    ph -
-    v / yMax * ph;
-
-
-  /*
-     Pulisce.
-  */
-
-  ctx.clearRect(
-    0,
-    0,
-    w,
-    h
-  );
-
-
-  /* =================================================
-     GRIGLIA
-     ================================================= */
-
-  ctx.font =
-    "11px Arial";
-
-  ctx.textAlign =
-    "right";
-
-  ctx.textBaseline =
-    "middle";
-
-
-  for(
-    let v = 0;
-    v <= yMax;
-    v += 5
-  ){
-
-    const yy =
-      y(v);
-
-
-    ctx.strokeStyle =
-      "rgba(137,190,215,.14)";
-
-    ctx.lineWidth =
-      1;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      L,
-      yy
-    );
-
-    ctx.lineTo(
-      w - R,
-      yy
-    );
-
-    ctx.stroke();
-
-
-    ctx.fillStyle =
-      "#8da5b2";
-
-
-    ctx.fillText(
-      String(v),
-      L - 8,
-      yy
-    );
-
-  }
-
-
-  /* =================================================
-     ORE
-     ================================================= */
-
-  ctx.textAlign =
-    "center";
-
-  ctx.textBaseline =
-    "top";
-
-
-  history.forEach(
-    (d,i)=>{
-
-      const xx =
-        x(i);
-
-
-      /*
-         Linea verticale.
-      */
-
-      ctx.strokeStyle =
-        "rgba(137,190,215,.07)";
-
-      ctx.lineWidth =
-        1;
-
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        xx,
-        T
-      );
-
-      ctx.lineTo(
-        xx,
-        T + ph
-      );
-
-      ctx.stroke();
-
-
-      /*
-         Ora.
-      */
-
-      ctx.fillStyle =
-        "#a2b7c2";
-
-      ctx.font =
-        "12px Arial";
-
-
-      ctx.fillText(
-        String(d.hour).slice(-2),
-        xx,
-        T + ph + 9
-      );
-
-    }
-  );
-
-
-  /* =================================================
-     LINEE
-     ================================================= */
-
-  function drawLine(
-    key,
-    color,
-    width
-  ){
-
-    ctx.strokeStyle =
-      color;
-
-    ctx.lineWidth =
-      width;
-
-    ctx.lineJoin =
-      "round";
-
-    ctx.lineCap =
-      "round";
-
-
-    ctx.beginPath();
-
-
-    history.forEach(
-      (d,i)=>{
-
-        const xx =
-          x(i);
-
-        const yy =
-          y(
-            Number(d[key])
-          );
-
-
-        if(i === 0){
-
-          ctx.moveTo(
-            xx,
-            yy
-          );
-
-        }else{
-
-          ctx.lineTo(
-            xx,
-            yy
-          );
-
-        }
-
-      }
-    );
-
-
-    ctx.stroke();
-
-
-    /*
-       Pallini.
-    */
-
-    history.forEach(
-      (d,i)=>{
-
-        ctx.fillStyle =
-          color;
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-          x(i),
-          y(Number(d[key])),
-          3,
-          0,
-          Math.PI * 2
-        );
-
-        ctx.fill();
-
-      }
-    );
-
-  }
-
-
-  /*
-     Raffiche.
-  */
-
-  drawLine(
-    "gust",
-    "#ff5555",
-    2.5
-  );
-
-
-  /*
-     Vento medio.
-  */
-
-  drawLine(
-    "wind",
-    "#ffd83d",
-    3
-  );
-
-}
-
-
-/* =====================================================
-   DIREZIONE COMPATTA
-   ===================================================== */
-
-function compactDirection(deg){
-
-  if(
-    deg >= 337.5 ||
-    deg < 22.5
-  )
-    return "N";
-
-
-  if(deg < 67.5)
-    return "NE";
-
-
-  if(deg < 112.5)
-    return "E";
-
-
-  if(deg < 157.5)
-    return "SE";
-
-
-  if(deg < 202.5)
-    return "S";
-
-
-  if(deg < 247.5)
-    return "SO";
-
-
-  if(deg < 292.5)
-    return "O";
-
-
+function directionName(deg){
+  if(deg >= 337.5 || deg < 22.5) return "N";
+  if(deg < 67.5) return "NE";
+  if(deg < 112.5) return "E";
+  if(deg < 157.5) return "SE";
+  if(deg < 202.5) return "S";
+  if(deg < 247.5) return "SO";
+  if(deg < 292.5) return "O";
   return "NO";
-
 }
-
-
-/* =====================================================
-   BARRA DIREZIONE
-   ===================================================== */
 
 function drawDirectionBar(history){
+  const grid = document.getElementById("directionGrid");
+  grid.innerHTML = "";
 
-  const grid =
-    document.getElementById(
-      "directionGrid"
-    );
+  history.forEach(d => {
+    const deg = Number(d.direction);
+    const cell = document.createElement("div");
+    cell.className = "direction-cell";
 
+    const hour = document.createElement("div");
+    hour.className = "direction-hour";
+    hour.textContent = String(d.hour || d.timestamp || "--").slice(-5);
 
-  grid.innerHTML =
-    "";
+    const arrowBox = document.createElement("div");
+    arrowBox.className = "hourly-arrow";
+    const arrow = document.createElement("span");
 
-
-  history.forEach(
-    d => {
-
-      const deg =
-        Number(d.direction);
-
-
-      const cell =
-        document.createElement(
-          "div"
-        );
-
-      cell.className =
-        "direction-cell";
-
-
-      /*
-         Ora.
-      */
-
-      const hour =
-        document.createElement(
-          "div"
-        );
-
-      hour.className =
-        "direction-hour";
-
-      hour.textContent =
-        String(d.hour).slice(-2);
-
-
-      /*
-         Freccia.
-      */
-
-      const arrowBox =
-        document.createElement(
-          "div"
-        );
-
-      arrowBox.className =
-        "hourly-arrow";
-
-
-      const arrow =
-        document.createElement(
-          "span"
-        );
-
-
-      /*
-         Il dato del Comune indica
-         DA DOVE arriva il vento.
-
-         La freccia deve indicare
-         DOVE va il vento.
-
-         Per questo invertiamo di 180°.
-      */
-
-      if(
-        Number.isFinite(deg)
-      ){
-
-        const arrowDeg =
-          (deg + 180) % 360;
-
-
-        arrow.style.transform =
-          "rotate(" +
-          arrowDeg +
-          "deg)";
-
-      }
-
-
-      arrowBox.appendChild(
-        arrow
-      );
-
-
-      /*
-         Direzione.
-      */
-
-      const name =
-        document.createElement(
-          "div"
-        );
-
-      name.className =
-        "hourly-name";
-
-      name.textContent =
-        Number.isFinite(deg)
-          ? compactDirection(deg)
-          : "--";
-
-
-      /*
-         Gradi.
-      */
-
-      const degrees =
-        document.createElement(
-          "div"
-        );
-
-      degrees.className =
-        "hourly-degrees";
-
-      degrees.textContent =
-        Number.isFinite(deg)
-          ? Math.round(deg) + "°"
-          : "--";
-
-
-      cell.appendChild(
-        hour
-      );
-
-      cell.appendChild(
-        arrowBox
-      );
-
-      cell.appendChild(
-        name
-      );
-
-      cell.appendChild(
-        degrees
-      );
-
-
-      grid.appendChild(
-        cell
-      );
-
+    if(Number.isFinite(deg)){
+      arrow.style.transform = "rotate(" + ((deg + 180) % 360) + "deg)";
     }
-  );
+    arrowBox.appendChild(arrow);
 
+    const name = document.createElement("div");
+    name.className = "hourly-name";
+    name.textContent = Number.isFinite(deg) ? directionName(deg) : "--";
+
+    const degrees = document.createElement("div");
+    degrees.className = "hourly-degrees";
+    degrees.textContent = Number.isFinite(deg) ? Math.round(deg) + "°" : "--";
+
+    cell.append(hour,arrowBox,name,degrees);
+    grid.appendChild(cell);
+  });
 }
 
+function drawChart(history){
+  if(!Array.isArray(history) || !history.length){
+    throw new Error("Archivio vuoto: attendere la prima rilevazione.");
+  }
 
-/* =====================================================
-   CARICAMENTO DATI
-   ===================================================== */
+  historyData = history;
+  resizeCanvas();
+
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const L = 52, R = 22, T = 42, B = 65;
+  const pw = w-L-R, ph = h-T-B;
+
+  const values = history.flatMap(d => [
+    Number(d.wind), Number(d.gust)
+  ]).filter(Number.isFinite);
+
+  const maxValue = Math.max(...values,1);
+  const yMax = Math.max(5,Math.ceil(maxValue/5)*5);
+  const x = i => history.length === 1 ? L+pw/2 : L+i/(history.length-1)*pw;
+  const y = v => T+ph-(v/yMax)*ph;
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.font = "12px Arial";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+
+  for(let v=0;v<=yMax;v+=5){
+    const yy = y(v);
+    ctx.strokeStyle = "rgba(137,190,215,.17)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(L,yy);
+    ctx.lineTo(w-R,yy);
+    ctx.stroke();
+    ctx.fillStyle = "#8da5b2";
+    ctx.fillText(String(v),L-9,yy);
+  }
+
+  history.forEach((d,i)=>{
+    const xx = x(i);
+    ctx.strokeStyle = "rgba(137,190,215,.08)";
+    ctx.beginPath();
+    ctx.moveTo(xx,T);
+    ctx.lineTo(xx,T+ph);
+    ctx.stroke();
+
+    const stamp = String(d.hour || d.timestamp || "--");
+    const time = stamp.length >= 16 ? stamp.slice(11,16) : stamp;
+    ctx.save();
+    ctx.translate(xx,T+ph+10);
+    ctx.rotate(-Math.PI/4);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#a2b7c2";
+    ctx.font = "11px Arial";
+    ctx.fillText(time,0,0);
+    ctx.restore();
+  });
+
+  function drawLine(key,color,lineWidth,labelOffset){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+
+    history.forEach((d,i)=>{
+      const value = Number(d[key]);
+      if(!Number.isFinite(value)) return;
+      if(i===0) ctx.moveTo(x(i),y(value));
+      else ctx.lineTo(x(i),y(value));
+    });
+    ctx.stroke();
+
+    history.forEach((d,i)=>{
+      const value = Number(d[key]);
+      if(!Number.isFinite(value)) return;
+
+      const xx = x(i);
+      const yy = y(value);
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(xx,yy,3.5,0,Math.PI*2);
+      ctx.fill();
+
+      // Valore numerico associato al punto.
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const label = value.toFixed(1);
+      const labelY = Math.max(10,Math.min(h-12,yy+labelOffset));
+
+      // Contorno scuro per rendere il testo leggibile.
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#071522";
+      ctx.strokeText(label,xx,labelY);
+      ctx.fillStyle = color;
+      ctx.fillText(label,xx,labelY);
+    });
+  }
+
+  // Raffiche rosse: etichette sopra la curva.
+  drawLine("gust","#ff5555",2.5,-13);
+
+  // Vento medio giallo: etichette sotto la curva.
+  drawLine("wind","#ffd83d",3,14);
+}
 
 async function loadGraph(){
-
-  const updated =
-    document.getElementById(
-      "updated"
-    );
-
+  const updated = document.getElementById("updated");
 
   try{
+    updated.classList.remove("error");
+    updated.textContent = "Aggiornamento dati...";
 
-    updated.classList.remove(
-      "error"
-    );
+    const response = await fetch(API_URL+"?t="+Date.now(),{
+      cache:"no-store"
+    });
 
+    if(!response.ok) throw new Error("HTTP "+response.status);
 
-    updated.textContent =
-      "Aggiornamento dati...";
+    const result = await response.json();
 
-
-    const response =
-      await fetch(
-        API_URL +
-        "?t=" +
-        Date.now(),
-        {
-          cache:"no-store"
-        }
-      );
-
-
-    if(
-      !response.ok
-    ){
-
-      throw new Error(
-        "HTTP " +
-        response.status
-      );
-
+    if(result.ok !== true || !Array.isArray(result.history)){
+      throw new Error(result.error || "Risposta archivio non valida");
     }
 
-
-    const result =
-      await response.json();
-
-
-    if(
-      !result ||
-      result.ok !== true ||
-      !result.history ||
-      !result.current
-    ){
-
-      throw new Error(
-        "Dati non validi"
-      );
-
+    if(result.history.length === 0){
+      drawDirectionBar([]);
+      throw new Error(result.messaggio || "Archivio in attesa delle prime rilevazioni");
     }
 
+    drawDirectionBar(result.history);
+    drawChart(result.history);
 
-    /*
-       Prima le frecce.
-    */
-
-    drawDirectionBar(
-      result.history
-    );
-
-
-    /*
-       Poi il grafico.
-    */
-
-    drawChart(
-      result.history
-    );
-
-
-    /*
-       Aggiornamento.
-    */
+    const last = result.current?.timestamp ||
+      result.history[result.history.length-1].timestamp ||
+      result.history[result.history.length-1].hour;
 
     updated.textContent =
-      "Ultimo dato disponibile: " +
-      result.current.timestamp;
+      "Ultima rilevazione: "+last+
+      " · Campioni: "+result.history.length+"/48";
 
-
+    if(result.messaggio){
+      updated.textContent += " · "+result.messaggio;
+    }
   }catch(error){
-
-    console.error(
-      error
-    );
-
-
-    updated.textContent =
-      "ERRORE NEL CARICAMENTO DEI DATI";
-
-
-    updated.classList.add(
-      "error"
-    );
-
+    console.error(error);
+    updated.textContent = error.message || "ERRORE NEL CARICAMENTO DEI DATI";
+    updated.classList.add("error");
   }
-
 }
 
-
-/* =====================================================
-   RIDISEGNO AL CAMBIO DIMENSIONE
-   ===================================================== */
-
-window.addEventListener(
-  "resize",
-  () => {
-
-    if(
-      historyData.length
-    ){
-
-      drawChart(
-        historyData
-      );
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   AVVIO
-   ===================================================== */
+window.addEventListener("resize",()=>{
+  if(historyData.length) drawChart(historyData);
+});
 
 loadGraph();
-
 </script>
-
 </body>
 </html>
