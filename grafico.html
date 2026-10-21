@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#071522;color:white}
 body{min-height:100vh;display:flex;justify-content:center;background:radial-gradient(circle at 50% 0%,#123b56 0%,#071522 45%,#040d14 100%)}
-.app{width:100%;max-width:900px;min-height:100vh;padding:18px 12px;display:flex;flex-direction:column}
+.app{width:100%;max-width:1100px;min-height:100vh;padding:18px 12px;display:flex;flex-direction:column}
 .header{text-align:center;margin-bottom:16px}
 .header .small{font-size:12px;letter-spacing:3px;color:#75b9d8;margin-bottom:6px}
 .header h1{margin:0;font-size:24px;letter-spacing:1.5px}
@@ -20,9 +20,9 @@ body{min-height:100vh;display:flex;justify-content:center;background:radial-grad
 .direction-card{padding:12px 8px 10px;margin-bottom:14px}
 .direction-label,.chart-title{font-size:11px;letter-spacing:2px;color:#7fb9d5;font-weight:bold;text-align:center}
 .direction-label{margin-bottom:10px}
-.direction-scroll,.chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#39718a #102532}
-.direction-grid{display:grid;grid-auto-flow:column;grid-auto-columns:42px;min-width:max-content;align-items:start}
-.direction-cell{text-align:center;width:42px}
+.direction-scroll,.chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#39718a #102532;-webkit-overflow-scrolling:touch}
+.direction-grid{display:grid;grid-auto-flow:column;grid-auto-columns:48px;min-width:max-content;align-items:start}
+.direction-cell{text-align:center;width:48px}
 .direction-hour{font-size:10px;color:#8faebd;margin-bottom:6px}
 .hourly-arrow{height:27px;display:flex;align-items:center;justify-content:center}
 .hourly-arrow span{display:block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:18px solid #55d6ff;filter:drop-shadow(0 0 4px rgba(85,214,255,.5));transform-origin:50% 15px}
@@ -44,7 +44,13 @@ canvas{display:block;height:350px}
 .back-button{display:inline-block;padding:11px 22px;border-radius:20px;border:1px solid rgba(93,166,199,.35);background:rgba(17,42,57,.88);color:#9fd8ed;font-size:11px;font-weight:bold;letter-spacing:1.5px;text-decoration:none;box-shadow:0 5px 15px rgba(0,0,0,.2)}
 .back-button:active{transform:scale(.97)}
 .footer{margin-top:auto;padding-top:18px;text-align:center;font-size:10px;color:#647e8c;line-height:1.5}
-@media(max-width:520px){.app{padding:12px 8px}.header h1{font-size:22px}.chart-card{padding-left:6px;padding-right:6px}}
+
+@media(max-width:520px){
+  .app{padding:12px 8px}
+  .header h1{font-size:22px}
+  .chart-card{padding-left:6px;padding-right:6px}
+  .chart-wrap,canvas{height:330px}
+}
 </style>
 </head>
 
@@ -59,7 +65,7 @@ canvas{display:block;height:350px}
 
   <div class="direction-card">
     <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI</div>
-    <div class="direction-scroll">
+    <div class="direction-scroll" id="directionScroll">
       <div class="direction-grid" id="directionGrid"></div>
     </div>
   </div>
@@ -97,11 +103,9 @@ canvas{display:block;height:350px}
 "use strict";
 
 const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
-const MAX_SAMPLES = 48;
-
-// Il Comune dichiara che i timestamp sono sempre in ora solare UTC+1.
-// Li convertiamo nel fuso italiano, che passa automaticamente da UTC+2
-// a UTC+1 quando termina l'ora legale.
+const MAX_SAMPLES = 288;
+const POINT_SPACING = 48;
+const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
 const SOURCE_TIME_ZONE_OFFSET = "+01:00";
 const ITALY_TIME_ZONE = "Europe/Rome";
 
@@ -109,6 +113,7 @@ const canvas = document.getElementById("windChart");
 const ctx = canvas.getContext("2d");
 const chartWrap = document.getElementById("chartWrap");
 const chartScroll = document.getElementById("chartScroll");
+const directionScroll = document.getElementById("directionScroll");
 const updated = document.getElementById("updated");
 
 let historyData = [];
@@ -127,16 +132,13 @@ function parseTimestamp(value) {
     "T" + match[4] + ":" + match[5] + ":" + (match[6] || "00") +
     SOURCE_TIME_ZONE_OFFSET;
 
-  const date = new Date(normalized);
-  return date.getTime();
+  return new Date(normalized).getTime();
 }
 
 function formatItalianTime(value, includeDate = false) {
   const timestamp = parseTimestamp(value);
 
   if (!Number.isFinite(timestamp)) return "--:--";
-
-  const date = new Date(timestamp);
 
   const options = includeDate
     ? {
@@ -155,11 +157,10 @@ function formatItalianTime(value, includeDate = false) {
         hourCycle: "h23"
       };
 
-  const formatted = new Intl.DateTimeFormat("it-IT", options).format(date);
+  const formatted = new Intl.DateTimeFormat("it-IT", options)
+    .format(new Date(timestamp));
 
-  return includeDate
-    ? formatted.replace(",", "")
-    : formatted;
+  return includeDate ? formatted.replace(",", "") : formatted;
 }
 
 function formatHour(value) {
@@ -198,12 +199,17 @@ function normalizeHistory(raw) {
   );
 
   valid.sort((a, b) => a.time - b.time);
+
+  // Mantiene al massimo le ultime 288 letture, cioè 24 ore
+  // quando la raccolta avviene ogni 5 minuti.
   return valid.slice(-MAX_SAMPLES);
 }
 
 function drawDirectionBar(history) {
   const grid = document.getElementById("directionGrid");
   grid.innerHTML = "";
+
+  grid.style.width = (history.length * POINT_SPACING) + "px";
 
   history.forEach(d => {
     const cell = document.createElement("div");
@@ -244,24 +250,34 @@ function drawChart(history) {
 
   historyData = history;
 
-  const pointSpacing = 48;
+  const firstTime = history[0].time;
+  const lastTime = history[history.length - 1].time;
+  const elapsedMinutes = Math.max(0, (lastTime - firstTime) / 60000);
+
+  // Ogni intervallo reale di 5 minuti occupa circa 48 pixel.
+  // Gli intervalli più lunghi rimangono visibili come spazi più ampi.
+  const timelineWidth = elapsedMinutes > 0
+    ? (elapsedMinutes / 5) * POINT_SPACING
+    : Math.max(0, (history.length - 1) * POINT_SPACING);
+
   const chartWidth = Math.max(
     chartScroll.clientWidth,
-    history.length * pointSpacing + 65
+    Math.ceil(timelineWidth + 100)
   );
 
   chartWrap.style.width = chartWidth + "px";
+  chartWrap.style.height = CHART_HEIGHT + "px";
   canvas.style.width = chartWidth + "px";
-  canvas.style.height = "350px";
+  canvas.style.height = CHART_HEIGHT + "px";
 
   const ratio = window.devicePixelRatio || 1;
   canvas.width = Math.round(chartWidth * ratio);
-  canvas.height = Math.round(350 * ratio);
+  canvas.height = Math.round(CHART_HEIGHT * ratio);
 
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
   const w = chartWidth;
-  const h = 350;
+  const h = CHART_HEIGHT;
   const L = 43;
   const R = 25;
   const T = 25;
@@ -275,19 +291,30 @@ function drawChart(history) {
   );
   const yMax = Math.max(5, Math.ceil(highest / 5) * 5);
 
-  const x = i => history.length === 1
-    ? L + pw / 2
-    : L + i / (history.length - 1) * pw;
+  const x = i => {
+    if (history.length === 1) return L + pw / 2;
 
-  const y = v => T + ph - v / yMax * ph;
+    const span = lastTime - firstTime;
+
+    if (span > 0) {
+      return L + ((history[i].time - firstTime) / span) * pw;
+    }
+
+    return L + (i / (history.length - 1)) * pw;
+  };
+
+  const y = v => T + ph - (v / yMax) * ph;
 
   ctx.clearRect(0, 0, w, h);
+
+  // Griglia orizzontale e scala dei nodi.
   ctx.font = "11px Arial";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
 
   for (let v = 0; v <= yMax; v += 5) {
     const yy = y(v);
+
     ctx.strokeStyle = "rgba(137,190,215,.17)";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -299,6 +326,7 @@ function drawChart(history) {
     ctx.fillText(String(v), L - 8, yy);
   }
 
+  // Linee verticali e orari. Ogni rilevazione mantiene il suo timestamp.
   history.forEach((d, i) => {
     const xx = x(i);
 
@@ -319,9 +347,9 @@ function drawChart(history) {
     ctx.restore();
   });
 
-  function drawSeries(key, color, width, labelOffset) {
+  function drawSeries(key, color, lineWidth, labelOffset) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = width;
+    ctx.lineWidth = lineWidth;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.beginPath();
@@ -342,16 +370,26 @@ function drawChart(history) {
 
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(xx, yy, 3.2, 0, Math.PI * 2);
+      ctx.arc(xx, yy, 2.7, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = color;
-      ctx.font = "bold 10px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
+      // Per non affollare il grafico con 288 valori,
+      // le etichette numeriche sono mostrate a intervalli regolari.
+      const showLabel =
+        history.length <= 48 ||
+        i === 0 ||
+        i === history.length - 1 ||
+        i % 6 === 0;
 
-      const labelY = Math.max(T + 10, yy + labelOffset);
-      ctx.fillText(d[key].toFixed(1), xx, labelY);
+      if (showLabel) {
+        ctx.fillStyle = color;
+        ctx.font = "bold 10px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+
+        const labelY = Math.max(T + 10, yy + labelOffset);
+        ctx.fillText(d[key].toFixed(1), xx, labelY);
+      }
     });
   }
 
@@ -375,9 +413,11 @@ async function loadGraph() {
     const result = await response.json();
 
     if (!result || result.ok !== true || !Array.isArray(result.history)) {
-      throw new Error(result && result.error
-        ? result.error
-        : "Risposta dello storico non valida");
+      throw new Error(
+        result && result.error
+          ? result.error
+          : "Risposta dello storico non valida"
+      );
     }
 
     const history = normalizeHistory(result.history);
@@ -390,6 +430,7 @@ async function loadGraph() {
     drawChart(history);
 
     const latest = history[history.length - 1];
+
     updated.textContent =
       "Campioni disponibili: " + history.length + " / " + MAX_SAMPLES +
       " · Ultimo dato: " + formatItalianTime(latest.timestamp, true) +
@@ -403,8 +444,15 @@ async function loadGraph() {
   }
 }
 
+let resizeTimeout;
+
 window.addEventListener("resize", () => {
-  if (historyData.length) drawChart(historyData);
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (historyData.length) {
+      drawChart(historyData);
+    }
+  }, 150);
 });
 
 loadGraph();
