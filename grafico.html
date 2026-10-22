@@ -25,7 +25,8 @@ body{min-height:100vh;display:flex;justify-content:center;background:radial-grad
 .direction-cell{text-align:center;width:48px;flex-shrink:0}
 .direction-hour{font-size:10px;color:#8faebd;margin-bottom:6px}
 .hourly-arrow{height:27px;display:flex;align-items:center;justify-content:center}
-.hourly-arrow span{display:block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:18px solid #55d6ff;filter:drop-shadow(0 0 4px rgba(85,214,255,.5));transform-origin:50% 15px}
+.hourly-arrow span.wind-direction-arrow{display:block;width:18px;height:5px;position:relative;background:#55d6ff;border-radius:3px;filter:drop-shadow(0 0 4px rgba(85,214,255,.5));transform-origin:center}
+.hourly-arrow span.wind-direction-arrow::after{content:"";position:absolute;right:-1px;top:-5px;width:0;height:0;border-top:7.5px solid transparent;border-bottom:7.5px solid transparent;border-left:9px solid #55d6ff}
 .hourly-name{font-size:8px;color:#c1d4dd;font-weight:bold;white-space:nowrap;margin-top:4px}
 .hourly-degrees{font-size:8px;color:#718b99;margin-top:2px}
 .chart-card{padding:14px 8px 12px}
@@ -63,7 +64,7 @@ canvas{display:block;height:350px}
   </div>
 
   <div class="direction-card">
-    <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI</div>
+    <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI ORARIE</div>
     <div class="direction-scroll" id="directionScroll">
       <div class="direction-grid" id="directionGrid"></div>
     </div>
@@ -121,13 +122,10 @@ const updated = document.getElementById("updated");
 let historyData = [];
 let refreshTimer = null;
 let resizeTimeout = null;
-
-/* Sincronizzazione delle due barre di scorrimento. */
 let syncingScroll = false;
 
 function syncScroll(source, target) {
   if (syncingScroll) return;
-
   syncingScroll = true;
 
   const sourceMax = source.scrollWidth - source.clientWidth;
@@ -250,10 +248,7 @@ function normalizeHistory(raw) {
   return valid.slice(-MAX_SAMPLES);
 }
 
-/*
-  Crea un punto per ogni settore di mezz'ora effettivamente
-  presente nello storico. Non arrotonda le letture in avanti.
-*/
+/* Raggruppa le rilevazioni nei settori di mezz'ora senza anticiparle. */
 function makeHalfHourlyHistory(history) {
   const intervalMs = CHART_INTERVAL_MINUTES * 60 * 1000;
   const buckets = new Map();
@@ -275,17 +270,22 @@ function makeHalfHourlyHistory(history) {
     .slice(-49);
 }
 
+/* Una freccia all'ora intera, rivolta verso dove soffia il vento. */
 function drawDirectionBar(history) {
   const grid = document.getElementById("directionGrid");
   const chartData = makeHalfHourlyHistory(history);
 
-  grid.innerHTML = "";
-  grid.style.width = (chartData.length * CHART_POINT_SPACING) + "px";
+  const hourlyData = chartData.filter(d =>
+    italianParts(d.chartTime).minute === "00"
+  );
 
-  chartData.forEach(d => {
+  grid.innerHTML = "";
+  grid.style.width = (hourlyData.length * DIRECTION_SPACING) + "px";
+
+  hourlyData.forEach(d => {
     const cell = document.createElement("div");
     cell.className = "direction-cell";
-    cell.style.width = CHART_POINT_SPACING + "px";
+    cell.style.width = DIRECTION_SPACING + "px";
 
     const hour = document.createElement("div");
     hour.className = "direction-hour";
@@ -295,9 +295,13 @@ function drawDirectionBar(history) {
     arrowBox.className = "hourly-arrow";
 
     const arrow = document.createElement("span");
+    arrow.className = "wind-direction-arrow";
+
     if (Number.isFinite(d.direction)) {
-      arrow.style.transform = "rotate(" + d.direction + "deg)";
+      const blowingToward = (d.direction + 180) % 360;
+      arrow.style.transform = "rotate(" + blowingToward + "deg)";
     }
+
     arrowBox.appendChild(arrow);
 
     const name = document.createElement("div");
@@ -370,7 +374,6 @@ function drawChart(history) {
   const y = value => T + ph - (value / yMax) * ph;
 
   ctx.clearRect(0, 0, w, h);
-
   ctx.font = "11px Arial";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
@@ -410,8 +413,7 @@ function drawChart(history) {
   });
 
   function isWholeItalianHour(timestamp) {
-    const parts = italianParts(timestamp);
-    return parts.minute === "00";
+    return italianParts(timestamp).minute === "00";
   }
 
   function drawSeries(key, color, lineWidth, labelOffset) {
@@ -486,7 +488,6 @@ async function loadGraph() {
     }
 
     historyData = history;
-
     drawDirectionBar(history);
     drawChart(history);
 
@@ -498,7 +499,6 @@ async function loadGraph() {
       " · Vento medio: " + latest.wind.toFixed(1) +
       " nodi · Raffica: " + latest.gust.toFixed(1) + " nodi";
 
-    /* Conserva una posizione di scorrimento coerente dopo l'aggiornamento. */
     syncScroll(chartScroll, directionScroll);
 
   } catch (error) {
@@ -508,7 +508,7 @@ async function loadGraph() {
   }
 }
 
-/* Aggiorna il grafico 3 minuti dopo ogni scadenza di 5 minuti. */
+/* Aggiorna il grafico 3 minuti dopo la scadenza dei 5 minuti. */
 function scheduleNextRefresh() {
   if (refreshTimer) clearTimeout(refreshTimer);
 
