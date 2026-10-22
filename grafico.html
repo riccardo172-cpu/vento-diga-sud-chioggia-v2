@@ -104,8 +104,18 @@ canvas{display:block;height:350px}
 
 const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
 const MAX_SAMPLES = 288;
-const POINT_SPACING = 48;
+const DIRECTION_SPACING = 48;
+const CHART_INTERVAL_MINUTES = 30;
+const CHART_POINT_SPACING = 48;
 const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
+
+/*
+  Il Comune pubblica il timestamp in UTC+1 fisso.
+  Lo interpretiamo prima in UTC+1 e poi lo visualizziamo
+  nell'ora civile italiana tramite Europe/Rome.
+  In questo modo il passaggio tra ora solare e legale
+  viene gestito automaticamente dal browser.
+*/
 const SOURCE_TIME_ZONE_OFFSET = "+01:00";
 const ITALY_TIME_ZONE = "Europe/Rome";
 
@@ -113,10 +123,11 @@ const canvas = document.getElementById("windChart");
 const ctx = canvas.getContext("2d");
 const chartWrap = document.getElementById("chartWrap");
 const chartScroll = document.getElementById("chartScroll");
-const directionScroll = document.getElementById("directionScroll");
 const updated = document.getElementById("updated");
 
 let historyData = [];
+let refreshTimer = null;
+let resizeTimeout = null;
 
 function parseTimestamp(value) {
   if (!value) return NaN;
@@ -129,8 +140,8 @@ function parseTimestamp(value) {
 
   const normalized =
     match[1] + "-" + match[2] + "-" + match[3] +
-    "T" + match[4] + ":" + match[5] + ":" + (match[6] || "00") +
-    SOURCE_TIME_ZONE_OFFSET;
+    "T" + match[4] + ":" + match[5] + ":" +
+    (match[6] || "00") + SOURCE_TIME_ZONE_OFFSET;
 
   return new Date(normalized).getTime();
 }
@@ -163,10 +174,6 @@ function formatItalianTime(value, includeDate = false) {
   return includeDate ? formatted.replace(",", "") : formatted;
 }
 
-function formatHour(value) {
-  return formatItalianTime(value, false);
-}
-
 function directionName(deg) {
   if (!Number.isFinite(deg)) return "--";
   if (deg >= 337.5 || deg < 22.5) return "TRAMONTANA";
@@ -187,7 +194,7 @@ function normalizeHistory(raw) {
   const valid = raw.map(d => ({
     timestamp: d.timestamp || "",
     time: parseTimestamp(d.timestamp),
-    hour: formatHour(d.timestamp),
+    hour: formatItalianTime(d.timestamp),
     direction: Number(d.direction),
     wind: Number(d.windKnots),
     gust: Number(d.maxKnots)
@@ -200,16 +207,14 @@ function normalizeHistory(raw) {
 
   valid.sort((a, b) => a.time - b.time);
 
-  // Mantiene al massimo le ultime 288 letture, cioè 24 ore
-  // quando la raccolta avviene ogni 5 minuti.
   return valid.slice(-MAX_SAMPLES);
 }
 
+/* Fascia della direzione: mantiene tutte le rilevazioni disponibili. */
 function drawDirectionBar(history) {
   const grid = document.getElementById("directionGrid");
   grid.innerHTML = "";
-
-  grid.style.width = (history.length * POINT_SPACING) + "px";
+  grid.style.width = (history.length * DIRECTION_SPACING) + "px";
 
   history.forEach(d => {
     const cell = document.createElement("div");
@@ -243,26 +248,58 @@ function drawDirectionBar(history) {
   });
 }
 
+/*
+  Riduce lo storico a un punto ogni 30 minuti.
+  Per ciascun intervallo seleziona la rilevazione più vicina
+  al minuto :00 o :30, se disponibile entro 15 minuti.
+  Il grafico non disegna più tutti i campioni da 5 minuti.
+*/
+function makeHalfHourlyHistory(history) {
+  if (!history.length) return [];
+
+  const intervalMs = CHART_INTERVAL_MINUTES * 60 * 1000;
+  const buckets = new Map();
+
+  history.forEach(d => {
+    const bucket = Math.round(d.time / intervalMs);
+    const targetTime = bucket * intervalMs;
+    const distance = Math.abs(d.time - targetTime);
+
+    if (distance > intervalMs / 2) return;
+
+    const existing = buckets.get(bucket);
+
+    if (!existing || distance < existing.distance) {
+      buckets.set(bucket, {
+        ...d,
+        chartTime: targetTime,
+        distance
+      });
+    }
+  });
+
+  return Array.from(buckets.values())
+    .sort((a, b) => a.chartTime - b.chartTime)
+    .slice(-49);
+}
+
 function drawChart(history) {
   if (!history.length) {
     throw new Error("Non ci sono ancora campioni storici da visualizzare");
   }
 
-  historyData = history;
+  const chartData = makeHalfHourlyHistory(history);
 
-  const firstTime = history[0].time;
-  const lastTime = history[history.length - 1].time;
-  const elapsedMinutes = Math.max(0, (lastTime - firstTime) / 60000);
+  if (!chartData.length) {
+    throw new Error("Non ci sono ancora rilevazioni utilizzabili per il grafico");
+  }
 
-  // Ogni intervallo reale di 5 minuti occupa circa 48 pixel.
-  // Gli intervalli più lunghi rimangono visibili come spazi più ampi.
-  const timelineWidth = elapsedMinutes > 0
-    ? (elapsedMinutes / 5) * POINT_SPACING
-    : Math.max(0, (history.length - 1) * POINT_SPACING);
+  const firstTime = chartData[0].chartTime;
+  const lastTime = chartData[chartData.length - 1].chartTime;
 
   const chartWidth = Math.max(
     chartScroll.clientWidth,
-    Math.ceil(timelineWidth + 100)
+    Math.ceil((chartData.length - 1) * CHART_POINT_SPACING + 100)
   );
 
   chartWrap.style.width = chartWidth + "px";
@@ -286,34 +323,34 @@ function drawChart(history) {
   const ph = h - T - B;
 
   const highest = Math.max(
-    ...history.map(d => Math.max(d.wind, d.gust)),
+    ...chartData.map(d => Math.max(d.wind, d.gust)),
     1
   );
   const yMax = Math.max(5, Math.ceil(highest / 5) * 5);
 
   const x = i => {
-    if (history.length === 1) return L + pw / 2;
+    if (chartData.length === 1) return L + pw / 2;
 
     const span = lastTime - firstTime;
 
     if (span > 0) {
-      return L + ((history[i].time - firstTime) / span) * pw;
+      return L + ((chartData[i].chartTime - firstTime) / span) * pw;
     }
 
-    return L + (i / (history.length - 1)) * pw;
+    return L + (i / (chartData.length - 1)) * pw;
   };
 
-  const y = v => T + ph - (v / yMax) * ph;
+  const y = value => T + ph - (value / yMax) * ph;
 
   ctx.clearRect(0, 0, w, h);
 
-  // Griglia orizzontale e scala dei nodi.
+  /* Griglia orizzontale e scala in nodi. */
   ctx.font = "11px Arial";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
 
-  for (let v = 0; v <= yMax; v += 5) {
-    const yy = y(v);
+  for (let value = 0; value <= yMax; value += 5) {
+    const yy = y(value);
 
     ctx.strokeStyle = "rgba(137,190,215,.17)";
     ctx.lineWidth = 1;
@@ -323,12 +360,21 @@ function drawChart(history) {
     ctx.stroke();
 
     ctx.fillStyle = "#8fa9b7";
-    ctx.fillText(String(v), L - 8, yy);
+    ctx.fillText(String(value), L - 8, yy);
   }
 
-  // Linee verticali e orari. Ogni rilevazione mantiene il suo timestamp.
-  history.forEach((d, i) => {
+  /*
+    Una tacca per ogni settore di mezz'ora.
+    L'orario mostrato è quello civile italiano.
+  */
+  chartData.forEach((d, i) => {
     const xx = x(i);
+    const displayedTime = formatItalianTime(
+      new Date(d.chartTime - 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 16)
+        .replace("T", " ")
+    );
 
     ctx.strokeStyle = "rgba(137,190,215,.08)";
     ctx.beginPath();
@@ -343,7 +389,7 @@ function drawChart(history) {
     ctx.font = "10px Arial";
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
-    ctx.fillText(d.hour, 0, 0);
+    ctx.fillText(displayedTime, 0, 0);
     ctx.restore();
   });
 
@@ -354,7 +400,7 @@ function drawChart(history) {
     ctx.lineCap = "round";
     ctx.beginPath();
 
-    history.forEach((d, i) => {
+    chartData.forEach((d, i) => {
       const xx = x(i);
       const yy = y(d[key]);
 
@@ -364,22 +410,28 @@ function drawChart(history) {
 
     ctx.stroke();
 
-    history.forEach((d, i) => {
+    chartData.forEach((d, i) => {
       const xx = x(i);
       const yy = y(d[key]);
 
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(xx, yy, 2.7, 0, Math.PI * 2);
+      ctx.arc(xx, yy, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // Per non affollare il grafico con 288 valori,
-      // le etichette numeriche sono mostrate a intervalli regolari.
-      const showLabel =
-        history.length <= 48 ||
-        i === 0 ||
-        i === history.length - 1 ||
-        i % 6 === 0;
+      /*
+        Etichette numeriche soltanto alle ore intere.
+        Alle mezze ore si vedono il punto e la linea,
+        senza il valore numerico.
+      */
+      const localMinute = Number(
+        new Intl.DateTimeFormat("it-IT", {
+          timeZone: ITALY_TIME_ZONE,
+          minute: "2-digit"
+        }).format(new Date(d.time))
+      );
+
+      const showLabel = localMinute === 0;
 
       if (showLabel) {
         ctx.fillStyle = color;
@@ -426,6 +478,8 @@ async function loadGraph() {
       throw new Error("Lo storico è vuoto o non contiene dati validi");
     }
 
+    historyData = history;
+
     drawDirectionBar(history);
     drawChart(history);
 
@@ -444,10 +498,32 @@ async function loadGraph() {
   }
 }
 
-let resizeTimeout;
+/*
+  Aggiornamento 3 minuti dopo ogni scadenza dei 5 minuti:
+  minuti :03, :08, :13, :18, :23, :28, :33, :38, :43, :48, :53, :58.
+  Il primo caricamento viene effettuato subito all'apertura.
+*/
+function scheduleNextRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+
+  const now = new Date();
+  const next = new Date(now);
+  next.setSeconds(0, 0);
+
+  const nextMinute = Math.floor(now.getMinutes() / 5) * 5 + 8;
+  next.setMinutes(nextMinute);
+
+  const delay = Math.max(1000, next.getTime() - now.getTime());
+
+  refreshTimer = setTimeout(async () => {
+    await loadGraph();
+    scheduleNextRefresh();
+  }, delay);
+}
 
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimeout);
+
   resizeTimeout = setTimeout(() => {
     if (historyData.length) {
       drawChart(historyData);
@@ -455,7 +531,7 @@ window.addEventListener("resize", () => {
   }, 150);
 });
 
-loadGraph();
+loadGraph().finally(scheduleNextRefresh);
 </script>
 </body>
 </html>
