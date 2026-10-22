@@ -22,7 +22,7 @@ body{min-height:100vh;display:flex;justify-content:center;background:radial-grad
 .direction-label{margin-bottom:10px}
 .direction-scroll,.chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#39718a #102532;-webkit-overflow-scrolling:touch}
 .direction-grid{display:grid;grid-auto-flow:column;grid-auto-columns:48px;min-width:max-content;align-items:start}
-.direction-cell{text-align:center;width:48px}
+.direction-cell{text-align:center;width:48px;flex-shrink:0}
 .direction-hour{font-size:10px;color:#8faebd;margin-bottom:6px}
 .hourly-arrow{height:27px;display:flex;align-items:center;justify-content:center}
 .hourly-arrow span{display:block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:18px solid #55d6ff;filter:drop-shadow(0 0 4px rgba(85,214,255,.5));transform-origin:50% 15px}
@@ -108,7 +108,6 @@ const CHART_INTERVAL_MINUTES = 30;
 const CHART_POINT_SPACING = 48;
 const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
 
-/* Il Comune usa UTC+1 fisso; la visualizzazione converte in Europe/Rome. */
 const SOURCE_TIME_ZONE_OFFSET = "+01:00";
 const ITALY_TIME_ZONE = "Europe/Rome";
 
@@ -116,11 +115,40 @@ const canvas = document.getElementById("windChart");
 const ctx = canvas.getContext("2d");
 const chartWrap = document.getElementById("chartWrap");
 const chartScroll = document.getElementById("chartScroll");
+const directionScroll = document.getElementById("directionScroll");
 const updated = document.getElementById("updated");
 
 let historyData = [];
 let refreshTimer = null;
 let resizeTimeout = null;
+
+/* Sincronizzazione delle due barre di scorrimento. */
+let syncingScroll = false;
+
+function syncScroll(source, target) {
+  if (syncingScroll) return;
+
+  syncingScroll = true;
+
+  const sourceMax = source.scrollWidth - source.clientWidth;
+  const targetMax = target.scrollWidth - target.clientWidth;
+
+  target.scrollLeft = sourceMax > 0
+    ? (source.scrollLeft / sourceMax) * Math.max(0, targetMax)
+    : 0;
+
+  requestAnimationFrame(() => {
+    syncingScroll = false;
+  });
+}
+
+chartScroll.addEventListener("scroll", () => {
+  syncScroll(chartScroll, directionScroll);
+});
+
+directionScroll.addEventListener("scroll", () => {
+  syncScroll(directionScroll, chartScroll);
+});
 
 function parseTimestamp(value) {
   if (!value) return NaN;
@@ -222,18 +250,46 @@ function normalizeHistory(raw) {
   return valid.slice(-MAX_SAMPLES);
 }
 
-function drawDirectionBar(history) {
-  const grid = document.getElementById("directionGrid");
-  grid.innerHTML = "";
-  grid.style.width = (history.length * DIRECTION_SPACING) + "px";
+/*
+  Crea un punto per ogni settore di mezz'ora effettivamente
+  presente nello storico. Non arrotonda le letture in avanti.
+*/
+function makeHalfHourlyHistory(history) {
+  const intervalMs = CHART_INTERVAL_MINUTES * 60 * 1000;
+  const buckets = new Map();
 
   history.forEach(d => {
+    const bucketStart = Math.floor(d.time / intervalMs) * intervalMs;
+    const previous = buckets.get(bucketStart);
+
+    if (!previous || d.time > previous.time) {
+      buckets.set(bucketStart, {
+        ...d,
+        chartTime: bucketStart
+      });
+    }
+  });
+
+  return Array.from(buckets.values())
+    .sort((a, b) => a.chartTime - b.chartTime)
+    .slice(-49);
+}
+
+function drawDirectionBar(history) {
+  const grid = document.getElementById("directionGrid");
+  const chartData = makeHalfHourlyHistory(history);
+
+  grid.innerHTML = "";
+  grid.style.width = (chartData.length * CHART_POINT_SPACING) + "px";
+
+  chartData.forEach(d => {
     const cell = document.createElement("div");
     cell.className = "direction-cell";
+    cell.style.width = CHART_POINT_SPACING + "px";
 
     const hour = document.createElement("div");
     hour.className = "direction-hour";
-    hour.textContent = d.hour;
+    hour.textContent = formatItalianTimestamp(d.chartTime);
 
     const arrowBox = document.createElement("div");
     arrowBox.className = "hourly-arrow";
@@ -257,33 +313,6 @@ function drawDirectionBar(history) {
     cell.append(hour, arrowBox, name, degrees);
     grid.appendChild(cell);
   });
-}
-
-function makeHalfHourlyHistory(history) {
-  const intervalMs = CHART_INTERVAL_MINUTES * 60 * 1000;
-  const buckets = new Map();
-
-  history.forEach(d => {
-    const bucket = Math.round(d.time / intervalMs);
-    const targetTime = bucket * intervalMs;
-    const distance = Math.abs(d.time - targetTime);
-
-    if (distance > intervalMs / 2) return;
-
-    const previous = buckets.get(bucket);
-
-    if (!previous || distance < previous.distance) {
-      buckets.set(bucket, {
-        ...d,
-        chartTime: targetTime,
-        distance
-      });
-    }
-  });
-
-  return Array.from(buckets.values())
-    .sort((a, b) => a.chartTime - b.chartTime)
-    .slice(-49);
 }
 
 function drawChart(history) {
@@ -380,11 +409,6 @@ function drawChart(history) {
     ctx.restore();
   });
 
-  /*
-    Controlla l'ora civile italiana del settore del grafico.
-    Le etichette vengono mostrate a ogni ora intera (:00),
-    sia per il vento medio sia per le raffiche.
-  */
   function isWholeItalianHour(timestamp) {
     const parts = italianParts(timestamp);
     return parts.minute === "00";
@@ -416,7 +440,6 @@ function drawChart(history) {
       ctx.arc(xx, yy, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      /* Etichette ripristinate sulle ore intere. */
       if (isWholeItalianHour(d.chartTime)) {
         ctx.fillStyle = color;
         ctx.font = "bold 10px Arial";
@@ -463,6 +486,7 @@ async function loadGraph() {
     }
 
     historyData = history;
+
     drawDirectionBar(history);
     drawChart(history);
 
@@ -473,6 +497,9 @@ async function loadGraph() {
       " · Ultimo dato: " + formatItalianTime(latest.timestamp, true) +
       " · Vento medio: " + latest.wind.toFixed(1) +
       " nodi · Raffica: " + latest.gust.toFixed(1) + " nodi";
+
+    /* Conserva una posizione di scorrimento coerente dopo l'aggiornamento. */
+    syncScroll(chartScroll, directionScroll);
 
   } catch (error) {
     console.error(error);
@@ -503,7 +530,11 @@ function scheduleNextRefresh() {
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    if (historyData.length) drawChart(historyData);
+    if (historyData.length) {
+      drawDirectionBar(historyData);
+      drawChart(historyData);
+      syncScroll(chartScroll, directionScroll);
+    }
   }, 150);
 });
 
