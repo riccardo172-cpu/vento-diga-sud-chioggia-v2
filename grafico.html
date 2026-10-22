@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -55,7 +56,6 @@ canvas{display:block;height:350px}
 
 <body>
 <div class="app">
-
   <div class="header">
     <div class="small">STAZIONE METEOROLOGICA</div>
     <h1>GRAFICO 24 ORE</h1>
@@ -108,15 +108,7 @@ const CHART_INTERVAL_MINUTES = 30;
 const CHART_POINT_SPACING = 48;
 const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
 
-/*
-  ATTENZIONE AL FUSO ORARIO:
-  Il Comune pubblica i timestamp in UTC+1 fisso.
-  Li interpretiamo in UTC+1 una sola volta.
-  Per visualizzarli usiamo poi Europe/Rome, che applica
-  automaticamente UTC+1 in inverno e UTC+2 in estate.
-
-  Non sottrarre né aggiungere altre ore durante il disegno.
-*/
+/* Il Comune usa UTC+1 fisso; la visualizzazione converte in Europe/Rome. */
 const SOURCE_TIME_ZONE_OFFSET = "+01:00";
 const ITALY_TIME_ZONE = "Europe/Rome";
 
@@ -147,11 +139,24 @@ function parseTimestamp(value) {
   return new Date(normalized).getTime();
 }
 
-/*
-  Converte un istante già interpretato correttamente
-  nell'orario civile italiano. Accetta direttamente
-  il timestamp numerico per evitare conversioni doppie.
-*/
+function italianParts(timestamp) {
+  const parts = new Intl.DateTimeFormat("it-IT", {
+    timeZone: ITALY_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date(timestamp));
+
+  const result = {};
+  parts.forEach(part => {
+    if (part.type !== "literal") result[part.type] = part.value;
+  });
+  return result;
+}
+
 function formatItalianTimestamp(timestamp, includeDate = false) {
   if (!Number.isFinite(timestamp)) return "--:--";
 
@@ -214,11 +219,9 @@ function normalizeHistory(raw) {
   );
 
   valid.sort((a, b) => a.time - b.time);
-
   return valid.slice(-MAX_SAMPLES);
 }
 
-/* La fascia superiore mantiene tutte le rilevazioni disponibili. */
 function drawDirectionBar(history) {
   const grid = document.getElementById("directionGrid");
   grid.innerHTML = "";
@@ -256,11 +259,6 @@ function drawDirectionBar(history) {
   });
 }
 
-/*
-  Crea un punto per ciascun intervallo di 30 minuti.
-  Ogni punto utilizza la rilevazione disponibile più vicina
-  al confine :00 o :30, entro 15 minuti dal confine.
-*/
 function makeHalfHourlyHistory(history) {
   const intervalMs = CHART_INTERVAL_MINUTES * 60 * 1000;
   const buckets = new Map();
@@ -334,21 +332,16 @@ function drawChart(history) {
 
   const x = i => {
     if (chartData.length === 1) return L + pw / 2;
-
     const span = lastTime - firstTime;
-
-    if (span > 0) {
-      return L + ((chartData[i].chartTime - firstTime) / span) * pw;
-    }
-
-    return L + (i / (chartData.length - 1)) * pw;
+    return span > 0
+      ? L + ((chartData[i].chartTime - firstTime) / span) * pw
+      : L + (i / (chartData.length - 1)) * pw;
   };
 
   const y = value => T + ph - (value / yMax) * ph;
 
   ctx.clearRect(0, 0, w, h);
 
-  /* Griglia orizzontale e scala dei nodi. */
   ctx.font = "11px Arial";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
@@ -367,7 +360,6 @@ function drawChart(history) {
     ctx.fillText(String(value), L - 8, yy);
   }
 
-  /* Orari dell'asse: formattati direttamente da timestamp reali. */
   chartData.forEach((d, i) => {
     const xx = x(i);
 
@@ -388,14 +380,14 @@ function drawChart(history) {
     ctx.restore();
   });
 
+  /*
+    Controlla l'ora civile italiana del settore del grafico.
+    Le etichette vengono mostrate a ogni ora intera (:00),
+    sia per il vento medio sia per le raffiche.
+  */
   function isWholeItalianHour(timestamp) {
-    const parts = new Intl.DateTimeFormat("it-IT", {
-      timeZone: ITALY_TIME_ZONE,
-      minute: "2-digit"
-    }).formatToParts(new Date(timestamp));
-
-    const minutePart = parts.find(part => part.type === "minute");
-    return minutePart && minutePart.value === "00";
+    const parts = italianParts(timestamp);
+    return parts.minute === "00";
   }
 
   function drawSeries(key, color, lineWidth, labelOffset) {
@@ -424,7 +416,7 @@ function drawChart(history) {
       ctx.arc(xx, yy, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      /* Valori numerici soltanto alle ore intere italiane. */
+      /* Etichette ripristinate sulle ore intere. */
       if (isWholeItalianHour(d.chartTime)) {
         ctx.fillStyle = color;
         ctx.font = "bold 10px Arial";
@@ -489,11 +481,7 @@ async function loadGraph() {
   }
 }
 
-/*
-  Aggiornamento 3 minuti dopo ogni scadenza dei 5 minuti:
-  :03, :08, :13, :18, :23, :28, :33, :38, :43, :48, :53, :58.
-  Il primo caricamento avviene subito quando si apre la pagina.
-*/
+/* Aggiorna il grafico 3 minuti dopo ogni scadenza di 5 minuti. */
 function scheduleNextRefresh() {
   if (refreshTimer) clearTimeout(refreshTimer);
 
@@ -514,11 +502,8 @@ function scheduleNextRefresh() {
 
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimeout);
-
   resizeTimeout = setTimeout(() => {
-    if (historyData.length) {
-      drawChart(historyData);
-    }
+    if (historyData.length) drawChart(historyData);
   }, 150);
 });
 
