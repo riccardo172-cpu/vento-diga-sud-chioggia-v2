@@ -21,8 +21,8 @@ body{min-height:100vh;display:flex;justify-content:center;background:radial-grad
 .direction-label,.chart-title{font-size:11px;letter-spacing:2px;color:#7fb9d5;font-weight:bold;text-align:center}
 .direction-label{margin-bottom:10px}
 .direction-scroll,.chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#39718a #102532;-webkit-overflow-scrolling:touch}
-.direction-grid{display:grid;grid-auto-flow:column;grid-auto-columns:48px;min-width:max-content;align-items:start}
-.direction-cell{text-align:center;width:48px;flex-shrink:0}
+.direction-grid{display:grid;grid-auto-flow:column;grid-auto-columns:96px;min-width:max-content;align-items:start}
+.direction-cell{text-align:center;width:96px;flex-shrink:0}
 .direction-hour{font-size:10px;color:#8faebd;margin-bottom:6px}
 .hourly-arrow{height:27px;display:flex;align-items:center;justify-content:center}
 .hourly-arrow span.wind-direction-arrow{display:block;width:18px;height:5px;position:relative;background:#55d6ff;border-radius:3px;filter:drop-shadow(0 0 4px rgba(85,214,255,.5));transform-origin:center}
@@ -104,7 +104,7 @@ canvas{display:block;height:350px}
 
 const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
 const MAX_SAMPLES = 288;
-const DIRECTION_SPACING = 48;
+const DIRECTION_SPACING = 96;
 const CHART_INTERVAL_MINUTES = 30;
 const CHART_POINT_SPACING = 48;
 const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
@@ -128,12 +128,7 @@ function syncScroll(source, target) {
   if (syncingScroll) return;
   syncingScroll = true;
 
-  const sourceMax = source.scrollWidth - source.clientWidth;
-  const targetMax = target.scrollWidth - target.clientWidth;
-
-  target.scrollLeft = sourceMax > 0
-    ? (source.scrollLeft / sourceMax) * Math.max(0, targetMax)
-    : 0;
+  target.scrollLeft = source.scrollLeft;
 
   requestAnimationFrame(() => {
     syncingScroll = false;
@@ -299,7 +294,9 @@ function drawDirectionBar(history) {
 
     if (Number.isFinite(d.direction)) {
       const blowingToward = (d.direction + 180) % 360;
-      arrow.style.transform = "rotate(" + blowingToward + "deg)";
+
+      /* CSS considera 0° verso destra; la bussola considera 0° verso Nord. */
+      arrow.style.transform = "rotate(" + (blowingToward - 90) + "deg)";
     }
 
     arrowBox.appendChild(arrow);
