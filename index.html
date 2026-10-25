@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -100,6 +99,17 @@ body {
   font-size: 30px;
   line-height: 1;
   font-weight: 700;
+}
+
+/* Colori dinamici in base alla fonte */
+.wind-value.source-json {
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.wind-value.source-python {
+  color: #f1c40f !important;
+  text-shadow: 0 0 10px rgba(241, 196, 15, 0.4);
 }
 
 .wind-unit {
@@ -282,13 +292,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Il verde è il colore normale della scritta di aggiornamento */
-.status.warning span {
-  background: rgba(40, 170, 110, 0.16);
-  border-color: rgba(70, 220, 150, 0.25);
-  color: #6ee0aa;
-}
-
 .status.error span {
   background: rgba(220, 60, 60, 0.12);
   border-color: rgba(220, 80, 80, 0.25);
@@ -437,52 +440,6 @@ body {
 }
 
 .footer strong { color: #8299a6; }
-
-@media (max-width: 360px) {
-  .app { padding-left: 9px; padding-right: 9px; }
-  .wind-value { font-size: 27px; }
-  .compass {
-    width: 180px;
-    height: 180px;
-    min-width: 180px;
-    min-height: 180px;
-  }
-  .tick { transform-origin: 50% 90px; }
-  .t1  { transform: translate(-50%, -90px) rotate(0deg); }
-  .t2  { transform: translate(-50%, -90px) rotate(30deg); }
-  .t3  { transform: translate(-50%, -90px) rotate(60deg); }
-  .t4  { transform: translate(-50%, -90px) rotate(90deg); }
-  .t5  { transform: translate(-50%, -90px) rotate(120deg); }
-  .t6  { transform: translate(-50%, -90px) rotate(150deg); }
-  .t7  { transform: translate(-50%, -90px) rotate(180deg); }
-  .t8  { transform: translate(-50%, -90px) rotate(210deg); }
-  .t9  { transform: translate(-50%, -90px) rotate(240deg); }
-  .t10 { transform: translate(-50%, -90px) rotate(270deg); }
-  .t11 { transform: translate(-50%, -90px) rotate(300deg); }
-  .t12 { transform: translate(-50%, -90px) rotate(330deg); }
-  .webcam-home { padding: 7px 9px; font-size: 9px; }
-  .webcam-heading { font-size: 9px; }
-}
-
-@media (max-height: 800px) {
-  .app { padding-top: 5px; padding-bottom: 4px; }
-  .header { margin-bottom: 5px; }
-  .compass-section { margin-top: 5px; padding-top: 5px; padding-bottom: 4px; }
-  .direction-title { margin-bottom: 3px; }
-  .direction-name { margin-top: 3px; font-size: 17px; }
-  .direction-degrees { margin-top: 1px; font-size: 11px; }
-  .webcam-button { margin-top: 5px; min-height: 32px; padding-top: 5px; padding-bottom: 5px; }
-  .action-buttons { margin-top: 5px; gap: 5px; }
-  .action-button { min-height: 31px; padding-top: 4px; padding-bottom: 4px; }
-  .footer { margin-top: 4px; padding-top: 2px; font-size: 8px; line-height: 1.2; }
-}
-
-@media (orientation: landscape) and (max-height: 550px) {
-  .app { min-height: 100vh; }
-  .webcam-topbar { padding-top: 5px; padding-bottom: 5px; }
-  .webcam-home { padding: 7px 12px; }
-  .webcam-note { padding-top: 4px; padding-bottom: 4px; }
-}
 </style>
 </head>
 
@@ -498,13 +455,13 @@ body {
   <div class="wind-boxes">
     <div class="wind-box">
       <div class="wind-label">VENTO MEDIO</div>
-      <div class="wind-value" id="windKnots">--</div>
+      <div class="wind-value source-json" id="windKnots">--</div>
       <div class="wind-unit">nodi</div>
       <div class="wind-ms" id="windMs">-- m/s</div>
     </div>
     <div class="wind-box">
       <div class="wind-label">VENTO MAX</div>
-      <div class="wind-value" id="maxKnots">--</div>
+      <div class="wind-value source-json" id="maxKnots">--</div>
       <div class="wind-unit">nodi</div>
       <div class="wind-ms" id="maxMs">-- m/s</div>
     </div>
@@ -593,7 +550,8 @@ body {
 <script>
 "use strict";
 
-const API_URL = "https://vento-diga-sud.riccardo172.workers.dev/";
+// Puntiamo al worker unificato di test
+const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/";
 
 const TEMPERATURE_URL =
   "https://api.open-meteo.com/v1/forecast" +
@@ -661,10 +619,6 @@ document.addEventListener("keydown", function(event) {
   if (event.key === "Escape") closeWebcam();
 });
 
-/*
- * Converte il timestamp del Comune nell'ora corretta di Europe/Rome.
- * Gestisce sia l'ora solare sia l'ora legale.
- */
 function getTimestampDate(timestamp) {
   if (timestamp === null || timestamp === undefined || timestamp === "") {
     return null;
@@ -672,13 +626,11 @@ function getTimestampDate(timestamp) {
 
   const value = String(timestamp).trim();
 
-  // Se la data contiene già Z o un offset esplicito, rispetta quel fuso.
   if (/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value)) {
     const explicitDate = new Date(value);
     return Number.isNaN(explicitDate.getTime()) ? null : explicitDate;
   }
 
-  // Formati accettati: YYYY-MM-DD HH:MM oppure YYYY-MM-DD HH:MM:SS.
   const match = value.match(
     /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
   );
@@ -712,7 +664,6 @@ function getTimestampDate(timestamp) {
 
   let utcMilliseconds = desiredLocalAsUTC;
 
-  // Calcola l'offset del fuso italiano per la data in esame.
   for (let i = 0; i < 4; i++) {
     const parts = formatter.formatToParts(new Date(utcMilliseconds));
     const fields = {};
@@ -757,10 +708,6 @@ function formatTimestamp(timestamp) {
   });
 }
 
-/*
- * L'ora della scritta di aggiornamento viene presa dall'orologio
- * attuale italiano, NON dal timestamp trasmesso dal JSON.
- */
 function getItalianCurrentTime() {
   return new Intl.DateTimeFormat("it-IT", {
     timeZone: "Europe/Rome",
@@ -787,7 +734,6 @@ function setStatus(type, message) {
   status.className = "status";
   if (type === "error") status.classList.add("error");
 
-  // La scritta di aggiornamento rimane verde.
   status.innerHTML = "";
 
   const span = document.createElement("span");
@@ -843,11 +789,12 @@ async function loadData() {
     }
 
     const data = result.data;
-    const direction = Number(data.direction);
-    const windMs = Number(data.windMs);
-    const windKnots = Number(data.windKnots);
-    const maxMs = Number(data.maxMs);
-    const maxKnots = Number(data.maxKnots);
+    const direction = Number(data.direzione_deg);
+    const windMs = Number(data.vento_ms);
+    const windKnots = Number(data.vento_nodi);
+    const maxMs = Number(data.raffica_ms);
+    const maxKnots = Number(data.raffica_nodi);
+    const source = data.source; // "json_ufficiale" oppure "html_fallback"
 
     if (
       !Number.isFinite(direction) ||
@@ -859,15 +806,28 @@ async function loadData() {
       throw new Error("Valori vento non validi");
     }
 
-    // Il footer conserva l'ora della rilevazione fornita dalla stazione.
+    // Gestione colore dinamico: Bianco per JSON ufficiale, Giallo per Scraper Python
+    const windKnotsElem = document.getElementById("windKnots");
+    const maxKnotsElem = document.getElementById("maxKnots");
+
+    windKnotsElem.classList.remove("source-json", "source-python");
+    maxKnotsElem.classList.remove("source-json", "source-python");
+
+    if (source === "json_ufficiale") {
+      windKnotsElem.classList.add("source-json");
+      maxKnotsElem.classList.add("source-json");
+    } else {
+      windKnotsElem.classList.add("source-python");
+      maxKnotsElem.classList.add("source-python");
+    }
+
     document.getElementById("timestamp").textContent =
       formatTimestamp(data.timestamp);
 
-    document.getElementById("windKnots").textContent =
-      windKnots.toFixed(1);
+    windKnotsElem.textContent = windKnots.toFixed(1);
     document.getElementById("windMs").textContent =
       windMs.toFixed(1) + " m/s";
-    document.getElementById("maxKnots").textContent =
+    maxKnotsElem.textContent =
       maxKnots.toFixed(1);
     document.getElementById("maxMs").textContent =
       maxMs.toFixed(1) + " m/s";
@@ -879,7 +839,6 @@ async function loadData() {
     document.getElementById("arrow").style.transform =
       "translate(-50%, -57px) rotate(" + direction + "deg)";
 
-    // Verde e con l'ora attuale in Italia, indipendente dal JSON.
     setStatus(
       "ok",
       "AGGIORNAMENTO DELLE ORE " + getItalianCurrentTime()
@@ -894,11 +853,9 @@ async function loadData() {
   }
 }
 
-// Caricamento iniziale.
 loadData();
 loadTemperature();
 
-// Aggiornamento automatico ogni 5 minuti.
 setInterval(loadData, 5 * 60 * 1000);
 setInterval(loadTemperature, 5 * 60 * 1000);
 </script>
