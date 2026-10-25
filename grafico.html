@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -102,7 +101,7 @@ canvas{display:block;height:350px}
 <script>
 "use strict";
 
-const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
+const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/history";
 const MAX_SAMPLES = 288;
 const DIRECTION_SPACING = 96;
 const CHART_INTERVAL_MINUTES = 30;
@@ -229,9 +228,9 @@ function normalizeHistory(raw) {
     timestamp: d.timestamp || "",
     time: parseTimestamp(d.timestamp),
     hour: formatItalianTime(d.timestamp),
-    direction: Number(d.direction),
-    wind: Number(d.windKnots),
-    gust: Number(d.maxKnots)
+    direction: Number(d.direzione_deg),
+    wind: Number(d.vento_nodi),
+    gust: Number(d.raffica_nodi)
   })).filter(d =>
     d.timestamp &&
     Number.isFinite(d.time) &&
