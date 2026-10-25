@@ -550,7 +550,6 @@ body {
 <script>
 "use strict";
 
-// Puntiamo al worker unificato di test
 const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/";
 
 const TEMPERATURE_URL =
@@ -565,6 +564,7 @@ const WEBCAM_URL =
   "https://ipcamlive.com/player/player.php?alias=5727502f23ac2";
 
 let previousBodyOverflow = "";
+let refreshTimer = null;
 
 async function openWebcam() {
   const screen = document.getElementById("webcamScreen");
@@ -794,7 +794,7 @@ async function loadData() {
     const windKnots = Number(data.vento_nodi);
     const maxMs = Number(data.raffica_ms);
     const maxKnots = Number(data.raffica_nodi);
-    const source = data.source; // "json_ufficiale" oppure "html_fallback"
+    const source = data.source;
 
     if (
       !Number.isFinite(direction) ||
@@ -806,7 +806,6 @@ async function loadData() {
       throw new Error("Valori vento non validi");
     }
 
-    // Gestione colore dinamico: Bianco per JSON ufficiale, Giallo per Scraper Python
     const windKnotsElem = document.getElementById("windKnots");
     const maxKnotsElem = document.getElementById("maxKnots");
 
@@ -853,11 +852,26 @@ async function loadData() {
   }
 }
 
-loadData();
-loadTemperature();
+function scheduleNextRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minuti fissi
 
-setInterval(loadData, 5 * 60 * 1000);
-setInterval(loadTemperature, 5 * 60 * 1000);
+  refreshTimer = setTimeout(async () => {
+    await loadData();
+    await loadTemperature();
+    scheduleNextRefresh();
+  }, REFRESH_INTERVAL);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    loadData();
+    loadTemperature();
+  }
+});
+
+loadData();
+loadTemperature().finally(scheduleNextRefresh);
 </script>
 
 </body>
