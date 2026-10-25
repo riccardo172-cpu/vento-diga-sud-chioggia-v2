@@ -63,7 +63,7 @@ canvas{display:block;height:350px}
   </div>
 
   <div class="direction-card">
-    <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI ORARIE</div>
+    <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI</div>
     <div class="direction-scroll" id="directionScroll">
       <div class="direction-grid" id="directionGrid"></div>
     </div>
@@ -103,13 +103,11 @@ canvas{display:block;height:350px}
 
 const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/history";
 const MAX_SAMPLES = 288;
-const DIRECTION_SPACING = 96;
-const CHART_INTERVAL_MINUTES = 30;
-const CHART_POINT_SPACING = 48;
+const COLUMN_SPACING = 96;
 const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
 
-const SOURCE_TIME_ZONE_OFFSET = "+01:00";
-const ITALY_TIME_ZONE = "Europe/Rome";
+// Forza sempre l'offset UTC+1 (ora solare fissa)
+const FIXED_TIME_ZONE_OFFSET = "+01:00";
 
 const canvas = document.getElementById("windChart");
 const ctx = canvas.getContext("2d");
@@ -126,9 +124,7 @@ let syncingScroll = false;
 function syncScroll(source, target) {
   if (syncingScroll) return;
   syncingScroll = true;
-
   target.scrollLeft = source.scrollLeft;
-
   requestAnimationFrame(() => {
     syncingScroll = false;
   });
@@ -144,67 +140,32 @@ directionScroll.addEventListener("scroll", () => {
 
 function parseTimestamp(value) {
   if (!value) return NaN;
-
   const match = String(value).match(
     /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
   );
-
   if (!match) return NaN;
-
   const normalized =
     match[1] + "-" + match[2] + "-" + match[3] +
     "T" + match[4] + ":" + match[5] + ":" +
-    (match[6] || "00") + SOURCE_TIME_ZONE_OFFSET;
-
+    (match[6] || "00") + FIXED_TIME_ZONE_OFFSET;
   return new Date(normalized).getTime();
 }
 
-function italianParts(timestamp) {
-  const parts = new Intl.DateTimeFormat("it-IT", {
-    timeZone: ITALY_TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23"
-  }).formatToParts(new Date(timestamp));
-
-  const result = {};
-  parts.forEach(part => {
-    if (part.type !== "literal") result[part.type] = part.value;
-  });
-  return result;
-}
-
-function formatItalianTimestamp(timestamp, includeDate = false) {
+// Formatta esplicitamente come gg/mm/aaaa hh:mm usando i componenti UTC (forzando +01:00)
+function formatCustomDateTime(timestamp, includeDate = false) {
   if (!Number.isFinite(timestamp)) return "--:--";
+  const d = new Date(timestamp);
+  
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const year = d.getUTCFullYear();
+  const hours = String(d.getUTCHours()).padStart(2, "0");
+  const minutes = String(d.getUTCMinutes()).padStart(2, "0");
 
-  const options = includeDate
-    ? {
-        timeZone: ITALY_TIME_ZONE,
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
-      }
-    : {
-        timeZone: ITALY_TIME_ZONE,
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
-      };
-
-  const formatted = new Intl.DateTimeFormat("it-IT", options)
-    .format(new Date(timestamp));
-
-  return includeDate ? formatted.replace(",", "") : formatted;
-}
-
-function formatItalianTime(value, includeDate = false) {
-  return formatItalianTimestamp(parseTimestamp(value), includeDate);
+  if (includeDate) {
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+  return `${hours}:${minutes}`;
 }
 
 function directionName(deg) {
@@ -223,11 +184,9 @@ function normalizeHistory(raw) {
   if (!Array.isArray(raw)) {
     throw new Error("Il Worker non ha restituito lo storico in formato corretto");
   }
-
   const valid = raw.map(d => ({
     timestamp: d.timestamp || "",
     time: parseTimestamp(d.timestamp),
-    hour: formatItalianTime(d.timestamp),
     direction: Number(d.direzione_deg),
     wind: Number(d.vento_nodi),
     gust: Number(d.raffica_nodi)
@@ -237,101 +196,18 @@ function normalizeHistory(raw) {
     Number.isFinite(d.wind) &&
     Number.isFinite(d.gust)
   );
-
   valid.sort((a, b) => a.time - b.time);
   return valid.slice(-MAX_SAMPLES);
 }
 
-/* Raggruppa le rilevazioni nei settori di mezz'ora senza anticiparle. */
-function makeHalfHourlyHistory(history) {
-  const intervalMs = CHART_INTERVAL_MINUTES * 60 * 1000;
-  const buckets = new Map();
-
-  history.forEach(d => {
-    const bucketStart = Math.floor(d.time / intervalMs) * intervalMs;
-    const previous = buckets.get(bucketStart);
-
-    if (!previous || d.time > previous.time) {
-      buckets.set(bucketStart, {
-        ...d,
-        chartTime: bucketStart
-      });
-    }
-  });
-
-  return Array.from(buckets.values())
-    .sort((a, b) => a.chartTime - b.chartTime)
-    .slice(-49);
-}
-
-/* Una freccia all'ora intera, rivolta verso dove soffia il vento. */
-function drawDirectionBar(history) {
+function renderUI(history) {
   const grid = document.getElementById("directionGrid");
-  const chartData = makeHalfHourlyHistory(history);
-
-  const hourlyData = chartData.filter(d =>
-    italianParts(d.chartTime).minute === "00"
-  );
-
   grid.innerHTML = "";
-  grid.style.width = (hourlyData.length * DIRECTION_SPACING) + "px";
-
-  hourlyData.forEach(d => {
-    const cell = document.createElement("div");
-    cell.className = "direction-cell";
-    cell.style.width = DIRECTION_SPACING + "px";
-
-    const hour = document.createElement("div");
-    hour.className = "direction-hour";
-    hour.textContent = formatItalianTimestamp(d.chartTime);
-
-    const arrowBox = document.createElement("div");
-    arrowBox.className = "hourly-arrow";
-
-    const arrow = document.createElement("span");
-    arrow.className = "wind-direction-arrow";
-
-    if (Number.isFinite(d.direction)) {
-      const blowingToward = (d.direction + 180) % 360;
-
-      /* CSS considera 0° verso destra; la bussola considera 0° verso Nord. */
-      arrow.style.transform = "rotate(" + (blowingToward - 90) + "deg)";
-    }
-
-    arrowBox.appendChild(arrow);
-
-    const name = document.createElement("div");
-    name.className = "hourly-name";
-    name.textContent = directionName(d.direction);
-
-    const degrees = document.createElement("div");
-    degrees.className = "hourly-degrees";
-    degrees.textContent = Number.isFinite(d.direction)
-      ? Math.round(d.direction) + "°"
-      : "--";
-
-    cell.append(hour, arrowBox, name, degrees);
-    grid.appendChild(cell);
-  });
-}
-
-function drawChart(history) {
-  if (!history.length) {
-    throw new Error("Non ci sono ancora campioni storici da visualizzare");
-  }
-
-  const chartData = makeHalfHourlyHistory(history);
-
-  if (!chartData.length) {
-    throw new Error("Non ci sono ancora rilevazioni utilizzabili per il grafico");
-  }
-
-  const firstTime = chartData[0].chartTime;
-  const lastTime = chartData[chartData.length - 1].chartTime;
+  grid.style.width = (history.length * COLUMN_SPACING) + "px";
 
   const chartWidth = Math.max(
     chartScroll.clientWidth,
-    Math.ceil((chartData.length - 1) * CHART_POINT_SPACING + 100)
+    Math.ceil((history.length - 1) * COLUMN_SPACING + 100)
   );
 
   chartWrap.style.width = chartWidth + "px";
@@ -353,18 +229,49 @@ function drawChart(history) {
   const pw = w - L - R;
   const ph = h - T - B;
 
-  const highest = Math.max(
-    ...chartData.map(d => Math.max(d.wind, d.gust)),
-    1
-  );
+  history.forEach((d, i) => {
+    const cell = document.createElement("div");
+    cell.className = "direction-cell";
+    cell.style.width = COLUMN_SPACING + "px";
+
+    const hour = document.createElement("div");
+    hour.className = "direction-hour";
+    // Mostra data e ora o solo ora a seconda dello spazio, qui usiamo hh:mm o gg/mm hh:mm
+    hour.textContent = formatCustomDateTime(d.time);
+
+    const arrowBox = document.createElement("div");
+    arrowBox.className = "hourly-arrow";
+
+    const arrow = document.createElement("span");
+    arrow.className = "wind-direction-arrow";
+
+    if (Number.isFinite(d.direction)) {
+      const blowingToward = (d.direction + 180) % 360;
+      arrow.style.transform = "rotate(" + (blowingToward - 90) + "deg)";
+    }
+
+    arrowBox.appendChild(arrow);
+
+    const name = document.createElement("div");
+    name.className = "hourly-name";
+    name.textContent = directionName(d.direction);
+
+    const degrees = document.createElement("div");
+    degrees.className = "hourly-degrees";
+    degrees.textContent = Number.isFinite(d.direction)
+      ? Math.round(d.direction) + "°"
+      : "--";
+
+    cell.append(hour, arrowBox, name, degrees);
+    grid.appendChild(cell);
+  });
+
+  const highest = Math.max(...history.map(d => Math.max(d.wind, d.gust)), 1);
   const yMax = Math.max(5, Math.ceil(highest / 5) * 5);
 
   const x = i => {
-    if (chartData.length === 1) return L + pw / 2;
-    const span = lastTime - firstTime;
-    return span > 0
-      ? L + ((chartData[i].chartTime - firstTime) / span) * pw
-      : L + (i / (chartData.length - 1)) * pw;
+    if (history.length === 1) return L + pw / 2;
+    return L + (i / (history.length - 1)) * pw;
   };
 
   const y = value => T + ph - (value / yMax) * ph;
@@ -376,7 +283,6 @@ function drawChart(history) {
 
   for (let value = 0; value <= yMax; value += 5) {
     const yy = y(value);
-
     ctx.strokeStyle = "rgba(137,190,215,.17)";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -388,9 +294,8 @@ function drawChart(history) {
     ctx.fillText(String(value), L - 8, yy);
   }
 
-  chartData.forEach((d, i) => {
+  history.forEach((d, i) => {
     const xx = x(i);
-
     ctx.strokeStyle = "rgba(137,190,215,.08)";
     ctx.beginPath();
     ctx.moveTo(xx, T);
@@ -404,13 +309,11 @@ function drawChart(history) {
     ctx.font = "10px Arial";
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
-    ctx.fillText(formatItalianTimestamp(d.chartTime), 0, 0);
+    // Etichetta inclinata sotto il grafico in formato gg/mm/aaaa hh:mm oppure hh:mm
+    ctx.textContent = formatCustomDateTime(d.time, true);
+    ctx.fillText(formatCustomDateTime(d.time, true), 0, 0);
     ctx.restore();
   });
-
-  function isWholeItalianHour(timestamp) {
-    return italianParts(timestamp).minute === "00";
-  }
 
   function drawSeries(key, color, lineWidth, labelOffset) {
     ctx.strokeStyle = color;
@@ -419,34 +322,28 @@ function drawChart(history) {
     ctx.lineCap = "round";
     ctx.beginPath();
 
-    chartData.forEach((d, i) => {
+    history.forEach((d, i) => {
       const xx = x(i);
       const yy = y(d[key]);
-
       if (i === 0) ctx.moveTo(xx, yy);
       else ctx.lineTo(xx, yy);
     });
-
     ctx.stroke();
 
-    chartData.forEach((d, i) => {
+    history.forEach((d, i) => {
       const xx = x(i);
       const yy = y(d[key]);
-
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(xx, yy, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      if (isWholeItalianHour(d.chartTime)) {
-        ctx.fillStyle = color;
-        ctx.font = "bold 10px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-
-        const labelY = Math.max(T + 10, yy + labelOffset);
-        ctx.fillText(d[key].toFixed(1), xx, labelY);
-      }
+      ctx.fillStyle = color;
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      const labelY = Math.max(T + 10, yy + labelOffset);
+      ctx.fillText(d[key].toFixed(1), xx, labelY);
     });
   }
 
@@ -459,39 +356,24 @@ async function loadGraph() {
   updated.textContent = "Aggiornamento dati...";
 
   try {
-    const response = await fetch(API_URL + "?t=" + Date.now(), {
-      cache: "no-store"
-    });
-
-    if (!response.ok) {
-      throw new Error("Errore HTTP " + response.status);
-    }
+    const response = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!response.ok) throw new Error("Errore HTTP " + response.status);
 
     const result = await response.json();
-
     if (!result || result.ok !== true || !Array.isArray(result.history)) {
-      throw new Error(
-        result && result.error
-          ? result.error
-          : "Risposta dello storico non valida"
-      );
+      throw new Error(result && result.error ? result.error : "Risposta dello storico non valida");
     }
 
     const history = normalizeHistory(result.history);
-
-    if (!history.length) {
-      throw new Error("Lo storico è vuoto o non contiene dati validi");
-    }
+    if (!history.length) throw new Error("Lo storico è vuoto o non contiene dati validi");
 
     historyData = history;
-    drawDirectionBar(history);
-    drawChart(history);
+    renderUI(history);
 
     const latest = history[history.length - 1];
-
     updated.textContent =
       "Campioni disponibili: " + history.length + " / " + MAX_SAMPLES +
-      " · Ultimo dato: " + formatItalianTime(latest.timestamp, true) +
+      " · Ultimo dato: " + formatCustomDateTime(latest.time, true) +
       " · Vento medio: " + latest.wind.toFixed(1) +
       " nodi · Raffica: " + latest.gust.toFixed(1) + " nodi";
 
@@ -504,22 +386,17 @@ async function loadGraph() {
   }
 }
 
-/* Aggiorna il grafico 3 minuti dopo la scadenza dei 5 minuti. */
 function scheduleNextRefresh() {
   if (refreshTimer) clearTimeout(refreshTimer);
-
   const now = new Date();
   const next = new Date(now);
   next.setSeconds(0, 0);
-
   const nextMinute = Math.floor(now.getMinutes() / 5) * 5 + 8;
   next.setMinutes(nextMinute);
-
   const delay = Math.max(1000, next.getTime() - now.getTime());
 
   refreshTimer = setTimeout(async () => {
     await loadGraph();
-    scheduleNextRefresh();
   }, delay);
 }
 
@@ -527,8 +404,7 @@ window.addEventListener("resize", () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     if (historyData.length) {
-      drawDirectionBar(historyData);
-      drawChart(historyData);
+      renderUI(historyData);
       syncScroll(chartScroll, directionScroll);
     }
   }, 150);
