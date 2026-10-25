@@ -18,26 +18,39 @@ def scrape_and_push():
         soup = BeautifulSoup(response.text, 'html.parser')
         rows = soup.find_all('tr')
         
-        if rows:
-            latest_row = rows[-1]
-            cols = latest_row.find_all('td')
-            
-            if len(cols) >= 5:
-                timestamp = cols[0].get_text().strip()
-                water_level = cols[1].get_text().strip()
-                wind_dir = cols[2].get_text().strip()
-                wind_speed = cols[3].get_text().strip()
-                wind_gust = cols[4].get_text().strip()
-                
-                print("--- ULTIMO DATO RILEVATO ---")
-                print(f"Orario: {timestamp}")
-                print(f"Direzione Vento: {wind_dir}°")
-                print(f"Velocità Vento: {wind_speed} m/s")
-                print(f"Raffica Max: {wind_gust} m/s")
-            else:
-                print("Formato riga non riconosciuto.")
-        else:
-            print("Nessuna riga trovata nella pagina.")
+        last_row = None
+        for row in rows:
+            cols = [td.get_text(strip=True) for td in row.find_all('td')]
+            if len(cols) >= 5 and ":" in cols[0] and "-" in cols[0]:
+                last_row = cols
+
+        if not last_row:
+            print("Nessuna riga valida trovata.")
+            return
+
+        timestamp = last_row[0]
+        water_level = float(last_row[1])
+        wind_dir = float(last_row[2])
+        wind_speed = float(last_row[3])
+        wind_gust = float(last_row[4])
+
+        print(f"Dati pronti per l'invio: orario {timestamp}")
+
+        payload = {
+            "timestamp": timestamp,
+            "water_level": water_level,
+            "wind_direction": wind_dir,
+            "wind_speed": wind_speed,
+            "wind_gust": wind_gust
+        }
+        
+        worker_headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        r = requests.post(WORKER_URL, json=payload, headers=worker_headers, timeout=10)
+        print("Risposta Worker:", r.status_code, r.text)
 
     except Exception as e:
         print(f"Errore durante lo scraping: {e}")
