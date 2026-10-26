@@ -821,7 +821,7 @@ async function loadData() {
     }
 
     document.getElementById("timestamp").textContent =
-      formatTimestamp(data.timestamp);
+      formatTimestamp(data.timestamp_iso || data.timestamp);
 
     windKnotsElem.textContent = windKnots.toFixed(1);
     document.getElementById("windMs").textContent =
