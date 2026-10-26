@@ -718,6 +718,25 @@ function getItalianCurrentTime() {
   }).format(new Date());
 }
 
+/* Converte i gradi in una delle otto direzioni principali italiane. */
+function getWindDirectionName(degrees) {
+  const value = Number(degrees);
+
+  if (!Number.isFinite(value)) return "--";
+
+  const direction = ((value % 360) + 360) % 360;
+
+  if (direction >= 337.5 || direction < 22.5) return "TRAMONTANA";
+  if (direction < 67.5) return "GRECALE";
+  if (direction < 112.5) return "LEVANTE";
+  if (direction < 157.5) return "SCIROCCO";
+  if (direction < 202.5) return "OSTRO";
+  if (direction < 247.5) return "LIBECCIO";
+  if (direction < 292.5) return "PONENTE";
+
+  return "MAESTRALE";
+}
+
 function clearWindValues() {
   document.getElementById("windKnots").textContent = "--";
   document.getElementById("windMs").textContent = "-- m/s";
@@ -822,20 +841,22 @@ async function loadData() {
     }
 
     document.getElementById("timestamp").textContent =
-      formatTimestamp(data.timestamp_iso || data.timestamp);
+      formatTimestamp(data.timestamp);
 
     windKnotsElem.textContent = windKnots.toFixed(1);
     document.getElementById("windMs").textContent =
       windMs.toFixed(1) + " m/s";
-    maxKnotsElem.textContent =
-      maxKnots.toFixed(1);
+    maxKnotsElem.textContent = maxKnots.toFixed(1);
     document.getElementById("maxMs").textContent =
       maxMs.toFixed(1) + " m/s";
 
+    /* Il nome viene calcolato dai gradi ricevuti dal Worker. */
     document.getElementById("directionName").textContent =
-      data.directionName || "--";
+      getWindDirectionName(direction);
+
     document.getElementById("directionDegrees").textContent =
       Math.round(direction) + "°";
+
     document.getElementById("arrow").style.transform =
       "translate(-50%, -57px) rotate(" + direction + "deg)";
 
