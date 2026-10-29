@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -44,12 +45,11 @@ canvas{display:block;height:350px}
 .back-button{display:inline-block;padding:11px 22px;border-radius:20px;border:1px solid rgba(93,166,199,.35);background:rgba(17,42,57,.88);color:#9fd8ed;font-size:11px;font-weight:bold;letter-spacing:1.5px;text-decoration:none;box-shadow:0 5px 15px rgba(0,0,0,.2)}
 .back-button:active{transform:scale(.97)}
 .footer{margin-top:auto;padding-top:18px;text-align:center;font-size:10px;color:#647e8c;line-height:1.5}
-
 @media(max-width:520px){
-  .app{padding:12px 8px}
-  .header h1{font-size:22px}
-  .chart-card{padding-left:6px;padding-right:6px}
-  .chart-wrap,canvas{height:330px}
+.app{padding:12px 8px}
+.header h1{font-size:22px}
+.chart-card{padding-left:6px;padding-right:6px}
+.chart-wrap,canvas{height:330px}
 }
 </style>
 </head>
@@ -105,8 +105,7 @@ const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/history";
 const MAX_SAMPLES = 288;
 const COLUMN_SPACING = 96;
 const CHART_HEIGHT = window.innerWidth <= 520 ? 330 : 350;
-
-const FIXED_TIME_ZONE_OFFSET = "+01:00";
+const ITALY_TIME_ZONE = "Europe/Rome";
 
 const canvas = document.getElementById("windChart");
 const ctx = canvas.getContext("2d");
@@ -124,9 +123,7 @@ function syncScroll(source, target) {
   if (syncingScroll) return;
   syncingScroll = true;
   target.scrollLeft = source.scrollLeft;
-  requestAnimationFrame(() => {
-    syncingScroll = false;
-  });
+  requestAnimationFrame(() => { syncingScroll = false; });
 }
 
 chartScroll.addEventListener("scroll", () => syncScroll(chartScroll, directionScroll));
@@ -134,29 +131,38 @@ directionScroll.addEventListener("scroll", () => syncScroll(directionScroll, cha
 
 function parseTimestamp(value) {
   if (!value) return NaN;
-  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
+  const s = String(value).trim();
+
+  // Accetta date con spazio o T, con o senza secondi,
+  // e timestamp ISO che includono già il fuso orario.
+  if (/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(s)) {
+    const t = Date.parse(s);
+    return Number.isFinite(t) ? t : NaN;
+  }
+
+  const match = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
   if (!match) return NaN;
-  const normalized = match[1] + "-" + match[2] + "-" + match[3] + "T" + match[4] + ":" + match[5] + ":" + (match[6] || "00") + FIXED_TIME_ZONE_OFFSET;
-  return new Date(normalized).getTime();
+
+  const [, year, month, day, hours, minutes, seconds = "00"] = match;
+  // Le date senza fuso sono considerate nell'ora locale italiana,
+  // comprese le variazioni tra ora solare e ora legale.
+  const iso = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) ? t : NaN;
 }
 
 function formatCustomDateTime(timestamp, includeDate = false) {
   if (!Number.isFinite(timestamp)) return "--:--";
-  const d = new Date(timestamp);
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const year = d.getUTCFullYear();
-  const hours = String(d.getUTCHours()).padStart(2, "0");
-  const minutes = String(d.getUTCMinutes()).padStart(2, "0");
+  const options = includeDate
+    ? {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",hourCycle:"h23",timeZone:ITALY_TIME_ZONE}
+    : {hour:"2-digit",minute:"2-digit",hourCycle:"h23",timeZone:ITALY_TIME_ZONE};
 
-  if (includeDate) {
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  }
-  return `${hours}:${minutes}`;
+  return new Intl.DateTimeFormat("it-IT", options).format(new Date(timestamp));
 }
 
 function directionName(deg) {
   if (!Number.isFinite(deg)) return "--";
+  deg = ((deg % 360) + 360) % 360;
   if (deg >= 337.5 || deg < 22.5) return "TRAMONTANA";
   if (deg < 67.5) return "GRECALE";
   if (deg < 112.5) return "LEVANTE";
@@ -168,28 +174,268 @@ function directionName(deg) {
 }
 
 function normalizeHistory(raw) {
-  if (!Array.isArray(raw)) throw new Error("Risposta dello storico non valida");
-  const valid = raw.map(d => ({
-    timestamp: d.timestamp || "",
-    time: parseTimestamp(d.timestamp),
-    direction: Number(d.direzione_deg),
-    wind: Number(d.vento_nodi),
-    gust: Number(d.raffica_nodi)
-  })).filter(d => d.timestamp && Number.isFinite(d.time) && Number.isFinite(d.wind) && Number.isFinite(d.gust));
-  valid.sort((a, b) => a.time - b.time);
-  return valid.slice(-MAX_SAMPLES);
+  // Alcuni Worker restituiscono l'array direttamente, altri lo
+  // inseriscono in un oggetto data/history/records.
+  let rows = raw;
+  if (!Array.isArray(rows) && rows && typeof rows === "object") {
+    if (Array.isArray(rows.data)) rows = rows.data;
+    else if (Array.isArray(rows.history)) rows = rows.history;
+    else if (Array.isArray(rows.records)) rows = rows.records;
+    else if (Array.isArray(rows.results)) rows = rows.results;
+  }
+
+  if (!Array.isArray(rows)) {
+    throw new Error("Il Worker non ha restituito un elenco di rilevazioni. Verificare il formato della risposta.");
+  }
+
+  const valid = rows.map(d => {
+    const timestamp = d.timestamp || d.data || d.datetime || d.time || "";
+    const direction = Number(d.direzione_deg ?? d.direction ?? d.direzione ?? d.directionDeg);
+    const wind = Number(d.vento_nodi ?? d.windKnots ?? d.wind_knots ?? d.wind);
+    const gust = Number(d.raffica_nodi ?? d.gustKnots ?? d.gust_knots ?? d.gust);
+
+    return {
+      timestamp: String(timestamp),
+      time: parseTimestamp(timestamp),
+      direction,
+      wind,
+      gust
+    };
+  }).filter(d =>
+    d.timestamp &&
+    Number.isFinite(d.time) &&
+    Number.isFinite(d.wind) &&
+    Number.isFinite(d.gust)
+  );
+
+  valid.sort((a,b) => a.time - b.time);
+
+  // Mantiene soltanto le ultime 24 ore, fino a 288 rilevazioni.
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  return valid.filter(d => d.time >= cutoff).slice(-MAX_SAMPLES);
 }
 
-function renderUI(history) {
+function drawChart(history) {
+  const width = Math.max(1, Math.ceil(chartWrap.clientWidth));
+  const height = CHART_HEIGHT;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const left = 42;
+  const right = 14;
+  const top = 18;
+  const bottom = 36;
+  const plotW = width - left - right;
+  const plotH = height - top - bottom;
+
+  if (!history.length) {
+    ctx.fillStyle = "#8ba6b5";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Nessuna rilevazione disponibile", width / 2, height / 2);
+    return;
+  }
+
+  const maxValue = Math.max(10, Math.ceil(Math.max(...history.map(d => Math.max(d.wind, d.gust))) / 5) * 5);
+  const x = i => left + (history.length <= 1 ? plotW / 2 : i / (history.length - 1) * plotW);
+  const y = value => top + plotH - (value / maxValue) * plotH;
+
+  ctx.font = "10px Arial";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+
+  for (let value = 0; value <= maxValue; value += 5) {
+    const yy = y(value);
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(143,174,189,0.18)";
+    ctx.lineWidth = 1;
+    ctx.moveTo(left, yy);
+    ctx.lineTo(width - right, yy);
+    ctx.stroke();
+
+    ctx.fillStyle = "#8faebd";
+    ctx.fillText(String(value), left - 8, yy);
+  }
+
+  const step = Math.max(1, Math.ceil(history.length / 12));
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  for (let i = 0; i < history.length; i += step) {
+    const xx = x(i);
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(143,174,189,0.10)";
+    ctx.moveTo(xx, top);
+    ctx.lineTo(xx, height - bottom);
+    ctx.stroke();
+
+    ctx.fillStyle = "#8faebd";
+    ctx.save();
+    ctx.translate(xx, height - bottom + 8);
+    ctx.rotate(-Math.PI / 4);
+    ctx.fillText(formatCustomDateTime(history[i].time), 0, 0);
+    ctx.restore();
+  }
+
+  function drawLine(key, color, lineWidth) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+
+    let started = false;
+    history.forEach((d, i) => {
+      const value = d[key];
+      if (!Number.isFinite(value)) {
+        started = false;
+        return;
+      }
+      const xx = x(i);
+      const yy = y(Math.max(0, value));
+      if (!started) {
+        ctx.moveTo(xx, yy);
+        started = true;
+      } else {
+        ctx.lineTo(xx, yy);
+      }
+    });
+    ctx.stroke();
+  }
+
+  drawLine("gust", "#ff5555", 2);
+  drawLine("wind", "#ffd83d", 2.5);
+
+  ctx.fillStyle = "#8faebd";
+  ctx.font = "10px Arial";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("nodi", 8, 12);
+}
+
+function renderDirections(history) {
   const grid = document.getElementById("directionGrid");
   grid.innerHTML = "";
   grid.style.width = (history.length * COLUMN_SPACING) + "px";
 
+  history.forEach(d => {
+    const cell = document.createElement("div");
+    cell.className = "direction-cell";
+
+    const hour = document.createElement("div");
+    hour.className = "direction-hour";
+    hour.textContent = formatCustomDateTime(d.time, true);
+
+    const arrowWrap = document.createElement("div");
+    arrowWrap.className = "hourly-arrow";
+
+    const arrow = document.createElement("span");
+    arrow.className = "wind-direction-arrow";
+    if (Number.isFinite(d.direction)) {
+      arrow.style.transform = `rotate(${d.direction}deg)`;
+    } else {
+      arrow.style.opacity = "0.25";
+    }
+    arrow.title = Number.isFinite(d.direction)
+      ? `${directionName(d.direction)} · ${Math.round(d.direction)}°`
+      : "Direzione non disponibile";
+
+    arrowWrap.appendChild(arrow);
+
+    const name = document.createElement("div");
+    name.className = "hourly-name";
+    name.textContent = directionName(d.direction);
+
+    const degrees = document.createElement("div");
+    degrees.className = "hourly-degrees";
+    degrees.textContent = Number.isFinite(d.direction) ? `${Math.round(d.direction)}°` : "--°";
+
+    cell.append(hour, arrowWrap, name, degrees);
+    grid.appendChild(cell);
+  });
+}
+
+function renderUI(history) {
   const chartWidth = Math.max(
     chartScroll.clientWidth,
-    Math.ceil((history.length - 1) * COLUMN_SPACING + 100)
+    Math.ceil(Math.max(1, history.length - 1) * COLUMN_SPACING + 100)
   );
 
   chartWrap.style.width = chartWidth + "px";
   chartWrap.style.height = CHART_HEIGHT + "px";
-  canvas.style.width = chartWidth + "px";
+  renderDirections(history);
+  drawChart(history);
+
+  if (history.length) {
+    const first = history[0];
+    const last = history[history.length - 1];
+    updated.classList.remove("error");
+    updated.textContent =
+      `${history.length} rilevazioni · Dalle ${formatCustomDateTime(first.time, true)} alle ${formatCustomDateTime(last.time, true)} · Ultimo aggiornamento: ${formatCustomDateTime(Date.now(), true)}`;
+  } else {
+    updated.classList.add("error");
+    updated.textContent = "Nessuna rilevazione valida nelle ultime 24 ore.";
+  }
+}
+
+async function loadHistory() {
+  try {
+    updated.classList.remove("error");
+    updated.textContent = "Caricamento dati...";
+
+    const response = await fetch(API_URL, {
+      method: "GET",
+      cache: "no-store",
+      headers: { "Accept": "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Errore HTTP ${response.status} dal Worker dello storico`);
+    }
+
+    const result = await response.json();
+
+    if (result && result.ok === false) {
+      throw new Error(result.error || result.message || "Il Worker ha segnalato un errore");
+    }
+
+    historyData = normalizeHistory(result);
+    renderUI(historyData);
+
+    if (!historyData.length) {
+      updated.classList.add("error");
+      updated.textContent = "Il Worker risponde, ma non ci sono rilevazioni valide nelle ultime 24 ore. Verificare lo storico e il formato dei campi.";
+    }
+  } catch (error) {
+    console.error("Errore caricamento grafico vento:", error);
+    updated.classList.add("error");
+    updated.textContent = "Errore nel caricamento dello storico: " + (error.message || "errore sconosciuto");
+    drawChart([]);
+  }
+}
+
+function scheduleRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(loadHistory, 5 * 60 * 1000);
+}
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (historyData.length) renderUI(historyData);
+    else drawChart([]);
+  }, 150);
+});
+
+loadHistory();
+scheduleRefresh();
+</script>
+</body>
+</html>
