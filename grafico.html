@@ -6,126 +6,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#071522">
 <title>Grafico 24 Ore · Vento Diga Sud</title>
-
 <style>
 *{box-sizing:border-box}
-html,body{
-  margin:0;padding:0;width:100%;min-height:100%;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#071522;color:#fff;
-}
-body{
-  min-height:100vh;
-  background:radial-gradient(circle at 50% 0%,#123b56 0%,#071522 45%,#040d14 100%);
-  overflow-x:hidden;
-}
-.app{
-  width:100%;max-width:1500px;min-height:100vh;
-  margin:auto;padding:16px 10px;
-  display:flex;flex-direction:column;
-}
+html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#071522;color:#fff}
+body{background:radial-gradient(circle at 50% 0%,#123b56 0%,#071522 48%,#040d14 100%);overflow-x:hidden}
+.app{width:100%;max-width:1500px;margin:auto;padding:16px 10px;min-height:100vh;display:flex;flex-direction:column}
 .header{text-align:center;margin-bottom:16px}
-.header .small{
-  font-size:12px;letter-spacing:3px;color:#75b9d8;margin-bottom:6px
-}
-.header h1{margin:0;font-size:24px;letter-spacing:1.5px}
-.header .location{margin-top:6px;font-size:13px;color:#8ca5b5}
-
-.timeline-scroll{
-  width:100%;max-width:100%;
-  overflow-x:auto;overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-x:contain;
-  scrollbar-width:thin;
-  scrollbar-color:#55c9f0 #102532;
-  padding-bottom:8px;
-}
-.timeline-content{min-width:100%;width:100%}
-
-.direction-card,.chart-card{
-  background:rgba(10,30,43,.92);
-  border:1px solid rgba(93,166,199,.25);
-  border-radius:16px;
-  box-shadow:0 8px 25px rgba(0,0,0,.25);
-  width:100%;
-}
-.direction-card{padding:12px 8px 10px;margin-bottom:12px}
-.direction-label,.chart-title{
-  font-size:11px;letter-spacing:1.5px;
-  color:#7fb9d5;font-weight:bold;text-align:center;
-}
-.direction-label{margin-bottom:10px}
-.direction-grid{
-  display:grid;
-  grid-auto-flow:column;
-  grid-auto-columns:96px;
-  align-items:start;
-}
-.direction-cell{width:96px;text-align:center;overflow:visible}
-.direction-hour{font-size:10px;color:#a7c0cd;margin-bottom:7px}
-.hourly-arrow{height:28px;display:flex;align-items:center;justify-content:center}
-.wind-direction-arrow{
-  display:block;width:18px;height:5px;position:relative;
-  background:#55d6ff;border-radius:3px;
-  filter:drop-shadow(0 0 3px rgba(85,214,255,.45));
-  transform-origin:center;
-}
-.wind-direction-arrow::after{
-  content:"";position:absolute;right:-1px;top:-5px;width:0;height:0;
-  border-top:7.5px solid transparent;
-  border-bottom:7.5px solid transparent;
-  border-left:9px solid #55d6ff;
-}
-.hourly-name{
-  font-size:8px;color:#c1d4dd;font-weight:bold;
-  white-space:nowrap;margin-top:4px
-}
-.hourly-degrees{font-size:8px;color:#819baa;margin-top:2px}
-
+.small{font-size:12px;letter-spacing:3px;color:#75b9d8;margin-bottom:6px}
+h1{margin:0;font-size:24px;letter-spacing:1.5px}
+.location{margin-top:6px;font-size:13px;color:#8ca5b5}
+.scroll{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#55c9f0 #102532;padding-bottom:8px}
+.content{min-width:100%}
+.card{width:100%;background:rgba(10,30,43,.97);border:1px solid rgba(93,166,199,.28);border-radius:15px;box-shadow:0 5px 18px #0003}
+.directions{padding:12px 8px 10px;margin-bottom:12px}
+.section-title{text-align:center;font-size:11px;letter-spacing:1px;color:#7fb9d5;font-weight:bold;margin-bottom:12px}
+.direction-grid{display:grid;grid-auto-flow:column;align-items:start}
+.direction-cell{text-align:center;min-width:0}
+.direction-time{font-size:10px;color:#a7c0cd;margin-bottom:7px;white-space:nowrap}
+.arrow-box{height:30px;display:flex;align-items:center;justify-content:center}
+.arrow{position:relative;width:19px;height:5px;background:#55d6ff;border-radius:3px;transform-origin:center;filter:drop-shadow(0 0 3px #55d6ff66)}
+.arrow:after{content:"";position:absolute;right:-1px;top:-5px;width:0;height:0;border-top:7.5px solid transparent;border-bottom:7.5px solid transparent;border-left:10px solid #55d6ff}
+.direction-name{font-size:8px;font-weight:bold;color:#c1d4dd;white-space:nowrap;margin-top:4px}
+.direction-degrees{font-size:9px;color:#819baa;margin-top:3px}
 .chart-card{padding:14px 8px 12px}
-.chart-title{margin-bottom:8px}
-.chart-wrap{position:relative;height:360px}
+.chart-wrap{height:300px;position:relative}
 canvas{display:block}
-.legend{
-  display:flex;justify-content:center;gap:22px;flex-wrap:wrap;
-  margin-top:10px;font-size:11px;color:#a8bac5
-}
-.legend-item{display:inline-flex;align-items:center;gap:7px}
-.legend-line{width:24px;height:3px;border-radius:3px}
-.legend-wind{background:#ffd83d}
-.legend-gust{background:#ff5555}
-.updated{
-  text-align:center;margin-top:10px;font-size:10px;
-  color:#8ba6b5;line-height:1.6;overflow-wrap:anywhere
-}
-.error{color:#ff8585}
-.scroll-hint{
-  text-align:center;color:#8ba6b5;font-size:10px;
-  margin:2px 0 8px;
-}
+.legend{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:#a8bac5}
+.legend-item{display:flex;align-items:center;gap:7px}
+.legend-line{width:23px;height:3px;border-radius:3px}
+.yellow{background:#ffd83d}.red{background:#ff5555}
+.updated{text-align:center;margin-top:12px;font-size:10px;color:#8ba6b5;line-height:1.6;overflow-wrap:anywhere}
+.error{color:#ff9292}
+.hint{text-align:center;color:#8ba6b5;font-size:10px;margin:3px 0 8px}
 .buttons{display:flex;justify-content:center;margin-top:14px}
-.back-button{
-  display:inline-block;padding:11px 22px;border-radius:20px;
-  border:1px solid rgba(93,166,199,.35);
-  background:rgba(17,42,57,.88);color:#9fd8ed;
-  font-size:11px;font-weight:bold;letter-spacing:1.5px;
-  text-decoration:none;
-}
-.footer{
-  margin-top:auto;padding-top:18px;text-align:center;
-  font-size:10px;color:#647e8c;line-height:1.5
-}
+.back{display:inline-block;padding:11px 22px;border-radius:20px;border:1px solid #5da6c755;background:#112a39;color:#9fd8ed;font-size:11px;font-weight:bold;letter-spacing:1px;text-decoration:none}
+.footer{margin-top:auto;padding-top:18px;text-align:center;font-size:10px;color:#647e8c;line-height:1.5}
 @media(max-width:520px){
-  .app{padding:12px 6px}
-  .header h1{font-size:22px}
-  .direction-card,.chart-card{border-radius:12px}
-  .chart-wrap{height:360px}
-  .direction-label,.chart-title{font-size:10px;letter-spacing:1px}
-  .legend{gap:14px;font-size:10px}
+ .app{padding:12px 6px}
+ h1{font-size:22px}
+ .chart-wrap{height:290px}
+ .section-title{font-size:10px}
+ .legend{gap:14px;font-size:10px}
 }
 </style>
 </head>
-
 <body>
 <div class="app">
   <header class="header">
@@ -134,258 +58,259 @@ canvas{display:block}
     <div class="location">Chioggia · Sottomarina</div>
   </header>
 
-  <div class="timeline-scroll" id="timelineScroll">
-    <div class="timeline-content" id="timelineContent">
-
-      <section class="direction-card">
-        <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI</div>
+  <div class="scroll" id="scroll">
+    <div class="content" id="content">
+      <section class="card directions">
+        <div class="section-title">DIREZIONE DEL VENTO</div>
         <div class="direction-grid" id="directionGrid"></div>
       </section>
 
-      <section class="chart-card">
-        <div class="chart-title">VENTO DELLE ULTIME 24 ORE · NODI</div>
+      <section class="card chart-card">
+        <div class="section-title">VENTO ULTIME 24 ORE · NODI</div>
         <div class="chart-wrap" id="chartWrap">
-          <canvas id="windChart"></canvas>
+          <canvas id="chart"></canvas>
         </div>
-
         <div class="legend">
-          <div class="legend-item">
-            <span class="legend-line legend-wind"></span>
-            <span>VENTO MEDIO</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-line legend-gust"></span>
-            <span>RAFFICHE</span>
-          </div>
+          <div class="legend-item"><span class="legend-line yellow"></span>VENTO MEDIO</div>
+          <div class="legend-item"><span class="legend-line red"></span>RAFFICHE</div>
         </div>
         <div class="updated" id="updated">Caricamento dati...</div>
       </section>
-
     </div>
   </div>
 
-  <div class="scroll-hint">← Scorri orizzontalmente per vedere tutte le rilevazioni →</div>
-
-  <div class="buttons">
-    <a class="back-button" href="index.html">← TORNA A HOME</a>
-  </div>
-
-  <footer class="footer">Dati: Comune di Venezia · Diga Sud Chioggia</footer>
+  <div class="hint">← Scorri orizzontalmente per vedere tutte le rilevazioni →</div>
+  <div class="buttons"><a class="back" href="index.html">← TORNA A HOME</a></div>
+  <footer class="footer">Dati: storico vento · Diga Sud Chioggia</footer>
 </div>
 
 <script>
 "use strict";
 
-const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/history";
-const MAX_SAMPLES = 288;
-const COLUMN_SPACING = 96;
-const ITALY_TIME_ZONE = "Europe/Rome";
+/* Questo Worker restituisce lo storico sulla radice / */
+const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/";
 
-const timelineScroll = document.getElementById("timelineScroll");
-const timelineContent = document.getElementById("timelineContent");
+const MAX_SAMPLES = 48;
+const STEP_MS = 30 * 60 * 1000;
+const COLUMN = 68;
+
+const scrollEl = document.getElementById("scroll");
+const contentEl = document.getElementById("content");
 const directionGrid = document.getElementById("directionGrid");
 const chartWrap = document.getElementById("chartWrap");
-const canvas = document.getElementById("windChart");
+const canvas = document.getElementById("chart");
 const ctx = canvas.getContext("2d");
 const updated = document.getElementById("updated");
 
-let historyData = [];
-let refreshTimer = null;
-let resizeTimer = null;
+let samples = [];
+let refreshTimer;
+let resizeTimer;
 
-function parseTimestamp(value) {
-  if (!value) return NaN;
+function parseTime(value){
+  if(!value) return NaN;
   const s = String(value).trim();
 
-  if (/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(s)) {
-    const t = Date.parse(s);
-    return Number.isFinite(t) ? t : NaN;
+  if(/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(s)){
+    return Date.parse(s);
   }
 
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
-  if (!m) return NaN;
+  if(!m) return NaN;
 
-  const [,year,month,day,hour,minute,second="00"] = m;
-  return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`).getTime();
+  /* I timestamp senza fuso sono interpretati nell'ora locale del telefono. */
+  const [,y,mo,d,h,mi,se="00"] = m;
+  return new Date(+y,+mo-1,+d,+h,+mi,+se).getTime();
 }
 
-function formatTime(timestamp, withDate=false) {
-  if (!Number.isFinite(timestamp)) return "--:--";
-  const options = withDate
-    ? {day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",
-       hourCycle:"h23",timeZone:ITALY_TIME_ZONE}
-    : {hour:"2-digit",minute:"2-digit",hourCycle:"h23",timeZone:ITALY_TIME_ZONE};
-  return new Intl.DateTimeFormat("it-IT",options).format(new Date(timestamp));
+function timeLabel(ms,withDate=false){
+  if(!Number.isFinite(ms)) return "--:--";
+  const opts = withDate
+    ? {day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}
+    : {hour:"2-digit",minute:"2-digit",hourCycle:"h23"};
+  return new Intl.DateTimeFormat("it-IT",opts).format(new Date(ms));
 }
 
-function directionName(deg) {
-  if (!Number.isFinite(deg)) return "--";
-  deg = ((deg % 360) + 360) % 360;
-  if (deg >= 337.5 || deg < 22.5) return "TRAMONTANA";
-  if (deg < 67.5) return "GRECALE";
-  if (deg < 112.5) return "LEVANTE";
-  if (deg < 157.5) return "SCIROCCO";
-  if (deg < 202.5) return "OSTRO";
-  if (deg < 247.5) return "LIBECCIO";
-  if (deg < 292.5) return "PONENTE";
+function directionName(deg){
+  if(!Number.isFinite(deg)) return "N/D";
+  const d = ((deg%360)+360)%360;
+  if(d>=337.5 || d<22.5) return "TRAMONTANA";
+  if(d<67.5) return "GRECALE";
+  if(d<112.5) return "LEVANTE";
+  if(d<157.5) return "SCIROCCO";
+  if(d<202.5) return "OSTRO";
+  if(d<247.5) return "LIBECCIO";
+  if(d<292.5) return "PONENTE";
   return "MAESTRALE";
 }
 
-function normalizeHistory(raw) {
+function firstNumber(obj,keys){
+  for(const key of keys){
+    if(obj[key]!==undefined && obj[key]!==null && obj[key]!==""){
+      const n = Number(obj[key]);
+      if(Number.isFinite(n)) return n;
+    }
+  }
+  return NaN;
+}
+
+function normalize(raw){
   let rows = raw;
 
-  if (!Array.isArray(rows) && rows && typeof rows === "object") {
-    if (Array.isArray(rows.data)) rows = rows.data;
-    else if (Array.isArray(rows.history)) rows = rows.history;
-    else if (Array.isArray(rows.records)) rows = rows.records;
-    else if (Array.isArray(rows.results)) rows = rows.results;
+  if(!Array.isArray(rows) && rows && typeof rows==="object"){
+    if(Array.isArray(rows.history)) rows=rows.history;
+    else if(Array.isArray(rows.data)) rows=rows.data;
+    else if(Array.isArray(rows.records)) rows=rows.records;
+    else if(Array.isArray(rows.results)) rows=rows.results;
   }
 
-  if (!Array.isArray(rows)) {
-    throw new Error("Il Worker non ha restituito un elenco di rilevazioni.");
+  if(!Array.isArray(rows)){
+    throw new Error("La risposta del Worker non contiene lo storico.");
   }
 
-  const valid = rows.map(d => {
-    const timestamp = d.timestamp || d.data || d.datetime || d.time || "";
-    const direction = Number(d.direzione_deg ?? d.direction ?? d.direzione ?? d.directionDeg);
-    const wind = Number(d.vento_nodi ?? d.windKnots ?? d.wind_knots ?? d.wind);
-    const gust = Number(d.raffica_nodi ?? d.gustKnots ?? d.gust_knots ?? d.gust);
-
+  const cutoff = Date.now()-24*60*60*1000;
+  const valid = rows.map(r=>{
+    const stamp = r.timestamp || r.data || r.datetime || r.time;
     return {
-      timestamp:String(timestamp),
-      time:parseTimestamp(timestamp),
-      direction,
-      wind,
-      gust
+      timestamp:stamp,
+      time:parseTime(stamp),
+      direction:firstNumber(r,["direction","direzione_deg","direzione","directionDeg"]),
+      wind:firstNumber(r,["windKnots","vento_nodi","wind_knots"]),
+      gust:firstNumber(r,["maxKnots","gustKnots","raffica_nodi","gust_knots"])
     };
-  }).filter(d =>
-    d.timestamp &&
-    Number.isFinite(d.time) &&
-    Number.isFinite(d.wind) &&
-    Number.isFinite(d.gust)
-  );
+  }).filter(r=>
+    r.timestamp &&
+    Number.isFinite(r.time) &&
+    r.time>=cutoff &&
+    Number.isFinite(r.wind) &&
+    Number.isFinite(r.gust)
+  ).sort((a,b)=>a.time-b.time);
 
-  valid.sort((a,b) => a.time - b.time);
-  const cutoff = Date.now() - 24*60*60*1000;
-  return valid.filter(d => d.time >= cutoff).slice(-MAX_SAMPLES);
+  /*
+   * Raggruppa i dati in intervalli di 30 minuti.
+   * Se sono presenti più letture, mantiene quella più recente.
+   */
+  const buckets = new Map();
+  for(const r of valid){
+    const bucket = Math.floor(r.time/STEP_MS);
+    r.bucket = bucket;
+    buckets.set(bucket,r);
+  }
+
+  return Array.from(buckets.values())
+    .sort((a,b)=>a.time-b.time)
+    .slice(-MAX_SAMPLES);
 }
 
-function setTimelineWidth(count) {
-  const viewportWidth = Math.max(280, timelineScroll.clientWidth);
-  const contentWidth = Math.max(viewportWidth, count * COLUMN_SPACING + 16);
+function setWidths(count){
+  const viewport = Math.max(260,scrollEl.clientWidth);
+  const width = Math.max(viewport,count*COLUMN+16);
 
-  timelineContent.style.width = contentWidth + "px";
-  timelineContent.style.minWidth = contentWidth + "px";
-
-  directionGrid.style.width = (contentWidth - 16) + "px";
-  directionGrid.style.gridTemplateColumns = `repeat(${Math.max(1,count)}, ${COLUMN_SPACING}px)`;
-
-  chartWrap.style.width = (contentWidth - 16) + "px";
+  contentEl.style.width = width+"px";
+  contentEl.style.minWidth = width+"px";
+  directionGrid.style.width = (width-16)+"px";
+  directionGrid.style.gridTemplateColumns =
+    `repeat(${Math.max(count,1)}, ${COLUMN}px)`;
+  chartWrap.style.width = (width-16)+"px";
 }
 
-function drawDirections(history) {
-  directionGrid.innerHTML = "";
+function drawDirections(data){
+  directionGrid.replaceChildren();
 
-  history.forEach(d => {
-    const cell = document.createElement("div");
-    cell.className = "direction-cell";
+  for(const r of data){
+    const cell=document.createElement("div");
+    cell.className="direction-cell";
 
-    const hour = document.createElement("div");
-    hour.className = "direction-hour";
-    hour.textContent = formatTime(d.time,true);
+    const t=document.createElement("div");
+    t.className="direction-time";
+    t.textContent=timeLabel(r.time,true);
 
-    const arrowWrap = document.createElement("div");
-    arrowWrap.className = "hourly-arrow";
+    const box=document.createElement("div");
+    box.className="arrow-box";
 
-    const arrow = document.createElement("span");
-    arrow.className = "wind-direction-arrow";
+    const arrow=document.createElement("span");
+    arrow.className="arrow";
 
-    if (Number.isFinite(d.direction)) {
-      arrow.style.transform = `rotate(${d.direction}deg)`;
-    } else {
-      arrow.style.opacity = "0.25";
+    if(Number.isFinite(r.direction)){
+      /*
+       * La punta della freccia parte verso destra.
+       * +90 gradi fa corrispondere la direzione opposta
+       * allo schema precedente (rotazione di 180 gradi).
+       */
+      arrow.style.transform=`rotate(${(r.direction+90)%360}deg)`;
+      arrow.title=`${directionName(r.direction)} · ${Math.round(r.direction)}°`;
+    }else{
+      arrow.style.opacity=".25";
     }
 
-    arrow.title = Number.isFinite(d.direction)
-      ? `${directionName(d.direction)} · ${Math.round(d.direction)}°`
-      : "Direzione non disponibile";
+    box.appendChild(arrow);
 
-    arrowWrap.appendChild(arrow);
+    const name=document.createElement("div");
+    name.className="direction-name";
+    name.textContent=directionName(r.direction);
 
-    const name = document.createElement("div");
-    name.className = "hourly-name";
-    name.textContent = directionName(d.direction);
+    const deg=document.createElement("div");
+    deg.className="direction-degrees";
+    deg.textContent=Number.isFinite(r.direction)
+      ? `${Math.round(r.direction)}°` : "--°";
 
-    const degrees = document.createElement("div");
-    degrees.className = "hourly-degrees";
-    degrees.textContent = Number.isFinite(d.direction)
-      ? `${Math.round(d.direction)}°`
-      : "--°";
-
-    cell.append(hour,arrowWrap,name,degrees);
+    cell.append(t,box,name,deg);
     directionGrid.appendChild(cell);
-  });
+  }
 }
 
-function drawChart(history) {
-  const width = Math.max(1, Math.floor(chartWrap.clientWidth));
-  const height = window.innerWidth <= 520 ? 360 : 360;
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
+function drawChart(data){
+  const width=Math.max(1,Math.floor(chartWrap.clientWidth));
+  const height=window.innerWidth<=520?290:300;
 
-  canvas.width = Math.round(width*dpr);
-  canvas.height = Math.round(height*dpr);
-  canvas.style.width = width + "px";
-  canvas.style.height = height + "px";
+  /* Limita la memoria del canvas sui telefoni ad alta densità. */
+  const dpr=Math.min(1.5,Math.max(1,window.devicePixelRatio||1));
+
+  canvas.width=Math.round(width*dpr);
+  canvas.height=Math.round(height*dpr);
+  canvas.style.width=width+"px";
+  canvas.style.height=height+"px";
 
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,width,height);
 
-  const left = 48;
-  const right = 48;
-  const top = 34;
-  const bottom = 48;
-  const plotH = height - top - bottom;
+  const left=38,right=18,top=28,bottom=45;
+  const plotHeight=height-top-bottom;
 
-  if (!history.length) {
-    ctx.fillStyle = "#8ba6b5";
-    ctx.font = "12px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("Nessuna rilevazione disponibile",width/2,height/2);
+  if(!data.length){
+    ctx.fillStyle="#9ab1bd";
+    ctx.font="12px Arial";
+    ctx.textAlign="center";
+    ctx.fillText("Nessun dato disponibile",width/2,height/2);
     return;
   }
 
-  const maxData = Math.max(...history.map(d => Math.max(d.wind,d.gust)));
-  const maxValue = Math.max(10,Math.ceil(maxData/5)*5);
-  const x = i => left + i*COLUMN_SPACING;
-  const y = v => top + plotH - (Math.max(0,v)/maxValue)*plotH;
+  const peak=Math.max(...data.map(r=>Math.max(r.wind,r.gust)));
+  const maxValue=Math.max(10,Math.ceil(peak/5)*5);
+  const x=i=>left+i*COLUMN;
+  const y=v=>top+plotHeight-(Math.max(0,v)/maxValue)*plotHeight;
 
-  ctx.font = "10px Arial";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
+  ctx.font="10px Arial";
+  ctx.textAlign="right";
+  ctx.textBaseline="middle";
 
-  for (let value=0; value<=maxValue; value+=5) {
-    const yy = y(value);
+  for(let v=0;v<=maxValue;v+=5){
+    const yy=y(v);
     ctx.beginPath();
-    ctx.strokeStyle = "rgba(143,174,189,0.20)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle="rgba(143,174,189,.2)";
     ctx.moveTo(left,yy);
     ctx.lineTo(width-right,yy);
     ctx.stroke();
-
-    ctx.fillStyle = "#8faebd";
-    ctx.fillText(String(value),left-8,yy);
+    ctx.fillStyle="#8faebd";
+    ctx.fillText(String(v),left-6,yy);
   }
 
-  // Etichette dell'ora: meno frequenti per restare leggibili sul telefono.
-  const labelStep = Math.max(1,Math.ceil(history.length/12));
-  ctx.font = "10px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
+  /* Tacche orarie: soltanto i campioni delle ore intere. */
+  for(let i=0;i<data.length;i++){
+    if(data[i].bucket%2!==0) continue;
 
-  for (let i=0;i<history.length;i+=labelStep) {
-    const xx = x(i);
+    const xx=x(i);
     ctx.beginPath();
-    ctx.strokeStyle = "rgba(143,174,189,0.10)";
+    ctx.strokeStyle="rgba(143,174,189,.10)";
     ctx.moveTo(xx,top);
     ctx.lineTo(xx,height-bottom);
     ctx.stroke();
@@ -393,141 +318,132 @@ function drawChart(history) {
     ctx.save();
     ctx.translate(xx,height-bottom+8);
     ctx.rotate(-Math.PI/4);
-    ctx.fillStyle = "#8faebd";
-    ctx.fillText(formatTime(history[i].time),0,0);
+    ctx.fillStyle="#9ab1bd";
+    ctx.font="10px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="top";
+    ctx.fillText(timeLabel(data[i].time),0,0);
     ctx.restore();
   }
 
-  function drawSeries(key,color,lineWidth) {
+  function series(key,color,lineWidth){
     ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
+    ctx.strokeStyle=color;
+    ctx.lineWidth=lineWidth;
+    ctx.lineJoin="round";
+    ctx.lineCap="round";
 
-    history.forEach((d,i) => {
-      const xx = x(i), yy = y(d[key]);
-      if (i===0) ctx.moveTo(xx,yy);
-      else ctx.lineTo(xx,yy);
+    data.forEach((r,i)=>{
+      if(i===0) ctx.moveTo(x(i),y(r[key]));
+      else ctx.lineTo(x(i),y(r[key]));
     });
     ctx.stroke();
 
-    // Punto esatto per ogni rilevazione.
-    history.forEach((d,i) => {
-      const xx = x(i), yy = y(d[key]);
+    data.forEach((r,i)=>{
       ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.arc(xx,yy,2.4,0,Math.PI*2);
+      ctx.fillStyle=color;
+      ctx.arc(x(i),y(r[key]),2.5,0,Math.PI*2);
       ctx.fill();
     });
   }
 
-  // Prima le raffiche, poi il vento medio.
-  drawSeries("gust","#ff5555",2);
-  drawSeries("wind","#ffd83d",2.5);
+  /* Prima le raffiche rosse, poi il vento medio giallo. */
+  series("gust","#ff5555",2);
+  series("wind","#ffd83d",2.5);
 
-  // Valori numerici della raffica: ROSSO, sopra la linea rossa.
-  ctx.font = "bold 10px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
+  /* Valori della raffica in rosso sopra la linea rossa. */
+  ctx.font="bold 10px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="bottom";
 
-  history.forEach((d,i) => {
-    const xx = x(i);
-    const yy = y(d.gust);
-    ctx.fillStyle = "#ff6666";
-    ctx.fillText(d.gust.toFixed(1),xx,yy-7);
+  data.forEach((r,i)=>{
+    if(r.bucket%2!==0) return;
+    ctx.fillStyle="#ff6969";
+    ctx.fillText(r.gust.toFixed(1),x(i),y(r.gust)-5);
   });
 
-  // Valori numerici del vento medio: GIALLO, sotto la linea gialla.
-  ctx.textBaseline = "top";
-
-  history.forEach((d,i) => {
-    const xx = x(i);
-    const yy = y(d.wind);
-    ctx.fillStyle = "#ffe45c";
-    ctx.fillText(d.wind.toFixed(1),xx,yy+7);
+  /* Valori del vento medio in giallo sotto la linea gialla. */
+  ctx.textBaseline="top";
+  data.forEach((r,i)=>{
+    if(r.bucket%2!==0) return;
+    ctx.fillStyle="#ffe45c";
+    ctx.fillText(r.wind.toFixed(1),x(i),y(r.wind)+5);
   });
 
-  ctx.fillStyle = "#8faebd";
-  ctx.font = "10px Arial";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText("nodi",8,14);
+  ctx.fillStyle="#8faebd";
+  ctx.font="10px Arial";
+  ctx.textAlign="left";
+  ctx.textBaseline="alphabetic";
+  ctx.fillText("nodi",5,14);
 }
 
-function renderUI(history) {
-  setTimelineWidth(history.length);
-  drawDirections(history);
-  drawChart(history);
+function render(){
+  setWidths(samples.length);
+  drawDirections(samples);
+  drawChart(samples);
 
-  if (history.length) {
+  if(samples.length){
     updated.classList.remove("error");
-    updated.textContent =
-      `${history.length} rilevazioni · Dalle ${formatTime(history[0].time,true)} alle ${formatTime(history[history.length-1].time,true)} · Aggiornamento: ${formatTime(Date.now(),true)}`;
-  } else {
+    updated.textContent=
+      `${samples.length} rilevazioni disponibili · `+
+      `Aggiornamento pagina: ${timeLabel(Date.now(),true)}`;
+  }else{
     updated.classList.add("error");
-    updated.textContent = "Nessuna rilevazione valida nelle ultime 24 ore.";
+    updated.textContent=
+      "Non ci sono letture valide nelle ultime 24 ore.";
   }
 }
 
-async function loadHistory() {
-  try {
+async function loadData(){
+  try{
     updated.classList.remove("error");
-    updated.textContent = "Caricamento dati...";
+    updated.textContent="Caricamento dati...";
 
-    // GET semplice, senza header personalizzati, per evitare preflight CORS.
-    const response = await fetch(API_URL + "?_=" + Date.now(), {
+    const response=await fetch(API_URL+"?t="+Date.now(),{
       method:"GET",
       cache:"no-store"
     });
 
-    if (!response.ok) {
-      throw new Error(`Errore HTTP ${response.status} dal Worker dello storico`);
+    if(!response.ok){
+      throw new Error(`Errore HTTP ${response.status}`);
     }
 
-    const result = await response.json();
+    const json=await response.json();
 
-    if (result && result.ok === false) {
-      throw new Error(result.error || result.message || "Errore restituito dal Worker");
+    if(json && json.ok===false){
+      throw new Error(json.error||json.message||"Errore del Worker");
     }
 
-    historyData = normalizeHistory(result);
-    renderUI(historyData);
+    samples=normalize(json);
+    render();
 
-    if (!historyData.length) {
+    if(!samples.length){
       updated.classList.add("error");
-      updated.textContent = "Il Worker risponde, ma non contiene rilevazioni valide nelle ultime 24 ore.";
+      updated.textContent=
+        "Il Worker risponde, ma non sono state trovate letture valide nelle ultime 24 ore.";
     }
-  } catch (error) {
-    console.error("Errore caricamento grafico vento:",error);
+  }catch(err){
+    console.error("Errore grafico vento:",err);
     updated.classList.add("error");
-    updated.textContent =
-      "Errore nel caricamento dello storico: " +
-      (error.message || "errore sconosciuto") +
-      ". Verificare la connessione e le autorizzazioni CORS del Worker.";
+    updated.textContent=
+      "Errore nel caricamento dello storico: "+
+      (err.message||"connessione non disponibile");
+
+    samples=[];
+    setWidths(1);
+    drawDirections([]);
     drawChart([]);
   }
 }
 
-function scheduleRefresh() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(loadHistory,5*60*1000);
-}
-
-window.addEventListener("resize",() => {
+window.addEventListener("resize",()=>{
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    if (historyData.length) renderUI(historyData);
-    else {
-      setTimelineWidth(1);
-      drawChart([]);
-    }
-  },200);
+  resizeTimer=setTimeout(render,200);
 });
 
-setTimelineWidth(1);
-loadHistory();
-scheduleRefresh();
+setWidths(1);
+loadData();
+refreshTimer=setInterval(loadData,5*60*1000);
 </script>
 </body>
 </html>
