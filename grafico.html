@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#071522">
 <title>Grafico 24 Ore · Vento Diga Sud</title>
 
@@ -11,71 +12,80 @@
 html,body{
   margin:0;padding:0;width:100%;min-height:100%;
   font-family:Arial,Helvetica,sans-serif;
-  background:#071522;color:#fff
+  background:#071522;color:#fff;
 }
-html{background:#071522}
 body{
-  min-height:100vh;display:flex;justify-content:center;
+  min-height:100vh;
   background:radial-gradient(circle at 50% 0%,#123b56 0%,#071522 45%,#040d14 100%);
+  overflow-x:hidden;
 }
 .app{
   width:100%;max-width:1500px;min-height:100vh;
-  padding:18px 12px;display:flex;flex-direction:column;
-  background:transparent;
+  margin:auto;padding:16px 10px;
+  display:flex;flex-direction:column;
 }
 .header{text-align:center;margin-bottom:16px}
-.header .small{font-size:12px;letter-spacing:3px;color:#75b9d8;margin-bottom:6px}
+.header .small{
+  font-size:12px;letter-spacing:3px;color:#75b9d8;margin-bottom:6px
+}
 .header h1{margin:0;font-size:24px;letter-spacing:1.5px}
 .header .location{margin-top:6px;font-size:13px;color:#8ca5b5}
 
-.direction-card,.chart-card{
-  width:100%;background:rgba(10,30,43,.96);
-  border:1px solid rgba(93,166,199,.3);
-  border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.25);
-}
-.direction-card{padding:12px 8px 10px;margin-bottom:14px}
-.direction-label,.chart-title{
-  font-size:11px;letter-spacing:2px;color:#7fb9d5;
-  font-weight:bold;text-align:center
-}
-.direction-label{margin-bottom:10px}
-
-/* Unica barra di scorrimento per frecce e grafico */
 .timeline-scroll{
-  width:100%;overflow-x:auto;overflow-y:hidden;
-  scrollbar-width:thin;scrollbar-color:#39718a #102532;
+  width:100%;max-width:100%;
+  overflow-x:auto;overflow-y:hidden;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior-x:contain;
-  padding-bottom:7px;
+  scrollbar-width:thin;
+  scrollbar-color:#55c9f0 #102532;
+  padding-bottom:8px;
 }
-.timeline-content{width:100%;background:transparent}
+.timeline-content{min-width:100%;width:100%}
+
+.direction-card,.chart-card{
+  background:rgba(10,30,43,.92);
+  border:1px solid rgba(93,166,199,.25);
+  border-radius:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
+  width:100%;
+}
+.direction-card{padding:12px 8px 10px;margin-bottom:12px}
+.direction-label,.chart-title{
+  font-size:11px;letter-spacing:1.5px;
+  color:#7fb9d5;font-weight:bold;text-align:center;
+}
+.direction-label{margin-bottom:10px}
 .direction-grid{
-  display:grid;grid-auto-flow:column;
-  grid-auto-columns:96px;align-items:start;
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:96px;
+  align-items:start;
 }
-.direction-cell{text-align:center;width:96px;min-width:96px}
-.direction-hour{font-size:10px;color:#8faebd;margin-bottom:6px;white-space:nowrap}
-.hourly-arrow{height:27px;display:flex;align-items:center;justify-content:center}
-.hourly-arrow span.wind-direction-arrow{
+.direction-cell{width:96px;text-align:center;overflow:visible}
+.direction-hour{font-size:10px;color:#a7c0cd;margin-bottom:7px}
+.hourly-arrow{height:28px;display:flex;align-items:center;justify-content:center}
+.wind-direction-arrow{
   display:block;width:18px;height:5px;position:relative;
   background:#55d6ff;border-radius:3px;
-  filter:drop-shadow(0 0 4px rgba(85,214,255,.5));
+  filter:drop-shadow(0 0 3px rgba(85,214,255,.45));
   transform-origin:center;
 }
-.hourly-arrow span.wind-direction-arrow::after{
-  content:"";position:absolute;right:-1px;top:-5px;
-  width:0;height:0;
+.wind-direction-arrow::after{
+  content:"";position:absolute;right:-1px;top:-5px;width:0;height:0;
   border-top:7.5px solid transparent;
   border-bottom:7.5px solid transparent;
   border-left:9px solid #55d6ff;
 }
-.hourly-name{font-size:8px;color:#c1d4dd;font-weight:bold;white-space:nowrap;margin-top:4px}
-.hourly-degrees{font-size:8px;color:#718b99;margin-top:2px}
+.hourly-name{
+  font-size:8px;color:#c1d4dd;font-weight:bold;
+  white-space:nowrap;margin-top:4px
+}
+.hourly-degrees{font-size:8px;color:#819baa;margin-top:2px}
 
 .chart-card{padding:14px 8px 12px}
 .chart-title{margin-bottom:8px}
-.chart-wrap{position:relative;height:350px;width:100%;background:transparent}
-canvas{display:block;height:350px;background:transparent}
+.chart-wrap{position:relative;height:360px}
+canvas{display:block}
 .legend{
   display:flex;justify-content:center;gap:22px;flex-wrap:wrap;
   margin-top:10px;font-size:11px;color:#a8bac5
@@ -85,50 +95,55 @@ canvas{display:block;height:350px;background:transparent}
 .legend-wind{background:#ffd83d}
 .legend-gust{background:#ff5555}
 .updated{
-  text-align:center;margin-top:10px;font-size:10px;color:#8ba6b5;
-  line-height:1.6;overflow-wrap:anywhere
+  text-align:center;margin-top:10px;font-size:10px;
+  color:#8ba6b5;line-height:1.6;overflow-wrap:anywhere
 }
 .error{color:#ff8585}
+.scroll-hint{
+  text-align:center;color:#8ba6b5;font-size:10px;
+  margin:2px 0 8px;
+}
 .buttons{display:flex;justify-content:center;margin-top:14px}
 .back-button{
   display:inline-block;padding:11px 22px;border-radius:20px;
   border:1px solid rgba(93,166,199,.35);
-  background:rgba(17,42,57,.96);color:#9fd8ed;
+  background:rgba(17,42,57,.88);color:#9fd8ed;
   font-size:11px;font-weight:bold;letter-spacing:1.5px;
-  text-decoration:none;box-shadow:0 5px 15px rgba(0,0,0,.2)
+  text-decoration:none;
 }
-.back-button:active{transform:scale(.97)}
-.footer{margin-top:auto;padding-top:18px;text-align:center;font-size:10px;color:#647e8c;line-height:1.5}
-
+.footer{
+  margin-top:auto;padding-top:18px;text-align:center;
+  font-size:10px;color:#647e8c;line-height:1.5
+}
 @media(max-width:520px){
-  .app{padding:12px 8px}
+  .app{padding:12px 6px}
   .header h1{font-size:22px}
-  .chart-card{padding-left:6px;padding-right:6px}
-  .chart-wrap,canvas{height:330px}
+  .direction-card,.chart-card{border-radius:12px}
+  .chart-wrap{height:360px}
+  .direction-label,.chart-title{font-size:10px;letter-spacing:1px}
+  .legend{gap:14px;font-size:10px}
 }
 </style>
 </head>
 
 <body>
 <div class="app">
-
-  <div class="header">
+  <header class="header">
     <div class="small">STAZIONE METEOROLOGICA</div>
     <h1>GRAFICO 24 ORE</h1>
     <div class="location">Chioggia · Sottomarina</div>
-  </div>
+  </header>
 
   <div class="timeline-scroll" id="timelineScroll">
     <div class="timeline-content" id="timelineContent">
 
-      <div class="direction-card">
+      <section class="direction-card">
         <div class="direction-label">DIREZIONE DEL VENTO · RILEVAZIONI</div>
         <div class="direction-grid" id="directionGrid"></div>
-      </div>
+      </section>
 
-      <div class="chart-card">
+      <section class="chart-card">
         <div class="chart-title">VENTO DELLE ULTIME 24 ORE · NODI</div>
-
         <div class="chart-wrap" id="chartWrap">
           <canvas id="windChart"></canvas>
         </div>
@@ -143,18 +158,19 @@ canvas{display:block;height:350px;background:transparent}
             <span>RAFFICHE</span>
           </div>
         </div>
-
         <div class="updated" id="updated">Caricamento dati...</div>
-      </div>
+      </section>
 
     </div>
   </div>
+
+  <div class="scroll-hint">← Scorri orizzontalmente per vedere tutte le rilevazioni →</div>
 
   <div class="buttons">
     <a class="back-button" href="index.html">← TORNA A HOME</a>
   </div>
 
-  <div class="footer">Dati: Comune di Venezia · Diga Sud Chioggia</div>
+  <footer class="footer">Dati: Comune di Venezia · Diga Sud Chioggia</footer>
 </div>
 
 <script>
@@ -164,113 +180,83 @@ const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/history";
 const MAX_SAMPLES = 288;
 const COLUMN_SPACING = 96;
 const ITALY_TIME_ZONE = "Europe/Rome";
-const MOBILE_CHART_HEIGHT = 330;
-const DESKTOP_CHART_HEIGHT = 350;
 
-const canvas = document.getElementById("windChart");
-const ctx = canvas.getContext("2d");
-const chartWrap = document.getElementById("chartWrap");
 const timelineScroll = document.getElementById("timelineScroll");
 const timelineContent = document.getElementById("timelineContent");
+const directionGrid = document.getElementById("directionGrid");
+const chartWrap = document.getElementById("chartWrap");
+const canvas = document.getElementById("windChart");
+const ctx = canvas.getContext("2d");
 const updated = document.getElementById("updated");
 
 let historyData = [];
 let refreshTimer = null;
-let resizeTimeout = null;
+let resizeTimer = null;
 
-function chartHeight(){
-  return window.innerWidth <= 520
-    ? MOBILE_CHART_HEIGHT
-    : DESKTOP_CHART_HEIGHT;
-}
-
-function formatCustomDateTime(timestamp, includeDate = false){
-  if(!Number.isFinite(timestamp)) return "--:--";
-
-  const options = includeDate
-    ? {
-        day:"2-digit",month:"2-digit",
-        hour:"2-digit",minute:"2-digit",
-        hourCycle:"h23",timeZone:ITALY_TIME_ZONE
-      }
-    : {
-        hour:"2-digit",minute:"2-digit",
-        hourCycle:"h23",timeZone:ITALY_TIME_ZONE
-      };
-
-  return new Intl.DateTimeFormat("it-IT",options)
-    .format(new Date(timestamp));
-}
-
-function parseTimestamp(value){
-  if(!value) return NaN;
-
+function parseTimestamp(value) {
+  if (!value) return NaN;
   const s = String(value).trim();
 
-  if(/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(s)){
+  if (/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(s)) {
     const t = Date.parse(s);
     return Number.isFinite(t) ? t : NaN;
   }
 
-  const match = s.match(
-    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
-  );
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
+  if (!m) return NaN;
 
-  if(!match) return NaN;
-
-  const [,year,month,day,hours,minutes,seconds="00"] = match;
-  const iso = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-  const t = new Date(iso).getTime();
-
-  return Number.isFinite(t) ? t : NaN;
+  const [,year,month,day,hour,minute,second="00"] = m;
+  return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`).getTime();
 }
 
-function directionName(deg){
-  if(!Number.isFinite(deg)) return "--";
+function formatTime(timestamp, withDate=false) {
+  if (!Number.isFinite(timestamp)) return "--:--";
+  const options = withDate
+    ? {day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",
+       hourCycle:"h23",timeZone:ITALY_TIME_ZONE}
+    : {hour:"2-digit",minute:"2-digit",hourCycle:"h23",timeZone:ITALY_TIME_ZONE};
+  return new Intl.DateTimeFormat("it-IT",options).format(new Date(timestamp));
+}
 
+function directionName(deg) {
+  if (!Number.isFinite(deg)) return "--";
   deg = ((deg % 360) + 360) % 360;
-
-  if(deg >= 337.5 || deg < 22.5) return "TRAMONTANA";
-  if(deg < 67.5) return "GRECALE";
-  if(deg < 112.5) return "LEVANTE";
-  if(deg < 157.5) return "SCIROCCO";
-  if(deg < 202.5) return "OSTRO";
-  if(deg < 247.5) return "LIBECCIO";
-  if(deg < 292.5) return "PONENTE";
-
+  if (deg >= 337.5 || deg < 22.5) return "TRAMONTANA";
+  if (deg < 67.5) return "GRECALE";
+  if (deg < 112.5) return "LEVANTE";
+  if (deg < 157.5) return "SCIROCCO";
+  if (deg < 202.5) return "OSTRO";
+  if (deg < 247.5) return "LIBECCIO";
+  if (deg < 292.5) return "PONENTE";
   return "MAESTRALE";
 }
 
-function normalizeHistory(raw){
+function normalizeHistory(raw) {
   let rows = raw;
 
-  if(!Array.isArray(rows) && rows && typeof rows === "object"){
-    if(Array.isArray(rows.data)) rows = rows.data;
-    else if(Array.isArray(rows.history)) rows = rows.history;
-    else if(Array.isArray(rows.records)) rows = rows.records;
-    else if(Array.isArray(rows.results)) rows = rows.results;
+  if (!Array.isArray(rows) && rows && typeof rows === "object") {
+    if (Array.isArray(rows.data)) rows = rows.data;
+    else if (Array.isArray(rows.history)) rows = rows.history;
+    else if (Array.isArray(rows.records)) rows = rows.records;
+    else if (Array.isArray(rows.results)) rows = rows.results;
   }
 
-  if(!Array.isArray(rows)){
+  if (!Array.isArray(rows)) {
     throw new Error("Il Worker non ha restituito un elenco di rilevazioni.");
   }
 
   const valid = rows.map(d => {
     const timestamp = d.timestamp || d.data || d.datetime || d.time || "";
-    const direction = Number(
-      d.direzione_deg ?? d.direction ?? d.direzione ?? d.directionDeg
-    );
-    const wind = Number(
-      d.vento_nodi ?? d.windKnots ?? d.wind_knots ?? d.wind
-    );
-    const gust = Number(
-      d.raffica_nodi ?? d.gustKnots ?? d.gust_knots ?? d.gust
-    );
+    const direction = Number(d.direzione_deg ?? d.direction ?? d.direzione ?? d.directionDeg);
+    const wind = Number(d.vento_nodi ?? d.windKnots ?? d.wind_knots ?? d.wind);
+    const gust = Number(d.raffica_nodi ?? d.gustKnots ?? d.gust_knots ?? d.gust);
 
     return {
       timestamp:String(timestamp),
       time:parseTimestamp(timestamp),
-      direction,wind,gust
+      direction,
+      wind,
+      gust
     };
   }).filter(d =>
     d.timestamp &&
@@ -280,194 +266,25 @@ function normalizeHistory(raw){
   );
 
   valid.sort((a,b) => a.time - b.time);
-
-  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
-
-  return valid
-    .filter(d => d.time >= cutoff)
-    .slice(-MAX_SAMPLES);
+  const cutoff = Date.now() - 24*60*60*1000;
+  return valid.filter(d => d.time >= cutoff).slice(-MAX_SAMPLES);
 }
 
-function setSharedContentWidth(history){
-  const innerWidth = Math.max(
-    1,
-    Math.ceil(Math.max(1,history.length) * COLUMN_SPACING)
-  );
+function setTimelineWidth(count) {
+  const viewportWidth = Math.max(280, timelineScroll.clientWidth);
+  const contentWidth = Math.max(viewportWidth, count * COLUMN_SPACING + 16);
 
-  const availableInnerWidth = Math.max(
-    1,
-    timelineScroll.clientWidth - 16
-  );
+  timelineContent.style.width = contentWidth + "px";
+  timelineContent.style.minWidth = contentWidth + "px";
 
-  const contentWidth = Math.max(innerWidth,availableInnerWidth);
+  directionGrid.style.width = (contentWidth - 16) + "px";
+  directionGrid.style.gridTemplateColumns = `repeat(${Math.max(1,count)}, ${COLUMN_SPACING}px)`;
 
-  timelineContent.style.width = (contentWidth + 16) + "px";
-  document.getElementById("directionGrid").style.width = contentWidth + "px";
-  chartWrap.style.width = contentWidth + "px";
+  chartWrap.style.width = (contentWidth - 16) + "px";
 }
 
-function drawChart(history){
-  const width = Math.max(1,Math.ceil(chartWrap.clientWidth));
-  const height = chartHeight();
-  const dpr = Math.max(1,window.devicePixelRatio || 1);
-
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  canvas.style.width = width + "px";
-  canvas.style.height = height + "px";
-  chartWrap.style.height = height + "px";
-
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.clearRect(0,0,width,height);
-
-  const left = 42;
-  const right = 12;
-  const top = 20;
-  const bottom = 38;
-  const plotH = height - top - bottom;
-
-  // Il centro di ogni punto coincide con il centro della freccia corrispondente.
-  const x = i => 48 + i * COLUMN_SPACING;
-
-  if(!history.length){
-    ctx.fillStyle = "#8ba6b5";
-    ctx.font = "12px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("Nessuna rilevazione disponibile",width/2,height/2);
-    return;
-  }
-
-  const maxValue = Math.max(
-    10,
-    Math.ceil(
-      Math.max(...history.map(d => Math.max(d.wind,d.gust))) / 5
-    ) * 5
-  );
-
-  const y = value => top + plotH - (value / maxValue) * plotH;
-
-  ctx.font = "10px Arial";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-
-  for(let value = 0; value <= maxValue; value += 5){
-    const yy = y(value);
-
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(143,174,189,0.18)";
-    ctx.lineWidth = 1;
-    ctx.moveTo(left,yy);
-    ctx.lineTo(width-right,yy);
-    ctx.stroke();
-
-    ctx.fillStyle = "#8faebd";
-    ctx.fillText(String(value),left-8,yy);
-  }
-
-  // Linee verticali e orari: una sola etichetta per ogni ora.
-  history.forEach((d,i) => {
-    const date = new Date(d.time);
-
-    if(date.getMinutes() !== 0) return;
-
-    const xx = x(i);
-
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(143,174,189,0.10)";
-    ctx.moveTo(xx,top);
-    ctx.lineTo(xx,height-bottom);
-    ctx.stroke();
-
-    ctx.fillStyle = "#8faebd";
-    ctx.font = "10px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-
-    ctx.save();
-    ctx.translate(xx,height-bottom+7);
-    ctx.rotate(-Math.PI/4);
-    ctx.fillText(formatCustomDateTime(d.time),0,0);
-    ctx.restore();
-  });
-
-  function drawLine(key,color,lineWidth){
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-
-    history.forEach((d,i) => {
-      const xx = x(i);
-      const yy = y(Math.max(0,d[key]));
-
-      if(i === 0) ctx.moveTo(xx,yy);
-      else ctx.lineTo(xx,yy);
-    });
-
-    ctx.stroke();
-  }
-
-  drawLine("gust","#ff5555",2);
-  drawLine("wind","#ffd83d",2.5);
-
-  // Valore del vento medio in nodi ad ogni ora.
-  // Le etichette hanno uno sfondo opaco per non confondersi con le linee.
-  history.forEach((d,i) => {
-    const date = new Date(d.time);
-
-    if(date.getMinutes() !== 0) return;
-
-    const xx = x(i);
-    const pointY = y(d.wind);
-    const label = Number(d.wind).toFixed(1).replace(".",",") + " kn";
-
-    const alternate = Math.floor(i / 12) % 2 === 0;
-    const labelY = alternate ? pointY - 20 : pointY + 20;
-    const clampedY = Math.max(
-      top + 9,
-      Math.min(height - bottom - 9,labelY)
-    );
-
-    ctx.font = "bold 11px Arial";
-
-    const textWidth = ctx.measureText(label).width;
-    const boxW = textWidth + 10;
-    const boxH = 17;
-    const boxX = Math.max(
-      left,
-      Math.min(width-boxW-2,xx-boxW/2)
-    );
-    const boxY = clampedY-boxH/2;
-
-    ctx.fillStyle = "rgba(7,21,34,0.98)";
-    ctx.fillRect(boxX,boxY,boxW,boxH);
-
-    ctx.strokeStyle = "rgba(255,216,61,0.9)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(boxX,boxY,boxW,boxH);
-
-    ctx.fillStyle = "#ffd83d";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(label,boxX+boxW/2,boxY+boxH/2);
-
-    ctx.beginPath();
-    ctx.fillStyle = "#ffd83d";
-    ctx.arc(xx,pointY,3,0,Math.PI*2);
-    ctx.fill();
-  });
-
-  ctx.fillStyle = "#8faebd";
-  ctx.font = "10px Arial";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText("nodi",4,12);
-}
-
-function renderDirections(history){
-  const grid = document.getElementById("directionGrid");
-  grid.innerHTML = "";
+function drawDirections(history) {
+  directionGrid.innerHTML = "";
 
   history.forEach(d => {
     const cell = document.createElement("div");
@@ -475,7 +292,7 @@ function renderDirections(history){
 
     const hour = document.createElement("div");
     hour.className = "direction-hour";
-    hour.textContent = formatCustomDateTime(d.time,true);
+    hour.textContent = formatTime(d.time,true);
 
     const arrowWrap = document.createElement("div");
     arrowWrap.className = "hourly-arrow";
@@ -483,9 +300,9 @@ function renderDirections(history){
     const arrow = document.createElement("span");
     arrow.className = "wind-direction-arrow";
 
-    if(Number.isFinite(d.direction)){
+    if (Number.isFinite(d.direction)) {
       arrow.style.transform = `rotate(${d.direction}deg)`;
-    }else{
+    } else {
       arrow.style.opacity = "0.25";
     }
 
@@ -506,81 +323,209 @@ function renderDirections(history){
       : "--°";
 
     cell.append(hour,arrowWrap,name,degrees);
-    grid.appendChild(cell);
+    directionGrid.appendChild(cell);
   });
 }
 
-function renderUI(history){
-  setSharedContentWidth(history);
-  renderDirections(history);
+function drawChart(history) {
+  const width = Math.max(1, Math.floor(chartWrap.clientWidth));
+  const height = window.innerWidth <= 520 ? 360 : 360;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+  canvas.width = Math.round(width*dpr);
+  canvas.height = Math.round(height*dpr);
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,width,height);
+
+  const left = 48;
+  const right = 48;
+  const top = 34;
+  const bottom = 48;
+  const plotH = height - top - bottom;
+
+  if (!history.length) {
+    ctx.fillStyle = "#8ba6b5";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Nessuna rilevazione disponibile",width/2,height/2);
+    return;
+  }
+
+  const maxData = Math.max(...history.map(d => Math.max(d.wind,d.gust)));
+  const maxValue = Math.max(10,Math.ceil(maxData/5)*5);
+  const x = i => left + i*COLUMN_SPACING;
+  const y = v => top + plotH - (Math.max(0,v)/maxValue)*plotH;
+
+  ctx.font = "10px Arial";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+
+  for (let value=0; value<=maxValue; value+=5) {
+    const yy = y(value);
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(143,174,189,0.20)";
+    ctx.lineWidth = 1;
+    ctx.moveTo(left,yy);
+    ctx.lineTo(width-right,yy);
+    ctx.stroke();
+
+    ctx.fillStyle = "#8faebd";
+    ctx.fillText(String(value),left-8,yy);
+  }
+
+  // Etichette dell'ora: meno frequenti per restare leggibili sul telefono.
+  const labelStep = Math.max(1,Math.ceil(history.length/12));
+  ctx.font = "10px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  for (let i=0;i<history.length;i+=labelStep) {
+    const xx = x(i);
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(143,174,189,0.10)";
+    ctx.moveTo(xx,top);
+    ctx.lineTo(xx,height-bottom);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(xx,height-bottom+8);
+    ctx.rotate(-Math.PI/4);
+    ctx.fillStyle = "#8faebd";
+    ctx.fillText(formatTime(history[i].time),0,0);
+    ctx.restore();
+  }
+
+  function drawSeries(key,color,lineWidth) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+
+    history.forEach((d,i) => {
+      const xx = x(i), yy = y(d[key]);
+      if (i===0) ctx.moveTo(xx,yy);
+      else ctx.lineTo(xx,yy);
+    });
+    ctx.stroke();
+
+    // Punto esatto per ogni rilevazione.
+    history.forEach((d,i) => {
+      const xx = x(i), yy = y(d[key]);
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.arc(xx,yy,2.4,0,Math.PI*2);
+      ctx.fill();
+    });
+  }
+
+  // Prima le raffiche, poi il vento medio.
+  drawSeries("gust","#ff5555",2);
+  drawSeries("wind","#ffd83d",2.5);
+
+  // Valori numerici della raffica: ROSSO, sopra la linea rossa.
+  ctx.font = "bold 10px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+
+  history.forEach((d,i) => {
+    const xx = x(i);
+    const yy = y(d.gust);
+    ctx.fillStyle = "#ff6666";
+    ctx.fillText(d.gust.toFixed(1),xx,yy-7);
+  });
+
+  // Valori numerici del vento medio: GIALLO, sotto la linea gialla.
+  ctx.textBaseline = "top";
+
+  history.forEach((d,i) => {
+    const xx = x(i);
+    const yy = y(d.wind);
+    ctx.fillStyle = "#ffe45c";
+    ctx.fillText(d.wind.toFixed(1),xx,yy+7);
+  });
+
+  ctx.fillStyle = "#8faebd";
+  ctx.font = "10px Arial";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("nodi",8,14);
+}
+
+function renderUI(history) {
+  setTimelineWidth(history.length);
+  drawDirections(history);
   drawChart(history);
 
-  if(history.length){
-    const first = history[0];
-    const last = history[history.length-1];
-
+  if (history.length) {
     updated.classList.remove("error");
     updated.textContent =
-      `${history.length} rilevazioni · Dalle ${formatCustomDateTime(first.time,true)} alle ${formatCustomDateTime(last.time,true)} · Ultimo aggiornamento: ${formatCustomDateTime(Date.now(),true)}`;
-  }else{
+      `${history.length} rilevazioni · Dalle ${formatTime(history[0].time,true)} alle ${formatTime(history[history.length-1].time,true)} · Aggiornamento: ${formatTime(Date.now(),true)}`;
+  } else {
     updated.classList.add("error");
     updated.textContent = "Nessuna rilevazione valida nelle ultime 24 ore.";
   }
 }
 
-async function loadHistory(){
-  try{
+async function loadHistory() {
+  try {
     updated.classList.remove("error");
     updated.textContent = "Caricamento dati...";
 
-    const response = await fetch(API_URL,{
+    // GET semplice, senza header personalizzati, per evitare preflight CORS.
+    const response = await fetch(API_URL + "?_=" + Date.now(), {
       method:"GET",
-      cache:"no-store",
-      headers:{"Accept":"application/json"}
+      cache:"no-store"
     });
 
-    if(!response.ok){
+    if (!response.ok) {
       throw new Error(`Errore HTTP ${response.status} dal Worker dello storico`);
     }
 
     const result = await response.json();
 
-    if(result && result.ok === false){
-      throw new Error(
-        result.error || result.message || "Il Worker ha segnalato un errore"
-      );
+    if (result && result.ok === false) {
+      throw new Error(result.error || result.message || "Errore restituito dal Worker");
     }
 
     historyData = normalizeHistory(result);
     renderUI(historyData);
 
-    if(!historyData.length){
+    if (!historyData.length) {
       updated.classList.add("error");
-      updated.textContent =
-        "Il Worker risponde, ma non ci sono rilevazioni valide nelle ultime 24 ore. Verificare lo storico e il formato dei campi.";
+      updated.textContent = "Il Worker risponde, ma non contiene rilevazioni valide nelle ultime 24 ore.";
     }
-  }catch(error){
+  } catch (error) {
     console.error("Errore caricamento grafico vento:",error);
     updated.classList.add("error");
     updated.textContent =
       "Errore nel caricamento dello storico: " +
-      (error.message || "errore sconosciuto");
+      (error.message || "errore sconosciuto") +
+      ". Verificare la connessione e le autorizzazioni CORS del Worker.";
     drawChart([]);
   }
 }
 
-function scheduleRefresh(){
-  if(refreshTimer) clearInterval(refreshTimer);
+function scheduleRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
   refreshTimer = setInterval(loadHistory,5*60*1000);
 }
 
 window.addEventListener("resize",() => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    renderUI(historyData);
-  },150);
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (historyData.length) renderUI(historyData);
+    else {
+      setTimelineWidth(1);
+      drawChart([]);
+    }
+  },200);
 });
 
+setTimelineWidth(1);
 loadHistory();
 scheduleRefresh();
 </script>
