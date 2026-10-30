@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#071522">
 <title>Grafico 24 Ore · Vento Diga Sud</title>
+
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#071522;color:#fff}
@@ -41,54 +42,66 @@ canvas{display:block}
 .buttons{display:flex;justify-content:center;margin-top:14px}
 .back{display:inline-block;padding:11px 22px;border-radius:20px;border:1px solid #5da6c755;background:#112a39;color:#9fd8ed;font-size:11px;font-weight:bold;letter-spacing:1px;text-decoration:none}
 .footer{margin-top:auto;padding-top:18px;text-align:center;font-size:10px;color:#647e8c;line-height:1.5}
+
 @media(max-width:520px){
- .app{padding:12px 6px}
- h1{font-size:22px}
- .chart-wrap{height:290px}
- .section-title{font-size:10px}
- .legend{gap:14px;font-size:10px}
+.app{padding:12px 6px}
+h1{font-size:22px}
+.chart-wrap{height:290px}
+.section-title{font-size:10px}
+.legend{gap:14px;font-size:10px}
 }
 </style>
 </head>
+
 <body>
 <div class="app">
-  <header class="header">
-    <div class="small">STAZIONE METEOROLOGICA</div>
-    <h1>GRAFICO 24 ORE</h1>
-    <div class="location">Chioggia · Sottomarina</div>
-  </header>
 
-  <div class="scroll" id="scroll">
-    <div class="content" id="content">
-      <section class="card directions">
-        <div class="section-title">DIREZIONE DEL VENTO</div>
-        <div class="direction-grid" id="directionGrid"></div>
-      </section>
+<header class="header">
+<div class="small">STAZIONE METEOROLOGICA</div>
+<h1>GRAFICO 24 ORE</h1>
+<div class="location">Chioggia · Sottomarina</div>
+</header>
 
-      <section class="card chart-card">
-        <div class="section-title">VENTO ULTIME 24 ORE · NODI</div>
-        <div class="chart-wrap" id="chartWrap">
-          <canvas id="chart"></canvas>
-        </div>
-        <div class="legend">
-          <div class="legend-item"><span class="legend-line yellow"></span>VENTO MEDIO</div>
-          <div class="legend-item"><span class="legend-line red"></span>RAFFICHE</div>
-        </div>
-        <div class="updated" id="updated">Caricamento dati...</div>
-      </section>
-    </div>
-  </div>
+<div class="scroll" id="scroll">
+<div class="content" id="content">
 
-  <div class="hint">← Scorri orizzontalmente per vedere tutte le rilevazioni →</div>
-  <div class="buttons"><a class="back" href="index.html">← TORNA A HOME</a></div>
-  <footer class="footer">Dati: storico vento · Diga Sud Chioggia</footer>
+<section class="card directions">
+<div class="section-title">DIREZIONE DEL VENTO</div>
+<div class="direction-grid" id="directionGrid"></div>
+</section>
+
+<section class="card chart-card">
+<div class="section-title">VENTO ULTIME 24 ORE · NODI</div>
+
+<div class="chart-wrap" id="chartWrap">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="legend">
+<div class="legend-item"><span class="legend-line yellow"></span>VENTO MEDIO</div>
+<div class="legend-item"><span class="legend-line red"></span>RAFFICHE</div>
+</div>
+
+<div class="updated" id="updated">Caricamento dati...</div>
+</section>
+
+</div>
+</div>
+
+<div class="hint">← Scorri orizzontalmente per vedere tutte le rilevazioni →</div>
+
+<div class="buttons">
+<a class="back" href="index.html">← TORNA A HOME</a>
+</div>
+
+<footer class="footer">Dati: storico vento · Diga Sud Chioggia</footer>
 </div>
 
 <script>
 "use strict";
 
-/* Questo Worker restituisce lo storico sulla radice / */
-const API_URL = "https://vento-diga-sud-test.riccardo172.workers.dev/";
+/* Worker corretto: storico delle ultime 24 ore */
+const API_URL = "https://vento-diga-sud-24h.riccardo172.workers.dev/";
 
 const MAX_SAMPLES = 48;
 const STEP_MS = 30 * 60 * 1000;
@@ -107,342 +120,367 @@ let refreshTimer;
 let resizeTimer;
 
 function parseTime(value){
-  if(!value) return NaN;
-  const s = String(value).trim();
+    if(!value) return NaN;
 
-  if(/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(s)){
-    return Date.parse(s);
-  }
+    const s = String(value).trim();
 
-  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
-  if(!m) return NaN;
+    /* Timestamp ISO con fuso orario */
+    if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})$/i.test(s)){
+        return Date.parse(s);
+    }
 
-  /* I timestamp senza fuso sono interpretati nell'ora locale del telefono. */
-  const [,y,mo,d,h,mi,se="00"] = m;
-  return new Date(+y,+mo-1,+d,+h,+mi,+se).getTime();
+    /* Timestamp del Comune senza fuso: ora locale italiana */
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
+
+    if(!m) return NaN;
+
+    const [,y,mo,d,h,mi,se="00"] = m;
+    return new Date(+y,+mo-1,+d,+h,+mi,+se).getTime();
 }
 
 function timeLabel(ms,withDate=false){
-  if(!Number.isFinite(ms)) return "--:--";
-  const opts = withDate
-    ? {day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}
-    : {hour:"2-digit",minute:"2-digit",hourCycle:"h23"};
-  return new Intl.DateTimeFormat("it-IT",opts).format(new Date(ms));
+    if(!Number.isFinite(ms)) return "--:--";
+
+    const opts = withDate
+        ? {day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}
+        : {hour:"2-digit",minute:"2-digit",hourCycle:"h23"};
+
+    return new Intl.DateTimeFormat("it-IT",opts).format(new Date(ms));
 }
 
 function directionName(deg){
-  if(!Number.isFinite(deg)) return "N/D";
-  const d = ((deg%360)+360)%360;
-  if(d>=337.5 || d<22.5) return "TRAMONTANA";
-  if(d<67.5) return "GRECALE";
-  if(d<112.5) return "LEVANTE";
-  if(d<157.5) return "SCIROCCO";
-  if(d<202.5) return "OSTRO";
-  if(d<247.5) return "LIBECCIO";
-  if(d<292.5) return "PONENTE";
-  return "MAESTRALE";
+    if(!Number.isFinite(deg)) return "N/D";
+
+    const d = ((deg%360)+360)%360;
+
+    if(d>=337.5 || d<22.5) return "TRAMONTANA";
+    if(d<67.5) return "GRECALE";
+    if(d<112.5) return "LEVANTE";
+    if(d<157.5) return "SCIROCCO";
+    if(d<202.5) return "OSTRO";
+    if(d<247.5) return "LIBECCIO";
+    if(d<292.5) return "PONENTE";
+    return "MAESTRALE";
 }
 
 function firstNumber(obj,keys){
-  for(const key of keys){
-    if(obj[key]!==undefined && obj[key]!==null && obj[key]!==""){
-      const n = Number(obj[key]);
-      if(Number.isFinite(n)) return n;
+    for(const key of keys){
+        if(obj[key]!==undefined && obj[key]!==null && obj[key]!==""){
+            const n = Number(obj[key]);
+            if(Number.isFinite(n)) return n;
+        }
     }
-  }
-  return NaN;
+    return NaN;
 }
 
 function normalize(raw){
-  let rows = raw;
+    let rows = raw;
 
-  if(!Array.isArray(rows) && rows && typeof rows==="object"){
-    if(Array.isArray(rows.history)) rows=rows.history;
-    else if(Array.isArray(rows.data)) rows=rows.data;
-    else if(Array.isArray(rows.records)) rows=rows.records;
-    else if(Array.isArray(rows.results)) rows=rows.results;
-  }
+    if(!Array.isArray(rows) && rows && typeof rows==="object"){
+        if(Array.isArray(rows.history)) rows=rows.history;
+        else if(Array.isArray(rows.data)) rows=rows.data;
+        else if(Array.isArray(rows.records)) rows=rows.records;
+        else if(Array.isArray(rows.results)) rows=rows.results;
+    }
 
-  if(!Array.isArray(rows)){
-    throw new Error("La risposta del Worker non contiene lo storico.");
-  }
+    if(!Array.isArray(rows)){
+        throw new Error("La risposta del Worker non contiene lo storico.");
+    }
 
-  const cutoff = Date.now()-24*60*60*1000;
-  const valid = rows.map(r=>{
-    const stamp = r.timestamp || r.data || r.datetime || r.time;
-    return {
-      timestamp:stamp,
-      time:parseTime(stamp),
-      direction:firstNumber(r,["direction","direzione_deg","direzione","directionDeg"]),
-      wind:firstNumber(r,["windKnots","vento_nodi","wind_knots"]),
-      gust:firstNumber(r,["maxKnots","gustKnots","raffica_nodi","gust_knots"])
-    };
-  }).filter(r=>
-    r.timestamp &&
-    Number.isFinite(r.time) &&
-    r.time>=cutoff &&
-    Number.isFinite(r.wind) &&
-    Number.isFinite(r.gust)
-  ).sort((a,b)=>a.time-b.time);
+    const cutoff = Date.now()-24*60*60*1000;
 
-  /*
-   * Raggruppa i dati in intervalli di 30 minuti.
-   * Se sono presenti più letture, mantiene quella più recente.
-   */
-  const buckets = new Map();
-  for(const r of valid){
-    const bucket = Math.floor(r.time/STEP_MS);
-    r.bucket = bucket;
-    buckets.set(bucket,r);
-  }
+    const valid = rows.map(r=>{
+        const stamp = r.timestamp || r.data || r.datetime || r.time;
 
-  return Array.from(buckets.values())
-    .sort((a,b)=>a.time-b.time)
-    .slice(-MAX_SAMPLES);
+        return {
+            timestamp:stamp,
+            time:parseTime(stamp),
+            direction:firstNumber(r,["direction","direzione_deg","direzione","directionDeg"]),
+            wind:firstNumber(r,["windKnots","vento_nodi","wind_knots"]),
+            gust:firstNumber(r,["maxKnots","gustKnots","raffica_nodi","gust_knots"])
+        };
+    }).filter(r=>
+        r.timestamp &&
+        Number.isFinite(r.time) &&
+        r.time>=cutoff &&
+        r.time<=Date.now() &&
+        Number.isFinite(r.wind) &&
+        Number.isFinite(r.gust)
+    ).sort((a,b)=>a.time-b.time);
+
+    /*
+       Raggruppamento in intervalli di 30 minuti.
+       Per ogni intervallo viene conservata la rilevazione
+       più recente disponibile.
+    */
+    const buckets = new Map();
+
+    for(const r of valid){
+        const bucket = Math.floor(r.time/STEP_MS);
+        r.bucket = bucket;
+        buckets.set(bucket,r);
+    }
+
+    return Array.from(buckets.values())
+        .sort((a,b)=>a.time-b.time)
+        .slice(-MAX_SAMPLES);
 }
 
 function setWidths(count){
-  const viewport = Math.max(260,scrollEl.clientWidth);
-  const width = Math.max(viewport,count*COLUMN+16);
+    const viewport = Math.max(260,scrollEl.clientWidth);
+    const width = Math.max(viewport,count*COLUMN+16);
 
-  contentEl.style.width = width+"px";
-  contentEl.style.minWidth = width+"px";
-  directionGrid.style.width = (width-16)+"px";
-  directionGrid.style.gridTemplateColumns =
-    `repeat(${Math.max(count,1)}, ${COLUMN}px)`;
-  chartWrap.style.width = (width-16)+"px";
+    contentEl.style.width = width+"px";
+    contentEl.style.minWidth = width+"px";
+
+    directionGrid.style.width = (width-16)+"px";
+    directionGrid.style.gridTemplateColumns =
+        `repeat(${Math.max(count,1)}, ${COLUMN}px)`;
+
+    chartWrap.style.width = (width-16)+"px";
 }
 
 function drawDirections(data){
-  directionGrid.replaceChildren();
+    directionGrid.replaceChildren();
 
-  for(const r of data){
-    const cell=document.createElement("div");
-    cell.className="direction-cell";
+    for(const r of data){
+        const cell=document.createElement("div");
+        cell.className="direction-cell";
 
-    const t=document.createElement("div");
-    t.className="direction-time";
-    t.textContent=timeLabel(r.time,true);
+        const t=document.createElement("div");
+        t.className="direction-time";
+        t.textContent=timeLabel(r.time,true);
 
-    const box=document.createElement("div");
-    box.className="arrow-box";
+        const box=document.createElement("div");
+        box.className="arrow-box";
 
-    const arrow=document.createElement("span");
-    arrow.className="arrow";
+        const arrow=document.createElement("span");
+        arrow.className="arrow";
 
-    if(Number.isFinite(r.direction)){
-      /*
-       * La punta della freccia parte verso destra.
-       * +90 gradi fa corrispondere la direzione opposta
-       * allo schema precedente (rotazione di 180 gradi).
-       */
-      arrow.style.transform=`rotate(${(r.direction+90)%360}deg)`;
-      arrow.title=`${directionName(r.direction)} · ${Math.round(r.direction)}°`;
-    }else{
-      arrow.style.opacity=".25";
+        if(Number.isFinite(r.direction)){
+            /*
+               Mantiene la rotazione già presente nel codice originale.
+               Non vengono modificati i gradi o i nomi delle direzioni.
+            */
+            arrow.style.transform=`rotate(${(r.direction+90)%360}deg)`;
+            arrow.title=`${directionName(r.direction)} · ${Math.round(r.direction)}°`;
+        }else{
+            arrow.style.opacity=".25";
+        }
+
+        box.appendChild(arrow);
+
+        const name=document.createElement("div");
+        name.className="direction-name";
+        name.textContent=directionName(r.direction);
+
+        const deg=document.createElement("div");
+        deg.className="direction-degrees";
+        deg.textContent=Number.isFinite(r.direction)
+            ? `${Math.round(r.direction)}°` : "--°";
+
+        cell.append(t,box,name,deg);
+        directionGrid.appendChild(cell);
     }
-
-    box.appendChild(arrow);
-
-    const name=document.createElement("div");
-    name.className="direction-name";
-    name.textContent=directionName(r.direction);
-
-    const deg=document.createElement("div");
-    deg.className="direction-degrees";
-    deg.textContent=Number.isFinite(r.direction)
-      ? `${Math.round(r.direction)}°` : "--°";
-
-    cell.append(t,box,name,deg);
-    directionGrid.appendChild(cell);
-  }
 }
 
 function drawChart(data){
-  const width=Math.max(1,Math.floor(chartWrap.clientWidth));
-  const height=window.innerWidth<=520?290:300;
+    const width=Math.max(1,Math.floor(chartWrap.clientWidth));
+    const height=window.innerWidth<=520?290:300;
 
-  /* Limita la memoria del canvas sui telefoni ad alta densità. */
-  const dpr=Math.min(1.5,Math.max(1,window.devicePixelRatio||1));
+    /* Limita la memoria del canvas sui telefoni ad alta densità */
+    const dpr=Math.min(1.5,Math.max(1,window.devicePixelRatio||1));
 
-  canvas.width=Math.round(width*dpr);
-  canvas.height=Math.round(height*dpr);
-  canvas.style.width=width+"px";
-  canvas.style.height=height+"px";
+    canvas.width=Math.round(width*dpr);
+    canvas.height=Math.round(height*dpr);
+    canvas.style.width=width+"px";
+    canvas.style.height=height+"px";
 
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.clearRect(0,0,width,height);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,width,height);
 
-  const left=38,right=18,top=28,bottom=45;
-  const plotHeight=height-top-bottom;
+    const left=38,right=18,top=28,bottom=45;
+    const plotHeight=height-top-bottom;
 
-  if(!data.length){
-    ctx.fillStyle="#9ab1bd";
-    ctx.font="12px Arial";
-    ctx.textAlign="center";
-    ctx.fillText("Nessun dato disponibile",width/2,height/2);
-    return;
-  }
+    if(!data.length){
+        ctx.fillStyle="#9ab1bd";
+        ctx.font="12px Arial";
+        ctx.textAlign="center";
+        ctx.fillText("Nessun dato disponibile",width/2,height/2);
+        return;
+    }
 
-  const peak=Math.max(...data.map(r=>Math.max(r.wind,r.gust)));
-  const maxValue=Math.max(10,Math.ceil(peak/5)*5);
-  const x=i=>left+i*COLUMN;
-  const y=v=>top+plotHeight-(Math.max(0,v)/maxValue)*plotHeight;
+    const peak=Math.max(...data.map(r=>Math.max(r.wind,r.gust)));
+    const maxValue=Math.max(10,Math.ceil(peak/5)*5);
 
-  ctx.font="10px Arial";
-  ctx.textAlign="right";
-  ctx.textBaseline="middle";
+    const x=i=>left+i*COLUMN;
+    const y=v=>top+plotHeight-(Math.max(0,v)/maxValue)*plotHeight;
 
-  for(let v=0;v<=maxValue;v+=5){
-    const yy=y(v);
-    ctx.beginPath();
-    ctx.strokeStyle="rgba(143,174,189,.2)";
-    ctx.moveTo(left,yy);
-    ctx.lineTo(width-right,yy);
-    ctx.stroke();
-    ctx.fillStyle="#8faebd";
-    ctx.fillText(String(v),left-6,yy);
-  }
-
-  /* Tacche orarie: soltanto i campioni delle ore intere. */
-  for(let i=0;i<data.length;i++){
-    if(data[i].bucket%2!==0) continue;
-
-    const xx=x(i);
-    ctx.beginPath();
-    ctx.strokeStyle="rgba(143,174,189,.10)";
-    ctx.moveTo(xx,top);
-    ctx.lineTo(xx,height-bottom);
-    ctx.stroke();
-
-    ctx.save();
-    ctx.translate(xx,height-bottom+8);
-    ctx.rotate(-Math.PI/4);
-    ctx.fillStyle="#9ab1bd";
     ctx.font="10px Arial";
+    ctx.textAlign="right";
+    ctx.textBaseline="middle";
+
+    for(let v=0;v<=maxValue;v+=5){
+        const yy=y(v);
+
+        ctx.beginPath();
+        ctx.strokeStyle="rgba(143,174,189,.2)";
+        ctx.moveTo(left,yy);
+        ctx.lineTo(width-right,yy);
+        ctx.stroke();
+
+        ctx.fillStyle="#8faebd";
+        ctx.fillText(String(v),left-6,yy);
+    }
+
+    /* Tacche orarie: soltanto i campioni delle ore intere */
+    for(let i=0;i<data.length;i++){
+        if(data[i].bucket%2!==0) continue;
+
+        const xx=x(i);
+
+        ctx.beginPath();
+        ctx.strokeStyle="rgba(143,174,189,.10)";
+        ctx.moveTo(xx,top);
+        ctx.lineTo(xx,height-bottom);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(xx,height-bottom+8);
+        ctx.rotate(-Math.PI/4);
+        ctx.fillStyle="#9ab1bd";
+        ctx.font="10px Arial";
+        ctx.textAlign="center";
+        ctx.textBaseline="top";
+        ctx.fillText(timeLabel(data[i].time),0,0);
+        ctx.restore();
+    }
+
+    function series(key,color,lineWidth){
+        ctx.beginPath();
+        ctx.strokeStyle=color;
+        ctx.lineWidth=lineWidth;
+        ctx.lineJoin="round";
+        ctx.lineCap="round";
+
+        data.forEach((r,i)=>{
+            if(i===0) ctx.moveTo(x(i),y(r[key]));
+            else ctx.lineTo(x(i),y(r[key]));
+        });
+
+        ctx.stroke();
+
+        data.forEach((r,i)=>{
+            ctx.beginPath();
+            ctx.fillStyle=color;
+            ctx.arc(x(i),y(r[key]),2.5,0,Math.PI*2);
+            ctx.fill();
+        });
+    }
+
+    /* Prima le raffiche rosse, poi il vento medio giallo */
+    series("gust","#ff5555",2);
+    series("wind","#ffd83d",2.5);
+
+    /* Valori della raffica in rosso sopra la linea rossa */
+    ctx.font="bold 10px Arial";
     ctx.textAlign="center";
+    ctx.textBaseline="bottom";
+
+    data.forEach((r,i)=>{
+        if(r.bucket%2!==0) return;
+
+        ctx.fillStyle="#ff6969";
+        ctx.fillText(r.gust.toFixed(1),x(i),y(r.gust)-5);
+    });
+
+    /* Valori del vento medio in giallo sotto la linea gialla */
     ctx.textBaseline="top";
-    ctx.fillText(timeLabel(data[i].time),0,0);
-    ctx.restore();
-  }
-
-  function series(key,color,lineWidth){
-    ctx.beginPath();
-    ctx.strokeStyle=color;
-    ctx.lineWidth=lineWidth;
-    ctx.lineJoin="round";
-    ctx.lineCap="round";
 
     data.forEach((r,i)=>{
-      if(i===0) ctx.moveTo(x(i),y(r[key]));
-      else ctx.lineTo(x(i),y(r[key]));
+        if(r.bucket%2!==0) return;
+
+        ctx.fillStyle="#ffe45c";
+        ctx.fillText(r.wind.toFixed(1),x(i),y(r.wind)+5);
     });
-    ctx.stroke();
 
-    data.forEach((r,i)=>{
-      ctx.beginPath();
-      ctx.fillStyle=color;
-      ctx.arc(x(i),y(r[key]),2.5,0,Math.PI*2);
-      ctx.fill();
-    });
-  }
-
-  /* Prima le raffiche rosse, poi il vento medio giallo. */
-  series("gust","#ff5555",2);
-  series("wind","#ffd83d",2.5);
-
-  /* Valori della raffica in rosso sopra la linea rossa. */
-  ctx.font="bold 10px Arial";
-  ctx.textAlign="center";
-  ctx.textBaseline="bottom";
-
-  data.forEach((r,i)=>{
-    if(r.bucket%2!==0) return;
-    ctx.fillStyle="#ff6969";
-    ctx.fillText(r.gust.toFixed(1),x(i),y(r.gust)-5);
-  });
-
-  /* Valori del vento medio in giallo sotto la linea gialla. */
-  ctx.textBaseline="top";
-  data.forEach((r,i)=>{
-    if(r.bucket%2!==0) return;
-    ctx.fillStyle="#ffe45c";
-    ctx.fillText(r.wind.toFixed(1),x(i),y(r.wind)+5);
-  });
-
-  ctx.fillStyle="#8faebd";
-  ctx.font="10px Arial";
-  ctx.textAlign="left";
-  ctx.textBaseline="alphabetic";
-  ctx.fillText("nodi",5,14);
+    ctx.fillStyle="#8faebd";
+    ctx.font="10px Arial";
+    ctx.textAlign="left";
+    ctx.textBaseline="alphabetic";
+    ctx.fillText("nodi",5,14);
 }
 
 function render(){
-  setWidths(samples.length);
-  drawDirections(samples);
-  drawChart(samples);
+    setWidths(samples.length);
+    drawDirections(samples);
+    drawChart(samples);
 
-  if(samples.length){
-    updated.classList.remove("error");
-    updated.textContent=
-      `${samples.length} rilevazioni disponibili · `+
-      `Aggiornamento pagina: ${timeLabel(Date.now(),true)}`;
-  }else{
-    updated.classList.add("error");
-    updated.textContent=
-      "Non ci sono letture valide nelle ultime 24 ore.";
-  }
+    if(samples.length){
+        updated.classList.remove("error");
+        updated.textContent=
+            `${samples.length} rilevazioni disponibili · `+
+            `Aggiornamento pagina: ${timeLabel(Date.now(),true)}`;
+    }else{
+        updated.classList.add("error");
+        updated.textContent=
+            "Non ci sono letture valide nelle ultime 24 ore.";
+    }
 }
 
 async function loadData(){
-  try{
-    updated.classList.remove("error");
-    updated.textContent="Caricamento dati...";
+    try{
+        updated.classList.remove("error");
+        updated.textContent="Caricamento dati...";
 
-    const response=await fetch(API_URL+"?t="+Date.now(),{
-      method:"GET",
-      cache:"no-store"
-    });
+        const response=await fetch(API_URL+"?t="+Date.now(),{
+            method:"GET",
+            cache:"no-store"
+        });
 
-    if(!response.ok){
-      throw new Error(`Errore HTTP ${response.status}`);
+        if(!response.ok){
+            throw new Error(`Errore HTTP ${response.status}`);
+        }
+
+        const json=await response.json();
+
+        if(json && json.ok===false){
+            throw new Error(json.error||json.message||"Errore del Worker");
+        }
+
+        samples=normalize(json);
+        render();
+
+        if(!samples.length){
+            updated.classList.add("error");
+            updated.textContent=
+                "Il Worker risponde, ma non sono state trovate letture valide nelle ultime 24 ore.";
+        }
+
+    }catch(err){
+        console.error("Errore grafico vento:",err);
+
+        updated.classList.add("error");
+        updated.textContent=
+            "Errore nel caricamento dello storico: "+
+            (err.message||"connessione non disponibile");
+
+        samples=[];
+        setWidths(1);
+        drawDirections([]);
+        drawChart([]);
     }
-
-    const json=await response.json();
-
-    if(json && json.ok===false){
-      throw new Error(json.error||json.message||"Errore del Worker");
-    }
-
-    samples=normalize(json);
-    render();
-
-    if(!samples.length){
-      updated.classList.add("error");
-      updated.textContent=
-        "Il Worker risponde, ma non sono state trovate letture valide nelle ultime 24 ore.";
-    }
-  }catch(err){
-    console.error("Errore grafico vento:",err);
-    updated.classList.add("error");
-    updated.textContent=
-      "Errore nel caricamento dello storico: "+
-      (err.message||"connessione non disponibile");
-
-    samples=[];
-    setWidths(1);
-    drawDirections([]);
-    drawChart([]);
-  }
 }
 
 window.addEventListener("resize",()=>{
-  clearTimeout(resizeTimer);
-  resizeTimer=setTimeout(render,200);
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(render,200);
 });
 
 setWidths(1);
 loadData();
+
+/* Aggiornamento della pagina ogni 5 minuti */
 refreshTimer=setInterval(loadData,5*60*1000);
 </script>
 </body>
